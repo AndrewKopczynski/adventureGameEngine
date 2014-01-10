@@ -1,0 +1,21 @@
+// example of save
+
+// actually much better idea to save a lot of load time
+
+map.xml
+{
+	id: 0
+	name: player
+	loc: 0,0,0
+	vel: 0
+}
+
+
+0 // id
+{
+	name: player // name
+	map: map.xml // wot map
+	loc: 0,0,0 // coords on map
+	vel: 0 // vel, for laters
+	
+}

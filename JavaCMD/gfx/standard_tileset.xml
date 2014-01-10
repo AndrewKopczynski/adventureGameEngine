@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<tiles>
+	<tile name="room" g="[_]" 	e="?" />
+	<tile name="h_LR" g="---" 	e="e, w" />
+	<tile name="h_UD" g=" | " 	e="n, s" />
+	<tile name="ha_X" g="-|-" 	e="n, e, w, s" />
+    <tile name="s_ud" g="[/]" 	e="n, e, w, s, u, d" />
+	<tile name="s_up" g="[^]"	e="n, e, w, s, u" />
+	<tile name="s_dn" g="[v]"	e="n, e, w, s, d" />
+	
+	<!-- Special Tiles -->
+	<tile name="blnk" g=" . " 	e="none" />
+	<tile name="plyr" g="x"		e="none" />
+	<tile name="prty" g="*" 	e="none" />
+</tiles>

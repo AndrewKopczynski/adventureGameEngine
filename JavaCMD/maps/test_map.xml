@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<map name="test_map" size="20">
+	<!-- Y LEVEL 0 -->
+	<room name="test_" type="room" coord="0,0,0" i="d" />
+	<room name="hal_1" type="h_LR" coord="1,0,0" i="d" />
+	<room name="alt_2" type="room" coord="2,0,0" i="d" />
+	
+    <room name="stair" type="s_up" coord="3,0,0" i="d" />
+	<room name="attic" type="s_ud" coord="3,0,1" i="d" />
+	<room name="attic" type="s_dn" coord="3,0,2" i="d" />
+	
+	<room name="attic" type="room" coord="2,0,2" i="d" />
+	<room name="attic" type="room" coord="3,1,2" i="d" />
+	
+	<room name="alt_3" type="room" coord="4,0,0" i="d"  />
+	
+	
+	<!-- Y LEVEL 1 -->
+	<room name="hal_2" type="h_UD" coord="0,1,0" i="d"  />
+	<room name="tckdR" type="room" coord="1,1,0" i="d"  />
+	<room name="spky1" type="ha_X" coord="2,1,0" i="d" />
+	<room name="spky2" type="h_LR" coord="3,1,0" i="d"  />
+	<room name="eotLn" type="room" coord="4,1,0" i="d" />
+	
+	
+	<!-- Y LEVEL 2 -->
+	<room name="tstR1" type="room" coord="0,2,0" i="d" />
+	<room name="tstR2" type="room" coord="1,2,0" i="d" />
+	<room name="spky3" type="h_UD" coord="2,2,0" i="d" />
+	
+	
+	<!-- Y LEVEL 3 -->
+	<room name="tstR3" type="room" coord="0,3,0" i="d" />
+	<room name="tstR4" type="room" coord="1,3,0" i="d" />
+	<room name="spky4" type="h_UD" coord="2,3,0" i="d"  />
+	
+	
+	<!-- Y LEVEL 4 -->
+	<room name="clset" type="room" coord="2,4,0" i="d" />
+</map>
