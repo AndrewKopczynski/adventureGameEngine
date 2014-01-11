@@ -4,7 +4,7 @@
 
 # adventureGame Specific
 # log.txt
-log.txt
+JavaCMD\log.txt
 
 *.pydevproject
 .project
