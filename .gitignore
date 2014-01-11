@@ -2,6 +2,10 @@
 ## Eclipse
 #################
 
+# adventureGame Specific
+# log.txt
+log.txt
+
 *.pydevproject
 .project
 .metadata
