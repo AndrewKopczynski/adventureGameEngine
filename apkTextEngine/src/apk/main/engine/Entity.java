@@ -1,6 +1,7 @@
 package apk.main.engine;
 
 import java.util.List;
+import apk.main.server.Server;
 
 /** Represents an entity.
  * <p>
@@ -261,12 +262,12 @@ public class Entity
 		
 		//gross!
 		//Client.map.renderMap();
-		Render_ASCII.renderMap();
+		//Render_ASCII.renderMap();
 		
 		//System.out.println("Exits: " + Map.roomArray[m_x][m_y][m_z].getRoomExits());
-		System.out.println("LOC: " + Client.player.getX() 
-				+ ", " + Client.player.getY()
-				+ ", " + Client.player.getZ());
+		System.out.println("LOC: " + Server.player.getX() 
+				+ ", " + Server.player.getY()
+				+ ", " + Server.player.getZ());
 		Logger.log(m_Id + ", " + m_name + " moved " + dir);
 		
 		return isDisplaced;

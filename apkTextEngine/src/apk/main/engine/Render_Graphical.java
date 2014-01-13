@@ -6,6 +6,8 @@ import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
+import apk.main.server.Server;
+
 public class Render_Graphical extends JPanel
 {
 	/** Required. */
@@ -29,7 +31,7 @@ public class Render_Graphical extends JPanel
 	
 	public void renderMap(Graphics2D g2d)
 	{
-		int z = Client.player.getZ();
+		int z = Server.player.getZ();
 		for (int y = 0; y < Map.mapSize; y++)
 		{
 			renderMapLine(g2d, y, z);
@@ -44,7 +46,7 @@ public class Render_Graphical extends JPanel
 		{
 			if (Map.isMapRoom(Map.roomArray, x, y, z))
 			{
-				if (x == Client.player.getX() && y == Client.player.getY())
+				if (x == Server.player.getX() && y == Server.player.getY())
 				{
 					// print player tile here, x++
 					g2d.setColor(Color.red);

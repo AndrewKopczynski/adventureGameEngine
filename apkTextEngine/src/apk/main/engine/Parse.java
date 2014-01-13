@@ -1,5 +1,6 @@
 package apk.main.engine;
 
+import apk.main.server.Server;
 import apk.parser.noun.*;
 import apk.parser.verb.*;
 
@@ -32,25 +33,33 @@ public class Parse {
 		return vnn;
 	}
 
-	public void parse(String input)
+	/** Tests input and executes actions.
+	 * 
+	 * @param input Input phrase to test
+	 * @return True if should return map, false if not.
+	 */
+	public boolean parse(String input)
 	{
 		String[] vnn = input.split(" ");
 		
 		/** SHORT MOVEMENT ------------------------------------------------	|
 		 * Short: north
 		 */
-		if (vnn.length == 1 && m_shortMove.contains(vnn[0])) 
+		if (vnn.length == 1 
+				&& m_shortMove.contains(vnn[0])) 
 		{
-			Client.player.move(m_shortMove.getMeaning(vnn[0]));
-			
+			Server.player.move(m_shortMove.getMeaning(vnn[0]));
+			return true;
 		} 
 		
 		/** MOVEMENT ------------------------------------------------------	|
 		 * Long: go north
 		 */
-		else if (vnn.length == 2 && m_move.contains(vnn[0]))
+		else if (vnn.length == 2 
+				&& m_move.contains(vnn[0]))
 		{
-			Client.player.move(m_direction.getMeaning(vnn[1]));
+			Server.player.move(m_direction.getMeaning(vnn[1]));
+			return true;
 		}
 		
 		/** TAKE ----------------------------------------------------------	|
@@ -62,28 +71,34 @@ public class Parse {
 				&& m_take.contains(vnn[0]))
 		{
 			System.out.println("Not implimented, but detected 'take'.");
+			return false;
 		}
 		
 		/** PUT -----------------------------------------------------------	|
 		 * Short: put item crate
 		 * Long: put huge sword in large crate
 		 */
-		else if ((vnn.length == 3 || vnn.length == 4) && m_put.contains(vnn[0]))
+		else if ((vnn.length == 3 || vnn.length == 4) 
+				&& m_put.contains(vnn[0]))
 		{
 			System.out.println("Not implimented, but detected 'put'.");
+			return false;
 		}
-		// short drop - eg. drop item
+		/** DROP ----------------------------------------------------------	|
+		 * Short: drop item
+		 */
 		else if (vnn.length == 2 && m_drop.contains(vnn[0]))
 		{
 			System.out.println("Not implimented, but detected 'drop'.");
+			return false;
 		}
-		else if (vnn.length == 3 && m_drop.contains(vnn[0]))
+		/*else if (vnn.length == 3 && m_drop.contains(vnn[0]))
 		{
 			
-		}
+		}*/
 		
 		/** ADMIN STUFF ---------------------------------------------------	|
-		 * 
+		 * General: admin [command] [parameter]
 		 */
 		else if ((vnn.length == 2 || vnn.length == 3) && m_admin.contains(vnn[0]))
 		{
@@ -92,13 +107,15 @@ public class Parse {
 			{
 				try
 				{
-					apk.main.engine.Render_ASCII.setRange(Integer.parseInt(vnn[2]));
+					Render_ASCII.setRange(Integer.parseInt(vnn[2]));
 					System.out.println("Set visibility range to " + vnn[2]);
+					return true;
 				}
 				
 				catch(Exception e)
 				{
 					System.out.println("Usage: admin range [number]");
+					return false;
 				}
 			}
 			
@@ -108,13 +125,15 @@ public class Parse {
 			{
 				try
 				{
-					Client.player.m_inv.add(new Item(vnn[2]));
+					Server.player.m_inv.add(new Item(vnn[2]));
 					System.out.println("Gave " + vnn[2] + " to player.");
+					return false;
 				}
 				
 				catch(Exception e)
 				{
 					System.out.println("Usage: admin give [item]");
+					return false;
 				}
 			}
 			/** removeItem */
@@ -122,13 +141,15 @@ public class Parse {
 			{
 				try
 				{
-					Client.player.m_inv.remove(vnn[2]);
+					Server.player.m_inv.remove(vnn[2]);
 					System.out.println("Removed " + vnn[2] + " from player.");
+					return false;
 				}
 				
 				catch(Exception e)
 				{
 					System.out.println("Usage: admin give [item]");
+					return false;
 				}
 			}
 			
@@ -136,22 +157,22 @@ public class Parse {
 			{
 				try
 				{
-					Client.player.ignoresCollision(Boolean.parseBoolean(vnn[2]));
+					Server.player.ignoresCollision(Boolean.parseBoolean(vnn[2]));
+					return false;
 				}
 				
 				catch(Exception e)
 				{
 					System.out.println("Usage: admin noclip [true/false]");
+					return false;
 				}
 			}
 			
 			else
 			{
 				System.out.println("Usage: admin [command] [parameter(s)]");
+				return false;
 			}
-			
-			
-			
 		}
 		
 		/** QUIT ----------------------------------------------------------	|
@@ -160,15 +181,15 @@ public class Parse {
 		else if (vnn.length == 1
 				&& m_quit.getMeaning(vnn[0]).equalsIgnoreCase("quit"))
 		{
-			//TODO: actual saving and quitting
 			System.out.println("Saving and quitting...");
+			return false;
 		}
 		
 		/** NO MATCH ------------------------------------------------------	|
 		 */
 		else
 		{
-			System.out.println("'" + vnn[0] + "' isn't a valid command..");
+			return false;
 		}
 	}
 }
