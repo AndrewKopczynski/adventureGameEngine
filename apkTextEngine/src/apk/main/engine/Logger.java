@@ -12,12 +12,14 @@ import java.io.PrintWriter;
  * @version 0.1 */
 public class Logger 
 {
+	/** Filename of output log file. */
+	private static final String m_filename = "log.log";
 	/** Clears the log.txt file. */
 	public static void clear() 
 	{
 		try 
 		{
-	        BufferedWriter out = new BufferedWriter(new FileWriter("log.txt"));
+	        BufferedWriter out = new BufferedWriter(new FileWriter(m_filename));
 	        log("Log cleared!");
 	        out.close();
 	    } catch (IOException e) 
@@ -34,13 +36,13 @@ public class Logger
 	 */
 	public static void log(String entry) 
 	{
-		
 		try 
 		{
-		    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("log.txt", true)));
+		    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(m_filename, true)));
 		    StackTraceElement[] st = Thread.currentThread().getStackTrace();
 		    
-		    String prefix = st[2].getClassName().replace("adventureGame.", "");
+		    String prefix = st[2].getClassName().toUpperCase().replace("APK.MAIN.ENGINE.", "");
+		    
 		    prefix = prefix.toUpperCase() + ": " + "\t";
 		    if (prefix.length() < 8) 
 		    {
@@ -49,7 +51,8 @@ public class Logger
 		    
 		    out.println(prefix + entry);
 		    out.close();
-		} catch (IOException e)
+		//} catch (IOException e)
+		} catch (Exception e)
 		{
 			System.out.println("!CRITICAL! An entry failed to be logged in the debug log!");
 		}

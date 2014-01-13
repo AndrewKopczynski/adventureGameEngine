@@ -11,6 +11,7 @@ public class Parse {
 	
 	private ShortMove m_shortMove = new ShortMove();
 	private Move m_move = new Move();
+	private Look m_look = new Look();
 	private Take m_take = new Take();
 	private Put m_put = new Put();
 	private Drop m_drop = new Drop();
@@ -60,6 +61,80 @@ public class Parse {
 		{
 			Server.player.move(m_direction.getMeaning(vnn[1]));
 			return true;
+		}
+		
+		/** LOOK ----------------------------------------------------------	|
+		 * Short: look
+		 * Mixed: look [item] or look [place] //TODO: look item support
+		 * Long: look at [item] or look to [direction] //TODO: implement
+		 */
+		else if (m_look.contains(vnn[0]))
+		{
+			if (vnn.length == 1)
+			{
+				return true;
+			}
+			
+			else if (vnn.length == 2 && m_direction.contains(vnn[1]))
+			{
+				//TODO: clean this and entity code up, rough pass for now
+				int n = 0;
+				int e = 0;
+				int s = 0;
+				int w = 0;
+				int u = 0;
+				int d = 0;
+				if (m_direction.getMeaning(vnn[1]).equals("n"))
+				{
+					n = 1;
+				}
+				else if (m_direction.getMeaning(vnn[1]).equals("ne"))
+				{
+					n = 1;
+					e = 1;
+				}
+				else if (m_direction.getMeaning(vnn[1]).equals("e"))
+				{
+					e = 1;
+				}
+				else if (m_direction.getMeaning(vnn[1]).equals("se"))
+				{
+					s = 1;
+					e = 1;
+				}
+				else if (m_direction.getMeaning(vnn[1]).equals("s"))
+				{
+					s = 1;
+				}
+				else if (m_direction.getMeaning(vnn[1]).equals("sw"))
+				{
+					s = 1;
+					w = 1;
+				}
+				else if (m_direction.getMeaning(vnn[1]).equals("w"))
+				{
+					w = 1;
+				}
+				else if (m_direction.getMeaning(vnn[1]).equals("nw"))
+				{
+					n = 1;
+					w = 1;
+				}
+				else if (m_direction.getMeaning(vnn[1]).equals("u"))
+				{
+					u = 1;
+				}
+				else if (m_direction.getMeaning(vnn[1]).equals("d"))
+				{
+					d = 1;
+				}
+				//TODO: lazy, refactor this later
+				Render_ASCII.setxOffset(e - w);
+				Render_ASCII.setyOffset(s - n);
+				Render_ASCII.setzOffset(u - d);
+				return true;
+			}
+			return false;
 		}
 		
 		/** TAKE ----------------------------------------------------------	|
@@ -125,7 +200,7 @@ public class Parse {
 			{
 				try
 				{
-					Server.player.m_inv.add(new Item(vnn[2]));
+					Server.player.getInventory().add(new Item(vnn[2]));
 					System.out.println("Gave " + vnn[2] + " to player.");
 					return false;
 				}
@@ -141,7 +216,7 @@ public class Parse {
 			{
 				try
 				{
-					Server.player.m_inv.remove(vnn[2]);
+					Server.player.getInventory().remove(vnn[2]);
 					System.out.println("Removed " + vnn[2] + " from player.");
 					return false;
 				}

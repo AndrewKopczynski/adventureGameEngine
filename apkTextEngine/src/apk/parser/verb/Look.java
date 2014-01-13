@@ -12,8 +12,6 @@ public class Look extends WordList
 		list.put("look",		m_d);
 		list.put("l",			m_d);
 		
-		list.put("err", "Usage: 'look item'");
+		list.put("err", "Usage: 'look [item]'");
 	}
-
-
 }

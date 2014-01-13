@@ -1,9 +1,17 @@
 package apk.main.engine;
 
-import apk.main.server.Server;
-
 public class Render_ASCII
 {
+	/** Maxmimum allowed offset at any given time.
+	 * Precautionary. */
+	private static final int M_OFFSET_CAP = 1;
+	/** Offset for X vision. */
+	private static int m_xOffset = 0;
+	/** Offset for Y vision. */
+	private static int m_yOffset = 0;
+	/** Offset for Z vision. */
+	private static int m_zOffset = 0;
+	
 	/** Sight range. 
 	 * <p>
 	 * Implemented for sanity's sake, otherwise map printing took absolutely ages
@@ -47,17 +55,19 @@ public class Render_ASCII
 	// for [range] lines above current y 
 	// to [range] lines below current y
 	// then get x lines
-	public static String[] renderMap()
+	public static String[] renderMap(int entX, int entY, int entZ)
 	{
-		int z = Server.player.getZ();
 		int i = 0;
 		String[] map = new String[Math.max(0, (m_range * 2) - 1)];
 		
-		for (int y = Server.player.getY() + 1 - m_range; y < Server.player.getY() + m_range; y++)
+		for (int y = (entY + 1 - m_range) + m_yOffset; y < (entY + m_range) + m_yOffset; y++)
 		{
-			map[i] = renderMapLine(y, z);
+			map[i] = renderMapLine(entX + m_xOffset, entY + m_yOffset, entZ + m_zOffset, y);
 			i++;
 		}
+		m_xOffset = 0;
+		m_yOffset = 0;
+		m_zOffset = 0;
 		return map;
 	}
 	
@@ -67,31 +77,32 @@ public class Render_ASCII
 	 * @param z Z level (depth)
 	 * @return A line of rooms in ASCII (eg. [_]---[_][^][v])
 	 */
-	private static String renderMapLine(int y, int z)
+	private static String renderMapLine(int entX, int entY, int entZ, int y)
 	{
-		//force local rendering for now (7x7)
 		String line = "";
-		for (int x = Server.player.getX() + 1 - m_range; x < Server.player.getX() + m_range; x++)
+		for (int x = entX + 1 - m_range; x < entX + m_range; x++)
 		{
-			if (Map.isMapRoom(Map.roomArray, x, y, z))
+			if (Map.isMapRoom(Map.roomArray, x, y, entZ))
 			{
-				if (x == Server.player.getX() && y == Server.player.getY())
+				//ignore offset for player drawing
+				if (x == entX - m_xOffset && y == entY - m_yOffset)
 				{
-					String player = Map.roomArray[x][y][z].getRoomGraphic().substring(0, 1)
+					String player = Map.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(0, 1)
 						+ Graphic.getGraphic("plyr")
-						+ Map.roomArray[x][y][z].getRoomGraphic().substring(2, 3);
+						+ Map.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(2, 3);
 					line += player;
 				} 
 				
 				else
 				{
-					line += Map.roomArray[x][y][z].getRoomGraphic();
+					line += Map.roomArray[x][y][entZ].getRoomGraphic();
 				}
 			} 
 			
 			else
 			{
-				if (x == Server.player.getX() && y == Server.player.getY())
+				//ignore offset for play drawing
+				if (x == entX - m_xOffset && y == entY - m_yOffset)
 				{
 					String player = " " + Graphic.getGraphic("plyr") + " ";
 					line += player;
@@ -101,7 +112,6 @@ public class Render_ASCII
 				{
 					line += Graphic.getGraphic("blnk");
 				}
-				
 			}
 		}
 		return line;
@@ -115,5 +125,20 @@ public class Render_ASCII
 	public static void setRange(int i)
 	{
 		m_range = i;
+	}
+	
+	public static void setxOffset(int x)
+	{
+		m_xOffset = Math.min(M_OFFSET_CAP, x);
+	}
+	
+	public static void setyOffset(int y)
+	{
+		m_yOffset = Math.min(M_OFFSET_CAP, y);
+	}
+	
+	public static void setzOffset(int z)
+	{
+		m_zOffset = Math.min(M_OFFSET_CAP, z);
 	}
 }

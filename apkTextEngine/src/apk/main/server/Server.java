@@ -33,7 +33,7 @@ public class Server
 		
 		if (m_p.parse(in))
 		{
-			return Render_ASCII.renderMap();
+			return Render_ASCII.renderMap(player.getX(), player.getY(), player.getZ());
 		}
 		String noMap[] = new String [1];
 		noMap[0] = "DEBUG: no map recieved.";
@@ -66,6 +66,6 @@ public class Server
 	public static void save()
 	{
 		// save TODO: better saving system that saves everything
-		player.m_inv.save();
+		player.getInventory().save();
 	}
 }

@@ -34,7 +34,7 @@ public class Entity
 	/** TODO: inventories. Placeholder. */
 	private String m_invPath;
 	/** Inventory of entity. */
-	public Inventory m_inv;
+	private Inventory m_inv;
 
 	/** TODO: physics
 	 * Probably going to have entities have a
@@ -110,9 +110,6 @@ public class Entity
 		int w = 0;
 		int u = 0;
 		int d = 0;
-		
-		// TODO: needed? replaced code for now
-		//int mapSize = Map.mapSize;
 		
 		String north = "n";
 		String east = "e";
@@ -354,5 +351,10 @@ public class Entity
 	private String createInvPath() 
 	{
 		return "ent/" + "inv_" + m_Id + "_" + m_name;
+	}
+	
+	public Inventory getInventory()
+	{
+		return m_inv;
 	}
 }
