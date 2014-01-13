@@ -51,12 +51,17 @@ public class Render_ASCII
 	 * the longer it takes to print the 'map' view.
 	 */
 	private static int m_range = 3;
-	
+
 	// for [range] lines above current y 
 	// to [range] lines below current y
 	// then get x lines
 	public static String[] renderMap(int entX, int entY, int entZ)
 	{
+		if (m_range <= 0)
+		{
+			//TODO: finish ? if range too low/cant see
+			getPlayerGraphic(entX, entY, entZ);
+		}
 		int i = 0;
 		String[] map = new String[Math.max(0, (m_range * 2) - 1)];
 		
@@ -87,10 +92,7 @@ public class Render_ASCII
 				//ignore offset for player drawing
 				if (x == entX - m_xOffset && y == entY - m_yOffset)
 				{
-					String player = Map.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(0, 1)
-						+ Graphic.getGraphic("plyr")
-						+ Map.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(2, 3);
-					line += player;
+					line += getPlayerGraphic(x, y, entZ);
 				} 
 				
 				else
@@ -115,6 +117,24 @@ public class Render_ASCII
 			}
 		}
 		return line;
+	}
+	
+	/** Graphic to represent player.
+	 * x - normal representation
+	 * ? - too dark / can't see
+	 */
+	private static String getPlayerGraphic(int x, int y, int entZ)
+	{
+		if (m_range > 0)
+		{
+			return Map.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(0, 1)
+			+ Graphic.getGraphic("plyr")
+			+ Map.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(2, 3);
+		}
+		else
+		{
+			return Graphic.getGraphic("lost");
+		}
 	}
 	
 	public static Integer getRange()

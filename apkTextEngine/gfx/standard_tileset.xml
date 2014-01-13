@@ -11,5 +11,6 @@
 	<!-- Special Tiles -->
 	<tile name="blnk" g=" . " 	e="none" />
 	<tile name="plyr" g="x"		e="none" />
+	<tile name="lost" g=" ? "		e="none" />
 	<tile name="prty" g="*" 	e="none" />
 </tiles>
