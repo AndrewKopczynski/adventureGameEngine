@@ -73,7 +73,7 @@ public class Entity
 		m_invPath = createInvPath();
 		m_inv = new Inventory(m_Id, m_name, m_invPath);
 		
-		Logger.log("ENTTY: Created new entity @ " + m_x + "," + m_y + "," + m_z + " - " + m_Id + ", " + m_name);
+		Logger.log("Created new ent '" + toString() +  "' @ " + getXYZ());
 	}
 	
 	/** Creates an entity, with default velocity (0).
@@ -94,7 +94,7 @@ public class Entity
 		m_invPath = createInvPath();
 		m_inv = new Inventory(m_Id, m_name, m_invPath);
 		
-		Logger.log("Created new entity @ " + x + "," + y + "," + z + " - " + m_Id + ", " + m_name);
+		Logger.log("Created new ent '" + toString() +  "' @ " + getXYZ());
 	}
 	
 	public boolean move(String dir)
@@ -274,6 +274,13 @@ public class Entity
 	public int getZ() 
 	{
 		return m_z;
+	}
+	
+	/** Returns XYZ as a string.
+	 * @return XYZ in format "0,0,0" */
+	public String getXYZ()
+	{
+		return m_x + "," + m_y + "," + m_z;
 	}
 	
 	public void ignoresCollision(boolean ignores)

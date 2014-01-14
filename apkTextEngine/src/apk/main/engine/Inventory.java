@@ -72,7 +72,7 @@ public class Inventory
 		try
 		{
 	        BufferedWriter out = new BufferedWriter(new FileWriter(m_invPath + ".txt"));
-	        Logger.log("Saving inventory for "+ m_identifier + ", " + m_name);
+	        Logger.log("Saving inventory for " + toString());
 	        out.close();
 		} catch (IOException e)
 		{
@@ -88,7 +88,7 @@ public class Inventory
                 out.println(m_inv.get(i));
             }
             out.close();
-            Logger.log("Saved " + m_identifier + ", " + m_name + "'s inventory.");
+            Logger.log("Saved " + toString() + "'s inventory.");
 	    } catch (IOException e)
 		{
 	        Logger.log("Save failed in " + m_invPath + ", " + e);
@@ -109,11 +109,12 @@ public class Inventory
 			{
 				String textDump = scan.nextLine();
 				m_inv.add(new Item(textDump));
-				Logger.log(textDump + " was loaded from " + m_identifier + ", " + m_name + "'s inventory.");
+				Logger.log(textDump + " was loaded from " + toString() + "'s inventory.");
 			}
 			scan.close();
-			Logger.log("Loaded " + m_identifier + ", " + m_name + "'s inventory.");
-		} catch (FileNotFoundException e)
+			Logger.log("Loaded " + toString() + "'s inventory.");
+		}
+		catch (FileNotFoundException e)
 		{
 			Logger.log("Inventory file " + m_invPath + " couldn't be found."
 					+ " Creating new inventory for room...");
@@ -136,7 +137,7 @@ public class Inventory
 	public void add(Item item)
 	{
 		m_inv.add(item);
-		Logger.log("Added item '" +  item + "' to " + m_identifier + ", " + m_name + "'s inventory.");
+		Logger.log("Added item '" +  item + "' to " + toString());
 	}
 	
 	public void remove(String item)
@@ -146,8 +147,12 @@ public class Inventory
 			if (item.equals(m_inv.get(i).toString()))
 			{
 				m_inv.remove(i);
-				Logger.log("Removed item '" +  item + "' from " + m_identifier + ", " + m_name + "'s inventory.");
+				Logger.log("Removed item '" +  item + "' from " + toString());
 			}
 		}
+	}
+	public String toString()
+	{
+		return m_name + "[" + m_identifier + "]";
 	}
 }

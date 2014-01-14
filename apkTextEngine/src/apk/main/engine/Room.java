@@ -6,7 +6,6 @@ public class Room
 	private String m_roomName;
 	private String m_type;
 	private String m_invPath;
-	@SuppressWarnings("unused")
 	private Inventory m_inv;
 	private int m_coords[] = new int[3];
 	
