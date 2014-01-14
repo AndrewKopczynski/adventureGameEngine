@@ -1,6 +1,5 @@
 package apk.main.engine;
 
-import apk.main.server.Server;
 import apk.parser.noun.*;
 import apk.parser.verb.*;
 
@@ -39,7 +38,7 @@ public class Parse {
 	 * @param input Input phrase to test
 	 * @return True if should return map, false if not.
 	 */
-	public boolean parse(String input)
+	public boolean parse(Entity entity, String input)
 	{
 		String[] vnn = input.split(" ");
 		
@@ -49,7 +48,7 @@ public class Parse {
 		if (vnn.length == 1 
 				&& m_shortMove.contains(vnn[0])) 
 		{
-			Server.player.move(m_shortMove.getMeaning(vnn[0]));
+			entity.move(m_shortMove.getMeaning(vnn[0]));
 			return true;
 		} 
 		
@@ -59,7 +58,7 @@ public class Parse {
 		else if (vnn.length == 2 
 				&& m_move.contains(vnn[0]))
 		{
-			Server.player.move(m_direction.getMeaning(vnn[1]));
+			entity.move(m_direction.getMeaning(vnn[1]));
 			return true;
 		}
 		
@@ -74,7 +73,6 @@ public class Parse {
 			{
 				return true;
 			}
-			
 			else if (vnn.length == 2 && m_direction.contains(vnn[1]))
 			{
 				//TODO: clean this and entity code up, rough pass for now
@@ -200,7 +198,7 @@ public class Parse {
 			{
 				try
 				{
-					Server.player.getInventory().add(new Item(vnn[2]));
+					entity.getInventory().add(new Item(vnn[2]));
 					System.out.println("Gave " + vnn[2] + " to player.");
 					return false;
 				}
@@ -216,7 +214,7 @@ public class Parse {
 			{
 				try
 				{
-					Server.player.getInventory().remove(vnn[2]);
+					entity.getInventory().remove(vnn[2]);
 					System.out.println("Removed " + vnn[2] + " from player.");
 					return false;
 				}
@@ -232,7 +230,7 @@ public class Parse {
 			{
 				try
 				{
-					Server.player.ignoresCollision(Boolean.parseBoolean(vnn[2]));
+					entity.ignoresCollision(Boolean.parseBoolean(vnn[2]));
 					return false;
 				}
 				
@@ -264,6 +262,8 @@ public class Parse {
 		 */
 		else
 		{
+			System.out.println(input + " for entity " 
+				+ entity + " isn't a valid command.");
 			return false;
 		}
 	}

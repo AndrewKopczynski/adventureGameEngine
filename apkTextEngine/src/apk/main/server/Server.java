@@ -1,9 +1,5 @@
 package apk.main.server;
 
-import java.util.Scanner;
-
-import javax.swing.JFrame;
-
 import apk.main.engine.Entity;
 import apk.main.engine.Logger;
 import apk.main.engine.Map;
@@ -14,15 +10,15 @@ import apk.main.engine.Render_ASCII;
 //TODO: load map
 public class Server 
 {
-	public static Entity player; //TODO: replace with loading entities from map/save files
-	public static Map m_map;
-	public static Parse m_p = new Parse();
+	private static Entity player; //TODO: replace with loading entities from map/save files
+	private static Parse m_p = new Parse();
+	private static String msg[] = new String[1];
 	
 	public Server()
 	{
 		/** TODO: make server load maps and stuff. */
 		Logger.clear();
-		m_map = new Map("maps/test_map.xml", "gfx/standard_tileset.xml");
+		new Map("maps/test_map.xml", "gfx/standard_tileset.xml");
 		
 		/** Create player */
 		player = new Entity(0, 0, 0, "player");
@@ -30,14 +26,18 @@ public class Server
 	
 	public static String[] input(String in) 
 	{	
-		
-		if (m_p.parse(in))
+		if (m_p.parse(player, in))
 		{
 			return Render_ASCII.renderMap(player.getX(), player.getY(), player.getZ());
 		}
-		String noMap[] = new String [1];
-		noMap[0] = "DEBUG: no map recieved.";
-		return noMap;
+		else
+		{
+			msg[0] = "Test";
+			return msg;
+		}
+		//String noMap[] = new String [1];
+		//noMap[0] = "DEBUG: no map recieved.";
+		//return noMap;
 		//unused, old 'client/server' code
 		/*Scanner scan = new Scanner(System.in);
 		String userInput = "";

@@ -1,7 +1,6 @@
 package apk.main.engine;
 
 import java.util.List;
-import apk.main.server.Server;
 
 /** Represents an entity.
  * <p>
@@ -16,7 +15,9 @@ import apk.main.server.Server;
  * */
 public class Entity
 {
-	/** List of Ids */
+	/** List of Ids
+	 * 
+	 * TODO: Replace this with a global ID list, probably. */
 	private static List<Integer> eIdList;
 	
 	/** Player's X (across the screen) coordinate. */
@@ -98,8 +99,6 @@ public class Entity
 	
 	public boolean move(String dir)
 	{
-		// found that logging every time graphics were fetched
-		// was really slow, runs much faster now
 		boolean isDisplaced = false;
 		boolean cond1; // contains direction you want to go
 		boolean cond2; // contains ? any room modifier
@@ -130,65 +129,55 @@ public class Entity
 			n = 1;
 			oppDir = south;
 		} 
-		
 		else if (dir.equals(east))
 		{
 			e = 1;
 			oppDir = west;
 		} 
-		
 		else if (dir.equals(south))
 		{
 			s = 1;
 			oppDir = north;
 		} 
-		
 		else if (dir.equals(west))
 		{
 			w = 1;
 			oppDir = east;
 		} 
-		
 		else if (dir.equals(northeast))
 		{
 			n = 1;
 			e = 1;
 			oppDir = southwest;
 		} 
-		
 		else if (dir.equals(southeast))
 		{
 			s = 1;
 			e = 1;
 			oppDir = northwest;
 		} 
-		
 		else if (dir.equals(southwest))
 		{
 			s = 1;
 			w = 1;
 			oppDir = northeast;
 		} 
-		
 		else if (dir.equals(northwest))
 		{
 			n = 1;
 			w = 1;
 			oppDir = southeast;
 		} 
-		
 		else if (dir.equals(up))
 		{
 			u = 1;
 			oppDir = down;
 		}
-		
 		else if (dir.equals(down))
 		{
 			d = 1;
 			oppDir = up;
 		}
-		
 		else 
 		{
 			System.out.println(dir + " is not a valid direction.");
@@ -227,13 +216,11 @@ public class Entity
 					|| Map.roomArray[xDisp][yDisp][zDisp].getRoomExits().contains(any);
 		
 		} 
-		
 		else if (m_ignoresCollision)
 		{
 			cond1 = true;
 			cond2 = true;
-		}
-		
+		}	
 		else
 		{
 			System.out.println("There's no exit that way.");
@@ -249,23 +236,21 @@ public class Entity
 			goUp(u);
 			goDown(d);
 		} 
-		
-		else {
+		else
+		{
 			System.out.println("There isn't an exit that way.");
 			return isDisplaced;
 		}
 		
 		isDisplaced = true;
 		
-		//gross!
-		//Client.map.renderMap();
-		//Render_ASCII.renderMap();
-		
-		//System.out.println("Exits: " + Map.roomArray[m_x][m_y][m_z].getRoomExits());
-		System.out.println("LOC: " + Server.player.getX() 
-				+ ", " + Server.player.getY()
-				+ ", " + Server.player.getZ());
-		Logger.log(m_Id + ", " + m_name + " moved " + dir);
+		/* For some reason when I first programmed the line of code below,
+		 * I used player.getX(), player.getY(), etc instead of just using
+		 * getX(), getY() to make it entity inspecific.
+		 * 
+		 * Probably a good reminder to focus less on the player and more on
+		 * getting other entities into the game. */
+		System.out.println("LOC: " + getX() + ", " + getY() + ", " + getZ());
 		
 		return isDisplaced;
 	}
@@ -356,5 +341,10 @@ public class Entity
 	public Inventory getInventory()
 	{
 		return m_inv;
+	}
+	
+	public String toString()
+	{
+		return m_name + "[" + m_Id + "]";
 	}
 }

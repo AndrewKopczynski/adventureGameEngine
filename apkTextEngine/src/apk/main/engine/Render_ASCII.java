@@ -63,13 +63,14 @@ public class Render_ASCII
 			getPlayerGraphic(entX, entY, entZ);
 		}
 		int i = 0;
-		String[] map = new String[Math.max(0, (m_range * 2) - 1)];
+		String[] map = new String[Math.max(0, (m_range * 2))];
 		
 		for (int y = (entY + 1 - m_range) + m_yOffset; y < (entY + m_range) + m_yOffset; y++)
 		{
 			map[i] = renderMapLine(entX + m_xOffset, entY + m_yOffset, entZ + m_zOffset, y);
 			i++;
 		}
+		map[i] = ("Exits: " + Map.roomArray[entX][entY][entZ].getRoomExits());
 		m_xOffset = 0;
 		m_yOffset = 0;
 		m_zOffset = 0;

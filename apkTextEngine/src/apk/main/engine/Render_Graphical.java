@@ -6,11 +6,14 @@ import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
-import apk.main.server.Server;
-
 public class Render_Graphical extends JPanel
 {
-	/** Required. */
+	/** TODO: probably scrap this and redo it later.
+	 * Code is messy because I wanted to test how easy it would be
+	 * to implement some sort of graphical map.
+	 */
+	private static final long serialVersionUID = -6928110710925627165L;
+	/** Required. *//*
 	private static final long serialVersionUID = 6419989246198401761L;
 	
 	private int m_x;
@@ -71,5 +74,5 @@ public class Render_Graphical extends JPanel
 				m_x += m_tSize;
 			}
 		}
-	}
+	}*/
 }

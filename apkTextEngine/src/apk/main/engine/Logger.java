@@ -41,6 +41,7 @@ public class Logger
 		    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(m_filename, true)));
 		    StackTraceElement[] st = Thread.currentThread().getStackTrace();
 		    
+		    //don't bother fixing this srsly, stacktrace is really finicky
 		    String prefix = st[2].getClassName().toUpperCase().replace("APK.MAIN.ENGINE.", "");
 		    
 		    prefix = prefix.toUpperCase() + ": " + "\t";
