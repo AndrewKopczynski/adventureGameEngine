@@ -31,7 +31,7 @@ import java.util.Scanner;
  */
 public class Inventory 
 {
-	private List<Item> m_inv = new ArrayList<Item>();
+	private List<Entity> m_inv = new ArrayList<Entity>();
 	private String m_identifier;
 	private String m_name;
 	private String m_invPath;
@@ -43,11 +43,11 @@ public class Inventory
 	 * @param name Name of the room
 	 * @param filePath Path where the entity should be saved
 	 */
-	public Inventory(String identifier, String name, String filePath)
+	public Inventory(Room room)
 	{
-		m_identifier = identifier;
-		m_name = name;
-		m_invPath = filePath;
+		m_identifier = "room";
+		m_name = room.getRoomName();
+		m_invPath = room.getFilePath();
 		load();
 	}
 	
@@ -57,11 +57,11 @@ public class Inventory
 	 * @param name Name of entity
 	 * @param filePath Path where the entity should be saved
 	 */
-	public Inventory(int id, String name, String filePath)
+	public Inventory(Entity entity)
 	{
-		m_identifier = "" + id;
-		m_name = name;
-		m_invPath = filePath;
+		m_identifier = "entity";
+		m_name = entity.toString();
+		m_invPath = entity.getFilePath();
 		load();
 	}
 	
@@ -107,9 +107,9 @@ public class Inventory
 			
 			while (scan.hasNextLine())
 			{
-				String textDump = scan.nextLine();
-				m_inv.add(new Item(textDump));
-				Logger.log(textDump + " was loaded from " + toString() + "'s inventory.");
+				String temp = scan.nextLine();
+				m_inv.add(new Entity(temp, 1));
+				Logger.log(temp + " was loaded from " + toString() + "'s inventory.");
 			}
 			scan.close();
 			Logger.log("Loaded " + toString() + "'s inventory.");
@@ -117,7 +117,7 @@ public class Inventory
 		catch (FileNotFoundException e)
 		{
 			Logger.log("Inventory file " + m_invPath + " couldn't be found."
-					+ " Creating new inventory for room...");
+					+ " Creating new inventory for " + toString() + "...");
 			save();
 		}
 	}
@@ -131,13 +131,11 @@ public class Inventory
 		} 
 	}
 	
-	/** Adds something to inventory.
-	 * TODO: Change to adding items instead of strings. 
-	 */
-	public void add(Item item)
+	/** Adds something to inventory. */
+	public void add(Entity entity)
 	{
-		m_inv.add(item);
-		Logger.log("Added item '" +  item + "' to " + toString());
+		m_inv.add(entity);
+		Logger.log("Added item '" + entity + "' to " + toString());
 	}
 	
 	public void remove(String item)
@@ -153,6 +151,6 @@ public class Inventory
 	}
 	public String toString()
 	{
-		return m_name + "[" + m_identifier + "]";
+		return m_identifier + " " + m_name;
 	}
 }

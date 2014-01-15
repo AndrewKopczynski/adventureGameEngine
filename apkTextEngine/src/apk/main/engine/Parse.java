@@ -27,10 +27,19 @@ public class Parse {
 		System.out.println("Loading parser...");
 	}
 	
-	public String[] collapse(String input)
+	/** Collapses a string array from a to b in a String array. */
+	public String collapse(String[] input, int a, int b)
 	{
-		String[] vnn = input.split(" ");
-		return vnn;
+		String temp = "";
+		for (; a < b; a++)
+		{
+			temp += input[a];
+			if (a + 1 < b)
+			{
+				temp += " ";
+			}
+		}
+		return temp;
 	}
 
 	/** Tests input and executes actions.
@@ -173,7 +182,7 @@ public class Parse {
 		/** ADMIN STUFF ---------------------------------------------------	|
 		 * General: admin [command] [parameter]
 		 */
-		else if ((vnn.length == 2 || vnn.length == 3) && m_admin.contains(vnn[0]))
+		else if (m_admin.contains(vnn[0]))
 		{
 			/** setRange */
 			if (vnn[1].equals("setRange"))
@@ -198,14 +207,17 @@ public class Parse {
 			{
 				try
 				{
-					entity.getInventory().add(new Item(vnn[2]));
+					entity.getInventory().add(
+							new Entity(collapse(vnn, 2, vnn.length - 1),
+							Integer.parseInt(vnn[vnn.length - 1])));
+					
 					System.out.println("Gave " + vnn[2] + " to player.");
 					return false;
 				}
 				
 				catch(Exception e)
 				{
-					System.out.println("Usage: admin give [item]");
+					System.out.println("Usage: admin give [item] [hp]");
 					return false;
 				}
 			}
@@ -214,7 +226,7 @@ public class Parse {
 			{
 				try
 				{
-					entity.getInventory().remove(vnn[2]);
+					entity.getInventory().remove(collapse(vnn, 2, vnn.length - 2));
 					System.out.println("Removed " + vnn[2] + " from player.");
 					return false;
 				}

@@ -36,7 +36,7 @@ public class Room
 		m_coords = array;
 		m_invPath = invFilePath;
 		
-		m_inv = new Inventory(m_mapName + getXYZ(), m_roomName, createInvPath(invFilePath));
+		m_inv = new Inventory(this);
 	}
 	
 	/** Gets the graphic for this room.
@@ -121,30 +121,30 @@ public class Room
 		return m_invPath;
 	}
 	
-	private String createInvPath(String invFilePath)
+	//TODO: decide if custom pathed inventories are a good idea/needed or not
+	/*public String getFilePath()
 	{
 		String temp;
-		if (invFilePath.equals("d"))
+		if (m_invPath.equals("d"))
 		{
 			temp = "maps/" + m_mapName + "/" + "inv_" + getXYZ() + "_" + m_roomName;
 		}
 		else
 		{
-			temp = invFilePath;
+			temp = m_invPath;
 		}
 		return temp;
+	}*/
+	
+	public String getFilePath() 
+	{
+		return "maps/" + m_mapName + "/" + "inv_" + toString();
 	}
 	
 	/** Debug
 	 * @return Retuns all room information. */
 	public String toString()
 	{
-		return m_mapName + " " 
-				+ m_roomName + " " 
-				+ m_type + " " 
-				+ m_coords[X] + "," 
-				+ m_coords[Y] + ","
-				+ m_coords[Z] + " " 
-				+ m_invPath;
+		return m_roomName + "[" + getXYZ() + "]";
 	}
 }

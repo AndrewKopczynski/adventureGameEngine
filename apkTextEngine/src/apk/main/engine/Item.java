@@ -2,7 +2,7 @@ package apk.main.engine;
 
 public class Item
 {
-	private String m_name;
+	/*private String m_name;
 	// placeholder TODO: items
 	public Item(String name)
 	{
@@ -17,5 +17,5 @@ public class Item
 	public String toString()
 	{
 		return m_name;
-	}
+	}*/
 }

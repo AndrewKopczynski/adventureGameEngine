@@ -1,5 +1,6 @@
 package apk.main.engine;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Represents an entity.
@@ -18,7 +19,7 @@ public class Entity
 	/** List of Ids
 	 * 
 	 * TODO: Replace this with a global ID list, probably. */
-	private static List<Integer> eIdList;
+	private static List<Integer> eIdList = new ArrayList<Integer>();
 	
 	/** Player's X (across the screen) coordinate. */
 	private int m_x;
@@ -29,70 +30,89 @@ public class Entity
 	
 	/** Unique ID */
 	private int m_Id;
+	
 	/** Name of entity. */
 	private String m_name;
+	/** Maxmimum health of entity. */
+	private int m_hpMax;
+	/** Current health of entity. */
+	private int m_hp;
 	
-	/** TODO: inventories. Placeholder. */
-	private String m_invPath;
 	/** Inventory of entity. */
 	private Inventory m_inv;
-
-	/** TODO: physics
-	 * Probably going to have entities have a
-	 * physics object or something instead of
-	 * tracking velocity in entities. */
-	@SuppressWarnings("unused")
-	private double m_velocity;
 	
 	/** Ignores collision checks, may go to any tile within array range.
 	 * <p>
 	 * <ul>
-	 * <li>On: Normal checks (cannot go through walls, must have appropriate exits)
-	 * <li>Off: 'Noclip', ignores collision checks, can fly and go through walls.
+	 * <li>False: Normal checks (cannot go through walls, must have appropriate exits)
+	 * <li>True: 'Noclip', ignores collision checks, can 'fly'/pass through walls.
 	 * </ul>
 	 */
 	private boolean m_ignoresCollision = false;
 	
-	/** Creates an entity.
+	public Entity(String name, int hpMax)
+	{
+		m_Id = eIdList.size();
+		eIdList.add(m_Id);
+		
+		m_name = name;
+		m_hpMax = hpMax;
+		m_hp = hpMax;
+		
+		m_inv = new Inventory(this);
+		
+		Logger.log("Created new ent '" + toString() +  "' @ " + "inventory?");
+	}
+	
+	/** Creates an entity, and sets their max/current HP.
 	 * 
 	 * @param x X (W(-)  <->  (+)E) coordinate
 	 * @param y Y (N(-)  <->  (+)S) coordinate
 	 * @param z Z (D(-)  <->  (+)U) coordinates
 	 * @param name Name of entity
-	 * @param PhysVelocity **TODO: Implement physics Velocity of entity
-	 * @param hasPlayerControl Unused TODO: Is this needed?
+	 * @hpMax Value the entity has at maxmimum health
+	 * @hp Current HP, always less than maxmium HP
 	 */
-	public Entity(int x, int y, int z, String name, double physVelocity)
+	public Entity(int x, int y, int z, String name, int hpMax, int hp)
 	{
+		m_Id = eIdList.size();
+		eIdList.add(m_Id);
+		
 		m_x = x;
 		m_y = y;
 		m_z = z;
 		
-		m_Id = (eIdList.size() + 1);
 		m_name = name;
-		m_invPath = createInvPath();
-		m_inv = new Inventory(m_Id, m_name, m_invPath);
+		m_hpMax = hpMax;
+		m_hp = hp;
+		
+		m_inv = new Inventory(this);
 		
 		Logger.log("Created new ent '" + toString() +  "' @ " + getXYZ());
 	}
 	
-	/** Creates an entity, with default velocity (0).
+	/** Creates an entity.
 	 * 
 	 * @param x X (W(-)  <->  (+)E) coordinate
 	 * @param y Y (N(-)  <->  (+)S) coordinate
-	 * @param z Z (D(-)  <->  (+)U) coordinates
-	 * @param PhysVelocity **TODO: Implement physics Velocity of entity
-	 * @param hasPlayerControl Unused TODO: Is this needed?
+	 * @param z Z (D(-)  <->  (+)U) coordinate
+	 * @param name Name of entity
+	 * @hpMax Value the entity has at maxmimum health
 	 */
-	public Entity(int x, int y, int z, String name)
+	public Entity(int x, int y, int z, String name, int hpMax)
 	{
+		m_Id = eIdList.size();
+		eIdList.add(m_Id);
+		
 		m_x = x;
 		m_y = y;
 		m_z = z;
-		m_Id = 0; // TODO later, lazy
+		
 		m_name = name;
-		m_invPath = createInvPath();
-		m_inv = new Inventory(m_Id, m_name, m_invPath);
+		m_hpMax = hpMax;
+		m_hp = hpMax;
+		
+		m_inv = new Inventory(this);
 		
 		Logger.log("Created new ent '" + toString() +  "' @ " + getXYZ());
 	}
@@ -261,33 +281,25 @@ public class Entity
 	{
 		return m_x;
 	}
-
 	/** Returns Y coordinate of entity.
 	 * @return Y coord of entity */
 	public int getY() 
 	{
 		return m_y;
 	}
-
 	/** Returns Z coordinate of entity.
 	 * @return Z coord of entity */
 	public int getZ() 
 	{
 		return m_z;
 	}
-	
 	/** Returns XYZ as a string.
 	 * @return XYZ in format "0,0,0" */
 	public String getXYZ()
 	{
 		return m_x + "," + m_y + "," + m_z;
 	}
-	
-	public void ignoresCollision(boolean ignores)
-	{
-		m_ignoresCollision = ignores;
-	}
-	
+
 	// getDirection
 	private int getNorth(int n) 
 	{
@@ -340,14 +352,28 @@ public class Entity
 		m_z -= d;
 	}
 	
-	private String createInvPath() 
+	public String getFilePath() 
 	{
-		return "ent/" + "inv_" + m_Id + "_" + m_name;
+		return "ent/" + "inv_" + toString();
+	}
+	
+	public void ignoresCollision(boolean ignores)
+	{
+		m_ignoresCollision = ignores;
 	}
 	
 	public Inventory getInventory()
 	{
 		return m_inv;
+	}
+	
+	public int getHPMax()
+	{
+		return m_hpMax;
+	}
+	public int getHP()
+	{
+		return m_hp;
 	}
 	
 	public String toString()

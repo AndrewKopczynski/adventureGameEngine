@@ -21,7 +21,7 @@ public class Server
 		new Map("maps/test_map.xml", "gfx/standard_tileset.xml");
 		
 		/** Create player */
-		player = new Entity(0, 0, 0, "player");
+		player = new Entity(0, 0, 0, "player", 1);
 	}
 	
 	public static String[] input(String in) 
