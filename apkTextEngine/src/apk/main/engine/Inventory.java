@@ -48,7 +48,7 @@ public class Inventory
 		m_identifier = "room";
 		m_name = room.toString();
 		m_invPath = room.getFilePath();
-		load();
+		load(room);
 	}
 	
 	/** Creates an inventory (typically) for an entity.
@@ -62,24 +62,11 @@ public class Inventory
 		m_identifier = "entity";
 		m_name = entity.toString();
 		m_invPath = entity.getFilePath();
-		load();
+		load(entity);
 	}
 	
-	/** Saves inventory (under xxx/invID_name). */
-	public void save() 
+	private void save(Room room)
 	{
-		/** Clear save file in preparation for writing to it. */
-		try
-		{
-	        BufferedWriter out = new BufferedWriter(new FileWriter(m_invPath + ".txt"));
-	        Logger.log("Saving inventory for " + toString());
-	        out.close();
-		} catch (IOException e)
-		{
-	        System.out.println("!CRITICAL! Couldn't clear the old save before writing new save!");
-	    }
-		
-		/** Write to save file. */
 		try
 		{
 	        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(m_invPath + ".txt", true)));
@@ -95,9 +82,7 @@ public class Inventory
 	    }
 	}
 	
-	/** Loads inventory (under ent/invID_name). 
-	 * REMEMBER TO CLEAR iInv BEFORE LOADING AGAIN! */
-	public void load()
+	private void load(Room room)
 	{
 		File file = new File(m_invPath + ".txt");
 		m_inv.clear();
@@ -119,7 +104,57 @@ public class Inventory
 		{
 			Logger.log("Inventory file " + m_invPath + " couldn't be found."
 					+ " Creating new inventory for " + toString() + "...");
-			save();
+			save(room);
+		}
+	}
+	
+	/** Entity save. */
+	public void save(Entity entity) 
+	{	
+		/** Write to save file. */
+		XMLWriter w = new XMLWriter(m_invPath);
+		
+		String[] a = {"id", "name"};
+		String[] b = {"" + entity.getId(), entity.getName()};
+		
+		w.writeOpenTag("entity", a, b);
+		
+		for (int i = 0; i < m_inv.size(); i++)
+		{
+			w.writeOpenTag("inventory");
+			String[] c = {"" + m_inv.get(i).getId(), m_inv.get(i).getName()};
+			w.writeTag("entity", a, c);
+			w.writeCloseTag("inventory");
+		}
+		
+		w.writeCloseTag("entity");
+		w.close();
+	}
+	
+	/** Entiy load. */
+	public void load(Entity entity)
+	{
+		File file = new File(m_invPath + ".txt");
+		m_inv.clear();
+		try
+		{
+			Scanner scan = new Scanner(file);
+			
+			while (scan.hasNextLine())
+			{
+				String temp = scan.nextLine();
+				System.out.println(temp.substring(0, temp.length() - 3));
+				m_inv.add(new Entity(temp.substring(0, temp.length() - 3), 1));
+				Logger.log(temp + " was loaded from " + toString() + "'s inventory.");
+			}
+			scan.close();
+			Logger.log("Loaded " + toString() + "'s inventory.");
+		}
+		catch (FileNotFoundException e)
+		{
+			Logger.log("Inventory file " + m_invPath + " couldn't be found."
+					+ " Creating new inventory for " + toString() + "...");
+			save(entity);
 		}
 	}
 	

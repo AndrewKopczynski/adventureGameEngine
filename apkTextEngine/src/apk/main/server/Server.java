@@ -66,6 +66,6 @@ public class Server
 	public static void save()
 	{
 		// save TODO: better saving system that saves everything
-		player.getInventory().save();
+		player.save();
 	}
 }

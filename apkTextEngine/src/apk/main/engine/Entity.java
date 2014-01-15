@@ -352,6 +352,16 @@ public class Entity
 		m_z -= d;
 	}
 	
+	public int getId()
+	{
+		return m_Id;
+	}
+	
+	public String getName()
+	{
+		return m_name;
+	}
+	
 	public String getFilePath() 
 	{
 		return "ent/" + "inv_" + toString();
@@ -374,6 +384,11 @@ public class Entity
 	public int getHP()
 	{
 		return m_hp;
+	}
+	
+	public void save()
+	{
+		m_inv.save(this);
 	}
 	
 	public String toString()

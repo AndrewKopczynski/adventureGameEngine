@@ -6,7 +6,8 @@ public class XMLWriter
 {
 	
 	private String m_filePath;
-	private PrintWriter out = null;
+	private PrintWriter m_out = null;
+	private int m_tab = 0;
 	
 	public XMLWriter(String filePath)
 	{
@@ -25,8 +26,8 @@ public class XMLWriter
 		
 		try
 		{
-		out = new PrintWriter(new BufferedWriter(new FileWriter(m_filePath + ".xml", true)));
-		out.println("<?xml version=\"1.0\" ?>");
+		m_out = new PrintWriter(new BufferedWriter(new FileWriter(m_filePath + ".xml", true)));
+		m_out.println("<?xml version=\"1.0\" ?>");
 		}
 		catch (IOException e)
 		{
@@ -36,50 +37,88 @@ public class XMLWriter
     
     public void writeTag(String element, String[] attributes, String[] values)
     {
-    	String temp = "\t<" + element;
+    	String temp = tab();
+    	temp += "<" + element;
+    	
     	for (int i = 0; i < attributes.length; i++)
     	{
     		temp += " " + attributes[i] + "=" + "\"" + values[i] + "\"";
     	}
+    	
     	temp += "/>";
-    	out.println(temp);
+    	
+    	m_out.println(temp);
     }
     
     public void writeTag(String element, String attribute, String value)
     {
-    	String temp = "\t<" + element;
+    	String temp = tab();
+    	temp += "<" + element;
+    	
     	temp += " " + attribute + "=" + "\"" + value + "\"";
     	temp += "/>";
-    	out.println(temp);
+    	
+    	m_out.println(temp);
     }
     
-    public void writeRootOpenTag(String root, String attribute, String value)
+    public void writeOpenTag(String root)
     {
-		String temp = "<" + root;
+		String temp = tab();
+		temp += "<" + root + ">";
+		
+    	m_out.println(temp);
+    	m_tab++;
+    }
+    
+    public void writeOpenTag(String root, String attribute, String value)
+    {
+    	String temp = tab();
+		temp += "<" + root;
     	temp += " " + attribute + "=" + "\"" + value + "\"";
     	temp += ">";
-    	out.println(temp);
+    	
+    	m_out.println(temp);
+    	m_tab++;
     }
     
-    public void writeRootOpenTag(String root, String[] attributes, String[] values)
+    public void writeOpenTag(String root, String[] attributes, String[] values)
     {
-		String temp = "<" + root;
+    	String temp = tab();
+		temp += "<" + root;
 		for (int i = 0; i < attributes.length; i++)
     	{
     		temp += " " + attributes[i] + "=" + "\"" + values[i] + "\"";
     	}
 		temp += ">";
-		out.println(temp);
+		
+		m_out.println(temp);
+		m_tab++;
     }
     
-    public void writeRootCloseTag(String root)
+    public void writeCloseTag(String root)
     {
-    	String temp = "<" + root + "/>";
-    	out.println(temp);
+    	m_tab--;
+    	
+    	String temp = tab();
+    	temp += "</" + root + ">";
+    	
+    	m_out.println(temp);
     }
     
     public void close()
     {
-    	out.close();
+    	m_out.close();
+    }
+    
+    private String tab()
+    {
+    	String temp = "";
+    	
+    	for (int i = 0; i < m_tab; i++)
+    	{
+    		temp += "\t";
+    	}
+    	
+    	return temp;
     }
 }

@@ -1,9 +1,7 @@
 package apk.main.client;
 
 import java.util.Scanner;
-
-
-import apk.main.engine.XMLWriter;
+//import apk.main.engine.XMLWriter;
 //import apk.main.engine.Entity;
 import apk.main.server.Server;
 //import apk.main.engine.Parse;
@@ -18,7 +16,7 @@ public class Client
 		String input = "";
 		String returned[];
 		
-		XMLWriter r = new XMLWriter("test");
+		/*XMLWriter r = new XMLWriter("test");
 		String[] temp1 = new String[2];
 		String[] temp2 = new String[2];
 		temp1[0] = "id";
@@ -29,9 +27,9 @@ public class Client
 		r.writeRootOpenTag("entity", "id", "0");
 		r.writeTag("health", "hpMax", "30");
 		r.writeRootCloseTag("entity");
-		r.close();
+		r.close();*/
 		
-		/*while (!input.equals("quit"))
+		while (!input.equals("quit"))
 		{
 			input = scan.nextLine();
 			//String[] vnn = input.split(" ");
@@ -43,7 +41,7 @@ public class Client
 			{
 				System.out.println(returned[i]);
 			}
-		}*/
+		}
 		scan.close();
 		Server.save();
 	}
