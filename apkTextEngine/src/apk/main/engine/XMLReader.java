@@ -12,7 +12,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class XML {
+public class XMLReader {
 
 	/* constructor:
 	 * filePath
@@ -52,7 +52,7 @@ public class XML {
 	 * @param filePath Path of XML File to load
 	 * @param elements Elements to be fetched/read from file
 	 */
-	public XML(String filePath, String[] elements) 
+	public XMLReader(String filePath, String[] elements) 
 	{
 		m_filePath = filePath;
 		m_elements = elements;

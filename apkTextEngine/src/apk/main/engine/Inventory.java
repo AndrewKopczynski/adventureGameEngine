@@ -46,7 +46,7 @@ public class Inventory
 	public Inventory(Room room)
 	{
 		m_identifier = "room";
-		m_name = room.getRoomName();
+		m_name = room.toString();
 		m_invPath = room.getFilePath();
 		load();
 	}
@@ -108,7 +108,8 @@ public class Inventory
 			while (scan.hasNextLine())
 			{
 				String temp = scan.nextLine();
-				m_inv.add(new Entity(temp, 1));
+				System.out.println(temp.substring(0, temp.length() - 3));
+				m_inv.add(new Entity(temp.substring(0, temp.length() - 3), 1));
 				Logger.log(temp + " was loaded from " + toString() + "'s inventory.");
 			}
 			scan.close();

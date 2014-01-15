@@ -1,40 +1,52 @@
 <?xml version="1.0"?>
-<map name="test_map" size="20">
-	<!-- Y LEVEL 0 -->
-	<room name="test_" type="room" coord="0,0,0" i="d" />
-	<room name="hal_1" type="h_LR" coord="1,0,0" i="d" />
-	<room name="alt_2" type="room" coord="2,0,0" i="d" />
+<map name="test_map" size="15">
+	<room name="spawn" type="room" coord="0,0,0" />
+	<room name="00001" type="room" coord="1,1,0" />
+	<room name="00002" type="room" coord="2,2,0" />
+	<room name="00003" type="room" coord="3,3,0" />
+	<room name="00004" type="room" coord="4,4,0" />
+	<room name="00005" type="room" coord="4,5,0" />
+	<room name="strWl" type="s_up" coord="5,5,0" />
 	
-    <room name="stair" type="s_up" coord="3,0,0" i="d" />
-	<room name="attic" type="s_ud" coord="3,0,1" i="d" />
-	<room name="attic" type="s_dn" coord="3,0,2" i="d" />
+	<room name="10005" type="s_ud" coord="5,5,1" />
+	<room name="20005" type="s_ud" coord="5,5,2" />
+	<room name="30005" type="s_ud" coord="5,5,3" />
+	<room name="40005" type="s_ud" coord="5,5,4" />
+
+	<!-- Y LEVEL 5 -->
+	<room name="test_" type="s_dn" coord="5,5,5" />
+	<room name="hal_1" type="h_LR" coord="6,5,5" />
+	<room name="alt_2" type="room" coord="7,5,5" />
 	
-	<room name="attic" type="room" coord="2,0,2" i="d" />
-	<room name="attic" type="room" coord="3,1,2" i="d" />
+    <room name="stair" type="s_up" coord="8,5,5" />
+	<room name="attic" type="s_ud" coord="8,5,6" />
+	<room name="attic" type="s_dn" coord="8,5,7" />
 	
-	<room name="alt_3" type="room" coord="4,0,0" i="d"  />
+	<room name="attic" type="room" coord="7,5,7" />
+	<room name="attic" type="room" coord="8,6,7" />
 	
+	<room name="alt_3" type="room" coord="9,5,5" />
 	
-	<!-- Y LEVEL 1 -->
-	<room name="hal_2" type="h_UD" coord="0,1,0" i="d"  />
-	<room name="tckdR" type="room" coord="1,1,0" i="d"  />
-	<room name="spky1" type="ha_X" coord="2,1,0" i="d" />
-	<room name="spky2" type="h_LR" coord="3,1,0" i="d"  />
-	<room name="eotLn" type="room" coord="4,1,0" i="d" />
-	
-	
-	<!-- Y LEVEL 2 -->
-	<room name="tstR1" type="room" coord="0,2,0" i="d" />
-	<room name="tstR2" type="room" coord="1,2,0" i="d" />
-	<room name="spky3" type="h_UD" coord="2,2,0" i="d" />
-	
-	
-	<!-- Y LEVEL 3 -->
-	<room name="tstR3" type="room" coord="0,3,0" i="d" />
-	<room name="tstR4" type="room" coord="1,3,0" i="d" />
-	<room name="spky4" type="h_UD" coord="2,3,0" i="d"  />
+	<!-- Y LEVEL 6 -->
+	<room name="hal_2" type="h_UD" coord="5,6,5" />
+	<room name="tckdR" type="room" coord="6,6,5" />
+	<room name="spky1" type="ha_X" coord="7,6,5" />
+	<room name="spky2" type="h_LR" coord="8,6,5" />
+	<room name="eotLn" type="room" coord="9,6,5" />
 	
 	
-	<!-- Y LEVEL 4 -->
-	<room name="clset" type="room" coord="2,4,0" i="d" />
+	<!-- Y LEVEL 7 -->
+	<room name="tstR1" type="room" coord="5,7,5" />
+	<room name="tstR2" type="room" coord="6,7,5" />
+	<room name="spky3" type="h_UD" coord="7,7,5" />
+	
+	
+	<!-- Y LEVEL 8 -->
+	<room name="tstR3" type="room" coord="5,8,5" />
+	<room name="tstR4" type="room" coord="6,8,5" />
+	<room name="spky4" type="h_UD" coord="7,8,5" />
+	
+	
+	<!-- Y LEVEL 9 -->
+	<room name="clset" type="room" coord="7,9,5" />
 </map>

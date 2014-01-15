@@ -27,7 +27,7 @@ public class Map
 			Logger.log("Loading tileset...");
 			
 			String[] tElements = {"tile"};
-			XML tileXML = new XML(tileFilePath, tElements);
+			XMLReader tileXML = new XMLReader(tileFilePath, tElements);
 			
 			for (int i = 0; i < tileXML.getNumOfElements(tElements[0]); i++)
 			{
@@ -51,7 +51,7 @@ public class Map
 			Logger.log("Loading map...");
 			
 			String[] mElements = {"room"};
-			XML mapXML = new XML(mapFilePath, mElements);
+			XMLReader mapXML = new XMLReader(mapFilePath, mElements);
 			
 			String mapName = mapXML.getRootAttribute("name");
 			mapSize = Integer.parseInt(mapXML.getRootAttribute("size"));
@@ -62,8 +62,7 @@ public class Map
 				String name = mapXML.getAttribute(mElements[0], i, "name");
 				String type = mapXML.getAttribute(mElements[0], i, "type");
 				String coord = mapXML.getAttribute(mElements[0], i, "coord");
-				String inv = mapXML.getAttribute(mElements[0], i, "i");
-				Room room = new Room(mapName, name, type, coord, inv);
+				Room room = new Room(mapName, name, type, coord);
 				roomArray[room.getX()][room.getY()][room.getZ()] = room;
 				System.out.println(roomArray[room.getX()][room.getY()][room.getZ()]);
 			}		

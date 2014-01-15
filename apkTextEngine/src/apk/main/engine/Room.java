@@ -5,7 +5,6 @@ public class Room
 	private String m_mapName;
 	private String m_roomName;
 	private String m_type;
-	private String m_invPath;
 	private Inventory m_inv;
 	private int m_coords[] = new int[3];
 	
@@ -21,7 +20,7 @@ public class Room
 	 * @param coords X/Y/Z coordinates of the room, used for rendering and movement
 	 * @param invFilePath File path for the inventory of the room. 'd' is default
 	 */
-	public Room(String map, String name, String type, String coords, String invFilePath)
+	public Room(String map, String name, String type, String coords)
 	{
 		String[] temp;
 		
@@ -34,7 +33,6 @@ public class Room
 		temp = coords.split(",");
 		int array[] = {Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2])};
 		m_coords = array;
-		m_invPath = invFilePath;
 		
 		m_inv = new Inventory(this);
 	}
@@ -115,26 +113,11 @@ public class Room
 	{
 		return m_coords[X] + "-" + m_coords[Y] + "-" + m_coords[Z];
 	}
-	// temp?
-	public String getRoomInventoryFileName()
-	{
-		return m_invPath;
-	}
 	
-	//TODO: decide if custom pathed inventories are a good idea/needed or not
-	/*public String getFilePath()
+	public Inventory getInventory()
 	{
-		String temp;
-		if (m_invPath.equals("d"))
-		{
-			temp = "maps/" + m_mapName + "/" + "inv_" + getXYZ() + "_" + m_roomName;
-		}
-		else
-		{
-			temp = m_invPath;
-		}
-		return temp;
-	}*/
+		return m_inv;
+	}
 	
 	public String getFilePath() 
 	{
