@@ -34,7 +34,7 @@ public class Room
 		int array[] = {Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2])};
 		m_coords = array;
 		
-		m_inv = new Inventory(this);
+		//m_inv = new Inventory(this);
 	}
 	
 	/** Gets the graphic for this room.
@@ -114,10 +114,10 @@ public class Room
 		return m_coords[X] + "-" + m_coords[Y] + "-" + m_coords[Z];
 	}
 	
-	public Inventory getInventory()
+	/*public Inventory getInventory()
 	{
 		return m_inv;
-	}
+	}*/
 	
 	public String getFilePath() 
 	{

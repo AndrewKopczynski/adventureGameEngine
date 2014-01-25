@@ -1,5 +1,6 @@
 package apk.main.engine;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,19 +8,25 @@ import java.util.List;
  * <p>
  * An entity has:
  * <ul>
+ * <li>A ID
  * <li>A X coordinate (int)
  * <li>A Y coordinate (int)
  * <li>A Z coordinate (int)
+ * <li>Maximum HP
+ * <li>Current HP
  * <li>An inventory (Inventory)
- * <li>A velocity (TODO: physics?)
  * </ul>
  * */
 public class Entity
-{
-	/** List of Ids
-	 * 
-	 * TODO: Replace this with a global ID list, probably. */
-	private static List<Integer> eIdList = new ArrayList<Integer>();
+{	
+	/** Grand list of IDs */
+	private static List<Integer> m_idList = new ArrayList<Integer>();
+	
+	/** Inventory of entity. */
+	private List<Entity> m_inv = new ArrayList<Entity>();
+	
+	/** Unique ID */
+	private int m_id;
 	
 	/** Player's X (across the screen) coordinate. */
 	private int m_x;
@@ -28,18 +35,12 @@ public class Entity
 	/** Player's Z (game world height) coordinate. */
 	private int m_z;
 	
-	/** Unique ID */
-	private int m_Id;
-	
 	/** Name of entity. */
 	private String m_name;
 	/** Maxmimum health of entity. */
 	private int m_hpMax;
 	/** Current health of entity. */
 	private int m_hp;
-	
-	/** Inventory of entity. */
-	private Inventory m_inv;
 	
 	/** Ignores collision checks, may go to any tile within array range.
 	 * <p>
@@ -50,18 +51,25 @@ public class Entity
 	 */
 	private boolean m_ignoresCollision = false;
 	
+	/** Only used for null entities (for Java garbage collection).
+	 */
+	public Entity()
+	{
+		
+	}
+	
 	public Entity(String name, int hpMax)
 	{
-		m_Id = eIdList.size();
-		eIdList.add(m_Id);
+		m_id = getNextId();
+		addId(m_id);
 		
 		m_name = name;
 		m_hpMax = hpMax;
 		m_hp = hpMax;
 		
-		m_inv = new Inventory(this);
-		
 		Logger.log("Created new ent '" + toString() +  "' @ " + "inventory?");
+		
+		writeSave();
 	}
 	
 	/** Creates an entity, and sets their max/current HP.
@@ -75,8 +83,8 @@ public class Entity
 	 */
 	public Entity(int x, int y, int z, String name, int hpMax, int hp)
 	{
-		m_Id = eIdList.size();
-		eIdList.add(m_Id);
+		m_id = getNextId();
+		addId(m_id);
 		
 		m_x = x;
 		m_y = y;
@@ -86,9 +94,9 @@ public class Entity
 		m_hpMax = hpMax;
 		m_hp = hp;
 		
-		m_inv = new Inventory(this);
-		
 		Logger.log("Created new ent '" + toString() +  "' @ " + getXYZ());
+		
+		writeSave();
 	}
 	
 	/** Creates an entity.
@@ -101,8 +109,8 @@ public class Entity
 	 */
 	public Entity(int x, int y, int z, String name, int hpMax)
 	{
-		m_Id = eIdList.size();
-		eIdList.add(m_Id);
+		m_id = getNextId();
+		addId(m_id);
 		
 		m_x = x;
 		m_y = y;
@@ -112,9 +120,93 @@ public class Entity
 		m_hpMax = hpMax;
 		m_hp = hpMax;
 		
-		m_inv = new Inventory(this);
-		
 		Logger.log("Created new ent '" + toString() +  "' @ " + getXYZ());
+		
+		writeSave();
+	}
+	
+	/** Creates a new entity from a file.
+	 * <p>
+	 * Usually used in loading entities from a save, but can also be used for template entities.
+	 * 
+	 * @param filePath exampleEntity[id].xml
+	 */
+	public Entity(String filePath)
+	{	
+		String[] entElements = {"entity", "health", "inventory"};
+		XMLReader invXML = new XMLReader(filePath, entElements);
+		
+		m_id = Integer.parseInt(invXML.getAttribute(entElements[0], 0, "id"));
+		m_idList.add(m_id);
+		
+		m_name = invXML.getAttribute("entity", 0, "name");
+		
+		String temp = invXML.getAttribute("entity", 0, "coords");
+		String split[] = temp.split(",");
+		m_x = Integer.parseInt(split[0]);
+		m_y = Integer.parseInt(split[1]);
+		m_z = Integer.parseInt(split[2]);
+		
+		m_hpMax = Integer.parseInt(invXML.getAttribute("health", 0, "hpMax"));
+		m_hp = Integer.parseInt(invXML.getAttribute("health", 0, "hp"));
+		
+		System.out.println("printing inventory...");
+		String ents[] = invXML.getChildren("inventory", 0);
+		for (int a = 1; a < ents.length; a += 2)
+		{
+			System.out.println("found ent: " + ents[a]);
+			if (!ents[a].equals(toString()))
+			{
+				addToInventory(new Entity("ent/" + ents[a] + ".xml"));
+			}
+			else
+			{
+				String err = "!CRTICAL! ENTITY " + toString() + "TRIED TO LOAD ITSELF!"
+						+ " CHECK ENTITY FILE " + getFilePath() + "!";
+				System.out.println(err);
+				Logger.log(err);
+				//throws a stackoverflow here probaby TODO: test
+			}
+		}
+		
+		writeSave();
+	}
+	
+	/** Write to save file. */
+	public void writeSave()
+	{
+		//create file (eg. ent/player[0].xml)
+		XMLWriter w = new XMLWriter(getFilePath());
+		
+		//fetch id, name, and coords
+		String[] a = {"id", "name", "coords"};
+		String[] b = {"" + getId(), getName(), getXYZ()};
+		
+		//open root
+		w.writeOpenTag("entity", a, b);
+		
+		//fetch hp
+		String[] c = {"hpMax", "hp"};
+		String[] d = {"" + getHPMax(), "" + getHP()};
+		
+		//write health
+		w.writeTag("health", c, d);
+		
+		//open inventory, write items
+		w.writeOpenTag("inventory");
+		for (int i = 0; i < m_inv.size(); i++)
+		{
+			w.writeTextContent("entity", m_inv.get(i).toString());
+		}
+		//close inventory
+		w.writeCloseTag("inventory");
+		
+		//close root
+		w.writeCloseTag("entity");
+		
+		//close file writer
+		w.close();
+		System.out.println("Wrote " + toString() +"'s inventory to " + getFilePath());
 	}
 	
 	public boolean move(String dir)
@@ -354,7 +446,7 @@ public class Entity
 	
 	public int getId()
 	{
-		return m_Id;
+		return m_id;
 	}
 	
 	public String getName()
@@ -364,17 +456,14 @@ public class Entity
 	
 	public String getFilePath() 
 	{
-		return "ent/" + "inv_" + toString();
+		//TODO: review inventory -> entity file changes
+		//return "ent/" + "inv_" + toString();
+		return "ent/" + toString();
 	}
 	
 	public void ignoresCollision(boolean ignores)
 	{
 		m_ignoresCollision = ignores;
-	}
-	
-	public Inventory getInventory()
-	{
-		return m_inv;
 	}
 	
 	public int getHPMax()
@@ -385,14 +474,114 @@ public class Entity
 	{
 		return m_hp;
 	}
-	
-	public void save()
+
+	public boolean addToInventory(Entity entity)
 	{
-		m_inv.save(this);
+		return m_inv.add(entity);
+	}
+	
+	public boolean delFromInventory(Entity entity)
+	{
+		return m_inv.remove(entity);
+	}
+	
+	public boolean delFromInventory(String entityName)
+	{
+		System.out.println("doing entity removal from inventory by name"
+				+ " for '" + entityName + "'");
+		for (int i = 0; i < m_inv.size(); i++)
+		{
+			if (m_inv.get(i).getName().equals(entityName))
+			{
+				System.out.println("found item!");
+				m_inv.get(i).remove();
+				m_inv.remove(i);
+				return true;
+			}	
+			System.out.println("checked " + m_inv.get(i).getName());
+		}
+		System.out.println("removal failed");
+		return false;
+	}
+	
+	/** Adds an ID to the list of IDs TODO: recycle IDs
+	 * 
+	 * @param id ID to add
+	 * @return true if added, false if not added.
+	 */
+	private static boolean addId(int id)
+	{
+		if (!m_idList.contains(id))
+		{
+			return m_idList.add(id);
+		}
+		else
+		{
+			return false;
+		}
+	}
+	/** Removes an ID from the ID list TODO: faster ID recycle
+	 * 
+	 * @param id ID to remove
+	 * @return true if removed, false if not removed
+	 */
+	private static boolean removeId(int id)
+	{
+		for (int i = 0; i < m_idList.size() - 1; i++)
+		{
+			if (m_idList.get(i) == id)
+			{
+				m_idList.remove(i);
+				return true;
+			}	
+		}
+		return false;
+	}
+	/** Gets the next free ID
+	 * TODO: make second array to track free IDs / garbage ID recycler
+	 * @return
+	 */
+	private static int getNextId()
+	{
+		int i = 0;
+		while(m_idList.contains(i))
+		{
+			i++;
+		}
+		return i;
+	}
+	
+	/** Sets this entity to null so it can be collected by
+	 * java's garbage collector (whenever it feels like doing that, though).
+	 */
+	private void remove()
+	{
+		// first we need to delete the entity file TODO: make the entity drop all its stuff too
+		try
+		{
+			File file = new File("ent/" + toString() + ".xml");
+			
+			if (file.delete())
+			{
+				System.out.println("entity file deleted!");
+			}
+			else
+			{
+				System.out.println("!CRTICAL! ENTITY FILE NOT DELETED!");
+			}
+		}
+		catch (Exception e)
+		{
+			
+		}
+		
+		// the we tell the server to remove the entity, RIP
+		apk.main.server.Server.remove(this);
 	}
 	
 	public String toString()
 	{
-		return m_name + "[" + m_Id + "]";
+		return m_name + "[" + m_id + "]";
 	}
+	
 }

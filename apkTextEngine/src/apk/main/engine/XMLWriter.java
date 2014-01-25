@@ -105,6 +105,14 @@ public class XMLWriter
     	m_out.println(temp);
     }
     
+    public void writeTextContent(String element, String text)
+    {
+    	String temp = tab();
+    	temp += "<" + element + ">" + text + "</" + element + ">"; 
+    	
+    	m_out.println(temp);
+    }
+    
     public void close()
     {
     	m_out.close();

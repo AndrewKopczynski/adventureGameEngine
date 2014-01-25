@@ -14,20 +14,6 @@ import org.w3c.dom.NodeList;
 
 public class XMLReader {
 
-	/* constructor:
-	 * filePath
-	 * array(?) of elements to be read from XML
-	 * array(?) of attributes to be read from XML 
-	 * 
-	 * once created we should be able to access the XML pretty easily
-	 * 
-	 * methods:
-	 * getRoot() {return String;}
-	 * getAttribute(element, attributeToGet) {return String;}
-	 * getLength(element) {return int;}
-	 * -> equiv to 'number of nodes'
-	 * -> for loops?
-	 */
 	/** File to read XML from. */
 	private File m_fileXML;
 	
@@ -158,70 +144,37 @@ public class XMLReader {
 		}
 		return temp;	
 	}
-			
-			/*NodeList tileNodeList = docXML.getElementsByTagName("tile");
-			
-			for (int i = 0; i < tileNodeList.getLength(); i++) {
-				Node nNode = tileNodeList.item(i);
-				
-				//System.out.println("DEBUG TAG: " +  nNode.getNodeName());
-				Logger.log("Tag found: " + nNode.getNodeName() + ", creating tile...");
-				
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) nNode;
-					String name = eElement.getAttribute("name");
-					String g = eElement.getAttribute("g");
-					String e = eElement.getAttribute("e");
-					new Graphic(name, g, e);
-				}
+	
+	public String[] getChildren(String element, int n)
+	{
+		String temp[] = new String[0]; // returner
+		int index = -1;
+		
+		for (int i = 0; i < m_elements.length; i++)
+		{
+			if (m_elements[i].equalsIgnoreCase(element))
+			{
+				index = i;
 			}
-			Logger.log("All graphics from tileset (" + filePath + ") were loaded sucessfully.");
-				
-			*//** Loads the file, filePath is required to know where the map is. 
-			 * Need loading zones for maps, or just have one huge map? 
-			 * Regardless, loading zones should give new filePath. *//*
-			
-			Logger.log("Loading map...");
-			File mapXmlFile = new File (mapFilePath);
-			DocumentBuilderFactory mapDbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder mapDBuilder = mapDbFactory.newDocumentBuilder();
-			Document mapDoc = mapDBuilder.parse(mapXmlFile);
-			mapDoc.getDocumentElement().normalize();
-			
-			*//** Important. Never remove, only comment out. *//*
-			//System.out.println("Root element: " + mapDoc.getDocumentElement().getNodeName());
-			Logger.log("Root Element found: " + mapDoc.getDocumentElement().getNodeName());
-			
-			mapSize = Integer.parseInt(mapDoc.getDocumentElement().getAttribute("size"));
-			roomArray = new Room[mapSize][mapSize];
-			
-			*//** Assign map name to room. *//*
-			String map = mapDoc.getDocumentElement().getAttribute("name");
-			
-			*//** Gets list of all element areas, so attributes can be read. *//*
-			NodeList mapNodeList = mapDoc.getElementsByTagName("room");
-			
-			for (int i = 0; i < mapNodeList.getLength(); i++) {
-				Node nNode = mapNodeList.item(i);
-				
-				*//** Knowing what tag is currently loaded. *//*
-				//System.out.println("DEBUG TAG: " + nNode.getNodeName());
-				Logger.log("Tag found: " + nNode.getNodeName() + ", creating room...");
-				
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) nNode;
-					
-					String name = eElement.getAttribute("name");
-					String type = eElement.getAttribute("type");
-					String coord = eElement.getAttribute("coord");
-					String inv = eElement.getAttribute("i");
-					Room room = new Room(map, name, type, coord, inv);
-					roomArray[room.getRoomCoordsX()][room.getRoomCoordsY()] = room;
-				}
+		}
+		
+		if (index == -1)
+		{	//Early return to avoid crash if element is invalid.
+			Logger.log(m_filePath + ": Didn't find element '" + element + "', returned early!");
+			return temp;
+		}
+		
+		Node nNode = m_docNodeList.get(index).item(n);
+		
+		if (nNode.getNodeType() == Node.ELEMENT_NODE)
+		{
+			Element eElement = (Element) nNode;
+			temp = new String[eElement.getChildNodes().getLength()];
+			for (int i = 0; i < eElement.getChildNodes().getLength(); i++)
+			{
+				temp[i] = eElement.getChildNodes().item(i).getTextContent();
 			}
-			Logger.log("All rooms in map (" + mapFilePath + ") were loaded sucessfully.");		
-		} catch (Exception e) {
-			Logger.log("Tileset OR Map ("+ filePath + " OR " + mapFilePath + ") failed to load! " + e);
-			e.printStackTrace();
-		}*/
+		}	
+		return temp;	
+	}
 }

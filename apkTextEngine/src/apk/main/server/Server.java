@@ -1,7 +1,6 @@
 package apk.main.server;
 
 import apk.main.engine.Entity;
-import apk.main.engine.Logger;
 import apk.main.engine.Map;
 import apk.main.engine.Parse;
 import apk.main.engine.Render_ASCII;
@@ -16,12 +15,8 @@ public class Server
 	
 	public Server()
 	{
-		/** TODO: make server load maps and stuff. */
-		Logger.clear();
 		new Map("maps/test_map.xml", "gfx/standard_tileset.xml");
-		
-		/** Create player */
-		player = new Entity(0, 0, 0, "player", 1);
+		player = new Entity("ent/player[0].xml");
 	}
 	
 	public static String[] input(String in) 
@@ -63,9 +58,17 @@ public class Server
 		frame.dispose();*/
 	}
 	
+	/** Removes an entity from memory.
+	 * Removed by Java's garbage collector (which automatically
+	 * gets rid of null entities whenver it feels like it).*/
+	public static void remove(Entity entity)
+	{
+		entity = null;
+	}
+	
 	public static void save()
 	{
 		// save TODO: better saving system that saves everything
-		player.save();
+		player.writeSave();
 	}
 }

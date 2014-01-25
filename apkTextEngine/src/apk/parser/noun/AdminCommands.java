@@ -8,7 +8,8 @@ public class AdminCommands extends WordList
 	{
 		list.put("setRange", 	"setRange");
 		list.put("give",		"give");
-		list.put("remove",		"remove");
+		list.put("remove",		"delete");
+		list.put("delete",      "delete");
 		list.put("noclip",		"noclip");
 		
 		list.put("err",			"Probably not a valid admin command,"

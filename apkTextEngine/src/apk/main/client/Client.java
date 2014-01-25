@@ -1,6 +1,8 @@
 package apk.main.client;
 
 import java.util.Scanner;
+
+//import apk.main.engine.XMLReader;
 //import apk.main.engine.XMLWriter;
 //import apk.main.engine.Entity;
 import apk.main.server.Server;
@@ -15,6 +17,23 @@ public class Client
 		Scanner scan = new Scanner(System.in);
 		String input = "";
 		String returned[];
+		
+		/*String[] invElements = {"entity", "health", "inventory"};
+		XMLReader invXML = new XMLReader("ent/test[10].xml", invElements);
+		
+		String temp = invXML.getAttribute(invElements[0], 0, "id");
+		System.out.println("id: " + temp);
+		temp = invXML.getAttribute("entity", 0, "name");
+		System.out.println("name: " + temp);
+		temp = invXML.getAttribute(invElements[1], 0, "hp");
+		System.out.println("hp: " + temp);
+	
+		System.out.println("printing inventory...");
+		String ents[] = invXML.getChildren("inventory", 0);
+		for (int a = 1; a < ents.length; a += 2)
+		{
+			System.out.println("id: " + Integer.parseInt(ents[a]));
+		}*/
 		
 		/*XMLWriter r = new XMLWriter("test");
 		String[] temp1 = new String[2];

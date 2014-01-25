@@ -31,7 +31,6 @@ import java.util.Scanner;
  */
 public class Inventory 
 {
-	private List<Entity> m_inv = new ArrayList<Entity>();
 	private String m_identifier;
 	private String m_name;
 	private String m_invPath;
@@ -43,13 +42,13 @@ public class Inventory
 	 * @param name Name of the room
 	 * @param filePath Path where the entity should be saved
 	 */
-	public Inventory(Room room)
+	/*public Inventory(Room room)
 	{
 		m_identifier = "room";
 		m_name = room.toString();
 		m_invPath = room.getFilePath();
 		load(room);
-	}
+	}*/
 	
 	/** Creates an inventory (typically) for an entity.
 	 * 
@@ -57,15 +56,16 @@ public class Inventory
 	 * @param name Name of entity
 	 * @param filePath Path where the entity should be saved
 	 */
+	/*
 	public Inventory(Entity entity)
 	{
 		m_identifier = "entity";
 		m_name = entity.toString();
 		m_invPath = entity.getFilePath();
-		load(entity);
-	}
+		//load(entity);
+	}*/
 	
-	private void save(Room room)
+	/*private void save(Room room)
 	{
 		try
 		{
@@ -80,9 +80,9 @@ public class Inventory
 		{
 	        Logger.log("Save failed in " + m_invPath + ", " + e);
 	    }
-	}
+	}*/
 	
-	private void load(Room room)
+	/*private void load(Room room)
 	{
 		File file = new File(m_invPath + ".txt");
 		m_inv.clear();
@@ -106,33 +106,37 @@ public class Inventory
 					+ " Creating new inventory for " + toString() + "...");
 			save(room);
 		}
-	}
+	}*/
 	
-	/** Entity save. */
-	public void save(Entity entity) 
+	/** Entity save. */ //TODO: should inventory and entity saving be different?
+	/*public void save(Entity entity) 
 	{	
-		/** Write to save file. */
+		*//** Write to save file. *//*
 		XMLWriter w = new XMLWriter(m_invPath);
 		
-		String[] a = {"id", "name"};
-		String[] b = {"" + entity.getId(), entity.getName()};
+		String[] a = {"id", "name", "coords"};
+		String[] b = {"" + entity.getId(), entity.getName(), entity.getXYZ()};
 		
 		w.writeOpenTag("entity", a, b);
 		
+		String[] c = {"hpMax", "hp"};
+		String[] d = {"" + entity.getHPMax(), "" + entity.getHP()};
+		
+		w.writeTag("health", c, d);
+		
+		w.writeOpenTag("inventory");
 		for (int i = 0; i < m_inv.size(); i++)
 		{
-			w.writeOpenTag("inventory");
-			String[] c = {"" + m_inv.get(i).getId(), m_inv.get(i).getName()};
-			w.writeTag("entity", a, c);
-			w.writeCloseTag("inventory");
+			w.writeTextContent("entity", "" + m_inv.get(i).getId());
 		}
+		w.writeCloseTag("inventory");
 		
 		w.writeCloseTag("entity");
 		w.close();
-	}
+	}*/
 	
 	/** Entiy load. */
-	public void load(Entity entity)
+	/*public void load(Entity entity)
 	{
 		File file = new File(m_invPath + ".txt");
 		m_inv.clear();
@@ -156,25 +160,25 @@ public class Inventory
 					+ " Creating new inventory for " + toString() + "...");
 			save(entity);
 		}
-	}
+	}*/
 	
 	/** Prints out the contents of inventory. */
-	public void print()
+	/*public void print()
 	{
 		for (int i = 0; i < m_inv.size(); i++)
 		{
 			System.out.println(m_inv.get(i));
 		} 
-	}
+	}*/
 	
 	/** Adds something to inventory. */
-	public void add(Entity entity)
+	/*public void add(Entity entity)
 	{
 		m_inv.add(entity);
 		Logger.log("Added item '" + entity + "' to " + toString());
-	}
+	}*/
 	
-	public void remove(String item)
+	/*public void remove(String item)
 	{
 		for (int i = 0; i < m_inv.size(); i++)
 		{
@@ -184,9 +188,9 @@ public class Inventory
 				Logger.log("Removed item '" +  item + "' from " + toString());
 			}
 		}
-	}
-	public String toString()
+	}*/
+	/*public String toString()
 	{
 		return m_identifier + " " + m_name;
-	}
+	}*/
 }

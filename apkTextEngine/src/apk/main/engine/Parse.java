@@ -207,12 +207,20 @@ public class Parse {
 			{
 				try
 				{
-					entity.getInventory().add(
-							new Entity(collapse(vnn, 2, vnn.length - 1),
-							Integer.parseInt(vnn[vnn.length - 1])));
+					//setup name, hp (assume full hp)
+					String name = collapse(vnn, 2, vnn.length - 1);
+					int hpMax = Integer.parseInt(vnn[vnn.length - 1]);
 					
-					System.out.println("Gave " + vnn[2] + " to player.");
-					return false;
+					if (entity.addToInventory(new Entity(name, hpMax)))
+					{
+						System.out.println("Gave " + name + " to " + entity.toString());
+						return false;
+					}
+					else
+					{
+						System.out.println("Couldn't give " + name + " to " + entity.toString());
+						return false;
+					}
 				}
 				
 				catch(Exception e)
@@ -221,19 +229,28 @@ public class Parse {
 					return false;
 				}
 			}
-			/** removeItem */
-			else if (vnn[1].equals("remove"))
+			/** deleteItem */ //TODO: convert everything to getMeaning!
+			else if ((vnn[1]).equals("delete"))
 			{
 				try
 				{
-					entity.getInventory().remove(collapse(vnn, 2, vnn.length - 2));
-					System.out.println("Removed " + vnn[2] + " from player.");
-					return false;
+					String name = collapse(vnn, 2, vnn.length);
+					
+					if (entity.delFromInventory(name))
+					{
+						System.out.println("Deleted " + vnn[2] + " from " + entity.toString());
+						return false;
+					}
+					else
+					{
+						System.out.println("Couldn't delete " + vnn[2] + " from " + entity.toString());
+						return false;
+					}
 				}
 				
 				catch(Exception e)
 				{
-					System.out.println("Usage: admin give [item]");
+					System.out.println("Usage: admin delete [item]");
 					return false;
 				}
 			}
