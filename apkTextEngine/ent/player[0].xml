@@ -2,5 +2,6 @@
 <entity id="0" name="player" coords="7,5,5">
 	<health hpMax="1" hp="1"/>
 	<inventory>
+        <entity>player2[1]</entity>
 	</inventory>
 </entity>

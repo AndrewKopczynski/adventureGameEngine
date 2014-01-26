@@ -9,7 +9,7 @@ import apk.main.engine.Render_ASCII;
 //TODO: load map
 public class Server 
 {
-	private static Entity player; //TODO: replace with loading entities from map/save files
+	private Entity player; //TODO: replace with loading entities from map/save files
 	private static Parse m_p = new Parse();
 	private static String msg[] = new String[1];
 	
@@ -19,7 +19,7 @@ public class Server
 		player = new Entity("ent/player[0].xml");
 	}
 	
-	public static String[] input(String in) 
+	public String[] input(String in) 
 	{	
 		if (m_p.parse(player, in))
 		{
@@ -61,12 +61,12 @@ public class Server
 	/** Removes an entity from memory.
 	 * Removed by Java's garbage collector (which automatically
 	 * gets rid of null entities whenever it feels like it).*/
-	public static void remove(Entity entity)
+	public void remove(Entity entity)
 	{
 		entity = null;
 	}
 	
-	public static void save()
+	public void save()
 	{
 		// save TODO: better saving system that saves everything
 		player.writeSave();

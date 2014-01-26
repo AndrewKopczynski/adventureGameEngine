@@ -39,7 +39,7 @@ public class Entity
 	
 	/** Name of entity. */
 	private String m_name;
-	/** Maxmimum health of entity. */
+	/** Maximum health of entity. */
 	private int m_hpMax;
 	/** Current health of entity. */
 	private int m_hp;
@@ -320,8 +320,8 @@ public class Entity
 		 *  Returns true if the room contains a valid exit for that way OR contains an
 		 *  'any' or ambiguous exit (symbolized by a '?' mark)
 		 *  
-		 *  TODO: overhaul into a point map. 
-		 *  NEW: noclip / ignores collision. */
+		 *  TODO: overhaul into a point map?
+		 */
 		if (!m_ignoresCollision && Map.isMapRoom(Map.roomArray, xDisp, yDisp, zDisp)) 
 		{
 			cond1 = Map.roomArray[getX()][getY()][getZ()].getRoomExits().contains(dir)
@@ -489,14 +489,14 @@ public class Entity
 	
 	public boolean delFromInventory(String entityName)
 	{
-		System.out.println("doing entity removal from inventory by name"
-				+ " for '" + entityName + "'");
+		System.out.println("doing entity removal from inventory by name for '" + entityName + "'");
+		
 		for (int i = 0; i < m_inv.size(); i++)
 		{
 			if (m_inv.get(i).getName().equals(entityName))
 			{
 				System.out.println("found item!");
-				m_inv.get(i).remove();
+				m_inv.get(i).delEntity();
 				m_inv.remove(i);
 				return true;
 			}	
@@ -540,8 +540,9 @@ public class Entity
 		return false;
 	}
 	/** Gets the next free ID
-	 * TODO: make second array to track free IDs / garbage ID recycler
-	 * @return
+	 * TODO: make second array track free IDs instead of looping through list.
+	 * 
+	 * @return The lowest available ID
 	 */
 	private static int getNextId()
 	{
@@ -556,7 +557,7 @@ public class Entity
 	/** Sets this entity to null so it can be collected by
 	 * java's garbage collector (whenever it feels like doing that, though).
 	 */
-	private void remove()
+	private void delEntity()
 	{
 		// first we need to delete the entity file TODO: make the entity drop all its stuff too
 		try
@@ -576,10 +577,8 @@ public class Entity
 		{
 			
 		}
-		
-		// then we tell the server to remove the entity, RIP
+		//no references, should clean up
 		delId(m_id);
-		Server.remove(this);
 	}
 	
 	public String toString()
