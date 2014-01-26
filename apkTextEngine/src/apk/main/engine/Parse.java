@@ -1,7 +1,7 @@
 package apk.main.engine;
 
-import apk.parser.noun.*;
-import apk.parser.verb.*;
+import apk.parser.action.*;
+import apk.parser.parameter.*;
 
 public class Parse {
 	
@@ -54,8 +54,7 @@ public class Parse {
 		/** SHORT MOVEMENT ------------------------------------------------	|
 		 * Short: north
 		 */
-		if (vnn.length == 1 
-				&& m_shortMove.contains(vnn[0])) 
+		if (vnn.length == 1 && m_shortMove.contains(vnn[0])) 
 		{
 			entity.move(m_shortMove.getMeaning(vnn[0]));
 			return true;
@@ -64,8 +63,7 @@ public class Parse {
 		/** MOVEMENT ------------------------------------------------------	|
 		 * Long: go north
 		 */
-		else if (vnn.length == 2 
-				&& m_move.contains(vnn[0]))
+		else if (vnn.length == 2 && m_move.contains(vnn[0]))
 		{
 			entity.move(m_direction.getMeaning(vnn[1]));
 			return true;
@@ -91,6 +89,7 @@ public class Parse {
 				int w = 0;
 				int u = 0;
 				int d = 0;
+				
 				if (m_direction.getMeaning(vnn[1]).equals("n"))
 				{
 					n = 1;
@@ -185,30 +184,30 @@ public class Parse {
 		else if (m_admin.contains(vnn[0]))
 		{
 			/** setRange */
-			if (vnn[1].equals("setRange"))
+			if ((m_admin.getMeaning(vnn[0]).equals("setVis")))
 			{
 				try
 				{
-					Render_ASCII.setRange(Integer.parseInt(vnn[2]));
-					System.out.println("Set visibility range to " + vnn[2]);
+					Render_ASCII.setRange(Integer.parseInt(vnn[1]));
+					System.out.println("Set visibility range to " + vnn[1]);
 					return true;
 				}
 				
 				catch(Exception e)
 				{
-					System.out.println("Usage: admin range [number]");
+					System.out.println("Usage: " + vnn[0] + " [number]");
 					return false;
 				}
 			}
 			
 			/** giveItem 
 			 * TODO: give items to any entity, not just the player */
-			else if (vnn[1].equals("give"))
+			else if ((m_admin.getMeaning(vnn[0]).equals("add")))
 			{
 				try
 				{
 					//setup name, hp (assume full hp)
-					String name = collapse(vnn, 2, vnn.length - 1);
+					String name = collapse(vnn, 1, vnn.length - 1);
 					int hpMax = Integer.parseInt(vnn[vnn.length - 1]);
 					
 					if (entity.addToInventory(new Entity(name, hpMax)))
@@ -225,54 +224,54 @@ public class Parse {
 				
 				catch(Exception e)
 				{
-					System.out.println("Usage: admin give [item] [hp]");
+					System.out.println("Usage: " + vnn[0] + " [itemName] [maxHp]");
 					return false;
 				}
 			}
 			/** deleteItem */ //TODO: convert everything to getMeaning!
-			else if ((vnn[1]).equals("delete"))
+			else if ((m_admin.getMeaning(vnn[0]).equals("del")))
 			{
 				try
 				{
-					String name = collapse(vnn, 2, vnn.length);
+					String name = collapse(vnn, 1, vnn.length);
 					
 					if (entity.delFromInventory(name))
 					{
-						System.out.println("Deleted " + vnn[2] + " from " + entity.toString());
+						System.out.println("Deleted " + name + " from " + entity.toString());
 						return false;
 					}
 					else
 					{
-						System.out.println("Couldn't delete " + vnn[2] + " from " + entity.toString());
+						System.out.println("Couldn't delete " + name + " from " + entity.toString());
 						return false;
 					}
 				}
 				
 				catch(Exception e)
 				{
-					System.out.println("Usage: admin delete [item]");
+					System.out.println("Usage: " + vnn[0] + " [itemName]");
 					return false;
 				}
 			}
-			
-			else if (vnn[1].equals("noclip"))
+			/** noclip */
+			else if ((m_admin.getMeaning(vnn[0]).equals("noclip")))
 			{
 				try
 				{
-					entity.ignoresCollision(Boolean.parseBoolean(vnn[2]));
+					entity.ignoresCollision(Boolean.parseBoolean(vnn[1]));
 					return false;
 				}
 				
 				catch(Exception e)
 				{
-					System.out.println("Usage: admin noclip [true/false]");
+					System.out.println("Usage: " + vnn[0] + " [true/false]");
 					return false;
 				}
 			}
 			
 			else
 			{
-				System.out.println("Usage: admin [command] [parameter(s)]");
+				System.out.println("'" + vnn[0] + "' doesn't seem to be a valid command.");
 				return false;
 			}
 		}

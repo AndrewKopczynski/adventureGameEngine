@@ -1,6 +1,0 @@
-<?xml version="1.0" ?>
-<entity id="4" name="item2" coords="0,0,0">
-	<health hpMax="1" hp="1"/>
-	<inventory>
-	</inventory>
-</entity>

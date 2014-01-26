@@ -2,7 +2,7 @@ package apk.main.engine;
 
 public class Render_ASCII
 {
-	/** Maxmimum allowed offset at any given time.
+	/** Maximum allowed offset at any given time.
 	 * Precautionary. */
 	private static final int M_OFFSET_CAP = 1;
 	/** Offset for X vision. */
@@ -59,7 +59,7 @@ public class Render_ASCII
 	{
 		if (m_range <= 0)
 		{
-			//TODO: finish ? if range too low/cant see
+			//TODO: finish ? if range too low/can't see
 			getPlayerGraphic(entX, entY, entZ);
 		}
 		int i = 0;
@@ -70,7 +70,15 @@ public class Render_ASCII
 			map[i] = renderMapLine(entX + m_xOffset, entY + m_yOffset, entZ + m_zOffset, y);
 			i++;
 		}
-		map[i] = ("Exits: " + Map.roomArray[entX][entY][entZ].getRoomExits());
+		if (Map.isMapRoom(Map.roomArray, entX, entY, entZ))
+		{
+			map[i] = ("Exits: " + Map.roomArray[entX][entY][entZ].getRoomExits());
+		}
+		else
+		{
+			map[i] = ("Exits: ?");
+		}
+		
 		m_xOffset = 0;
 		m_yOffset = 0;
 		m_zOffset = 0;

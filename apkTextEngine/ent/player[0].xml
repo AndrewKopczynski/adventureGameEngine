@@ -1,11 +1,6 @@
 <?xml version="1.0" ?>
-<entity id="0" name="player" coords="5,7,5">
+<entity id="0" name="player" coords="7,5,5">
 	<health hpMax="1" hp="1"/>
 	<inventory>
-		<entity>newTestSavedItem[1]</entity>
-		<entity>item1[3]</entity>
-		<entity>item2[4]</entity>
-		<entity>item3[5]</entity>
-		<entity>item4[6]</entity>
 	</inventory>
 </entity>

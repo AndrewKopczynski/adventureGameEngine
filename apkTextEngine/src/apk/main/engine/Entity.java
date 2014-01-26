@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import apk.main.server.Server;
+
 /** Represents an entity.
  * <p>
  * An entity has:
@@ -525,7 +527,7 @@ public class Entity
 	 * @param id ID to remove
 	 * @return true if removed, false if not removed
 	 */
-	private static boolean removeId(int id)
+	private static boolean delId(int id)
 	{
 		for (int i = 0; i < m_idList.size() - 1; i++)
 		{
@@ -575,8 +577,9 @@ public class Entity
 			
 		}
 		
-		// the we tell the server to remove the entity, RIP
-		apk.main.server.Server.remove(this);
+		// then we tell the server to remove the entity, RIP
+		delId(m_id);
+		Server.remove(this);
 	}
 	
 	public String toString()

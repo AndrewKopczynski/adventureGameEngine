@@ -1,4 +1,4 @@
-package apk.parser.verb;
+package apk.parser.action;
 
 import apk.parser.reference.WordList;
 

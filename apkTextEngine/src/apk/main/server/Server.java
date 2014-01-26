@@ -31,7 +31,7 @@ public class Server
 			return msg;
 		}
 		//String noMap[] = new String [1];
-		//noMap[0] = "DEBUG: no map recieved.";
+		//noMap[0] = "DEBUG: no map received.";
 		//return noMap;
 		//unused, old 'client/server' code
 		/*Scanner scan = new Scanner(System.in);
@@ -60,7 +60,7 @@ public class Server
 	
 	/** Removes an entity from memory.
 	 * Removed by Java's garbage collector (which automatically
-	 * gets rid of null entities whenver it feels like it).*/
+	 * gets rid of null entities whenever it feels like it).*/
 	public static void remove(Entity entity)
 	{
 		entity = null;

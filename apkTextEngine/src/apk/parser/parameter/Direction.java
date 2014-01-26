@@ -1,4 +1,4 @@
-package apk.parser.noun;
+package apk.parser.parameter;
 
 import apk.parser.reference.WordList;
 
