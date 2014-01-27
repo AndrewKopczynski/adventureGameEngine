@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
-<entity id="1" name="player2" coords="0,0,0">
+<entity id="0" name="testEnt" coords="0,0,0">
 	<health hpMax="1" hp="1"/>
 	<inventory>
-        <entity>player[0]</entity>
 	</inventory>
 </entity>

@@ -47,7 +47,7 @@ public class Parse {
 	 * @param input Input phrase to test
 	 * @return True if should return map, false if not.
 	 */
-	public boolean parse(Entity entity, String input)
+	public boolean parse(WorldEntity entity, String input)
 	{
 		String[] vnn = input.split(" ");
 		

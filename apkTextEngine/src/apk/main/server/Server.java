@@ -1,22 +1,23 @@
 package apk.main.server;
 
-import apk.main.engine.Entity;
 import apk.main.engine.Map;
 import apk.main.engine.Parse;
 import apk.main.engine.Render_ASCII;
+import apk.main.engine.WorldEntity;
 
 //TODO: make proper server/client
 //TODO: load map
 public class Server 
 {
-	private Entity player; //TODO: replace with loading entities from map/save files
+	private WorldEntity player; //TODO: replace with loading entities from map/save files
 	private static Parse m_p = new Parse();
 	private static String msg[] = new String[1];
 	
 	public Server()
 	{
 		new Map("maps/test_map.xml", "gfx/standard_tileset.xml");
-		player = new Entity("ent/player[0].xml");
+		player = new WorldEntity("ent/player[0].xml");
+		WorldEntity testEnt = new WorldEntity("ent/testEnt[0].xml");
 	}
 	
 	public String[] input(String in) 
@@ -56,14 +57,6 @@ public class Server
 		//unused, old 'client/server' code
 		/*scan.close();
 		frame.dispose();*/
-	}
-	
-	/** Removes an entity from memory.
-	 * Removed by Java's garbage collector (which automatically
-	 * gets rid of null entities whenever it feels like it).*/
-	public void remove(Entity entity)
-	{
-		entity = null;
 	}
 	
 	public void save()
