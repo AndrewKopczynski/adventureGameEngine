@@ -2,7 +2,9 @@ package apk.main.engine;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Represents an entity.
  * <p>
@@ -36,10 +38,13 @@ import java.util.List;
 public class Entity
 {	
 	/** Grand list of IDs */
-	protected static List<Integer> m_idList = new ArrayList<Integer>();
+	//testing hashmap instead of list
+	//protected static List<Integer> m_idList = new ArrayList<Integer>();
 	
 	/** Inventory of entity. */
 	protected List<Entity> m_inv = new ArrayList<Entity>();
+	
+	protected static Map<Integer, Entity> m_idList = new HashMap<Integer, Entity>();
 	
 	/** Unique ID */
 	protected int m_id;
@@ -69,7 +74,8 @@ public class Entity
 	public Entity(String name, int hpMax)
 	{
 		m_id = getNextId();
-		addId(m_id);
+		//addId(m_id);
+		addId(m_id, this);
 		
 		m_name = name;
 		m_hpMax = hpMax;
@@ -83,7 +89,8 @@ public class Entity
 	public Entity(String name, int hpMax, int hp)
 	{
 		m_id = getNextId();
-		addId(m_id);
+		//addId(m_id);
+		addId(m_id, this);
 		
 		m_name = name;
 		m_hpMax = hpMax;
@@ -109,23 +116,18 @@ public class Entity
 		m_id = Integer.parseInt(invXML.getAttribute(entElements[0], 0, "id"));
 		m_name = invXML.getAttribute("entity", 0, "name");
 		
-		System.out.println("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
-		m_idList.add(m_id);
-		
-		/*String temp = invXML.getAttribute("entity", 0, "coords");
-		String split[] = temp.split(",");
-		m_x = Integer.parseInt(split[0]);
-		m_y = Integer.parseInt(split[1]);
-		m_z = Integer.parseInt(split[2]);*/
+		Logger.log("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
+		//m_idList.add(m_id);
+		m_idList.put(m_id, this);
 		
 		m_hpMax = Integer.parseInt(invXML.getAttribute("health", 0, "hpMax"));
 		m_hp = Integer.parseInt(invXML.getAttribute("health", 0, "hp"));
 		
-		System.out.println("printing inventory...");
+		//System.out.println("printing inventory...");
 		String ents[] = invXML.getChildren("inventory", 0);
 		for (int a = 1; a < ents.length; a += 2)
 		{
-			System.out.println("found ent: " + ents[a]);
+			//System.out.println("found ent: " + ents[a]);
 			if (!ents[a].equals(toString()))
 			{
 				addToInventory(new Entity("ent/" + ents[a] + ".xml"));
@@ -136,10 +138,8 @@ public class Entity
 						+ " CHECK ENTITY FILE " + getFilePath() + "!";
 				System.out.println(err);
 				Logger.log(err);
-				//throws a stackoverflow here probaby TODO: test
 			}
 		}
-		
 		writeSave();
 	}
 	
@@ -177,7 +177,7 @@ public class Entity
 		
 		//close file writer
 		w.close();
-		System.out.println("Wrote " + toString() +"'s inventory to " + getFilePath());
+		Logger.log("Wrote " + toString() +"'s inventory to " + getFilePath());
 	}
 	
 	public int getId()
@@ -192,8 +192,6 @@ public class Entity
 	
 	public String getFilePath() 
 	{
-		//TODO: review inventory -> entity file changes
-		//return "ent/" + "inv_" + toString();
 		return "ent/" + toString();
 	}
 	
@@ -220,27 +218,25 @@ public class Entity
 	 * 
 	 * @param amount Amount to damage the entity by.
 	 */
-	public void hurt(int amount)
+	public String hurt(int amount)
 	{
 		if (amount < 0)
 		{
 			//reroute to heal if negative
-			heal(amount * -1);
-			return;
+			return heal(amount * -1);
 		}
 		
 		int temp = m_hp;
 		
 		if (m_hp - amount <= 0)
 		{
-			System.out.println(printMeter(temp, 0, m_hpMax, 30) + " ow.");
 			die();
+			return printMeter(temp, 0, m_hpMax, 30) + " ow.";
 		}
 		else
 		{
 			m_hp = Math.min(m_hp - amount, m_hpMax);
-			
-			System.out.println(printMeter(temp, m_hp, m_hpMax, 30) + " ow.");
+			return printMeter(temp, m_hp, m_hpMax, 30) + " ow.";
 		}
 	}
 	/** Heal this entity.
@@ -255,43 +251,35 @@ public class Entity
 	 * 
 	 * @param amount Amount to heal the entity by.
 	 */
-	public void heal(int amount)
+	public String heal(int amount)
 	{	
-		//precheck - is negative?
-		if (amount < 0)
+		if (amount < 0) //reroute to damage if negative
 		{
-			//reroute to damage if negative
-			hurt(amount * -1);
-			return;
-		}
-		else if (m_hp == m_hpMax)
-		{
-			//already maxhp
-			return;
+			return hurt(amount * -1);
 		}
 		
-		String str = "PLACEHOLDER_flag";
-		
-		if (str.equals("PLACEHOLDER_overheal_PERM"))
+		if ("PLACEHOLDER_flag".equals("PLACEHOLDER_overheal_PERM"))
 		{
 			m_hp += amount;
-			System.out.println(printMeter(m_hp, m_hp + amount, m_hpMax, 30) + " Ahh.");
+			
+			return printMeter(m_hp, m_hp + amount, m_hpMax, 30) + " Ahh.";
 		}
-		else if (str.equals("PLACEHOLDER_overheal_TEMP"))
+		else if ("PLACEHOLDER_flag".equals("PLACEHOLDER_overheal_TEMP"))
 		{
 			m_hp += amount;
-			System.out.println(printMeter(m_hp, m_hp + amount, m_hpMax, 30) + " Ahh.");
+			
+			return printMeter(m_hp, m_hp + amount, m_hpMax, 30) + " Ahh.";
 		}
 		else
 		{
 			int temp = m_hp;
-			
 			m_hp = Math.min(m_hp + amount, m_hpMax);
-			System.out.println(printMeter(temp, m_hp, m_hpMax, 30) + " Ahh.");
+			
+			return printMeter(temp, m_hp, m_hpMax, 30) + " Ahh.";
 		}
 	}
 	
-	private void die()
+	private void die() //TODO: finish
 	{
 		m_hp = 0;
 		
@@ -318,14 +306,11 @@ public class Entity
 		//TODO: does it matter enough to use doubles?
 		int tickValue = max / length;
 		
-		String str = "";
-		
-		str += "[";
-		
+		String str = "[";
 		
 		for (int i = 0; i < max; i += tickValue)
 		{
-			if ((i <= pre || i <= post) && pre == post)
+			if ((i < pre || i < post) && pre == post)
 			{
 				str += "|";
 				//System.out.println(" tcknorm ");
@@ -364,15 +349,12 @@ public class Entity
 	/** [player****] 10/10 */
 	public String printNamedHealthBar()
 	{
-		String str = "";
-		
-		str += "[";
+		String str = "[";
 		
 		for (int i = 0; i < m_hpMax; i++)
 		{
 			if (i < m_name.length())
 			{
-				System.out.println(m_name.substring(i, i + 1));
 				str += m_name.substring(i, i + 1);
 			}
 			else if (i < m_hp)
@@ -402,35 +384,36 @@ public class Entity
 	
 	public boolean delFromInventory(String entityName)
 	{
-		System.out.println("doing entity removal from inventory by name for '" + entityName + "'");
-		
+		//System.out.println("doing entity removal from inventory by name for '" + entityName + "'");
 		for (int i = 0; i < m_inv.size(); i++)
 		{
 			if (m_inv.get(i).getName().equals(entityName))
 			{
-				System.out.println("found item!");
+				//System.out.println("found item!");
 				m_inv.get(i).delEntity();
 				m_inv.remove(i);
 				return true;
 			}	
-			System.out.println("checked " + m_inv.get(i).getName());
+			//System.out.println("checked " + m_inv.get(i).getName());
 		}
-		System.out.println("removal failed");
+		//System.out.println("removal failed");
 		return false;
 	}
 	
-	/** Adds an ID to the list of IDs TODO: recycle IDs
+	/** Adds an ID to the list of IDs
 	 * 
 	 * @param id ID to add
 	 * @return true if added, false if not added.
 	 */
-	protected static boolean addId(int id)
+	protected static boolean addId(int id, Entity entity)
 	{
-		
 		System.out.println("ID: " + id);
-		if (!m_idList.contains(id))
+		//if (!m_idList.contains(id))
+		if (!m_idList.containsKey(id))
 		{
-			return m_idList.add(id);
+			//return m_idList.add(id);
+			m_idList.put(id, entity);
+			return true;
 		}
 		else
 		{
@@ -448,14 +431,19 @@ public class Entity
 	 */
 	private static boolean delId(int id)
 	{
-		for (int i = 0; i < m_idList.size() - 1; i++)
+		if (m_idList.containsKey(id))
+		{
+			m_idList.remove(id);
+			return true;
+		}
+		/*for (int i = 0; i < m_idList.size() - 1; i++)
 		{
 			if (m_idList.get(i) == id)
 			{
 				m_idList.remove(i);
 				return true;
 			}	
-		}
+		}*/
 		return false;
 	}
 	/** Gets the next free ID
@@ -466,38 +454,53 @@ public class Entity
 	private static int getNextId()
 	{
 		int i = 0;
-		while(m_idList.contains(i))
-		{
+		//while(m_idList.contains(i))
+		while(m_idList.containsKey(i))
 			i++;
-		}
 		return i;
 	}
 	
-	/** Sets this entity to null so it can be collected by
-	 * java's garbage collector (whenever it feels like doing that, though).
-	 */
-	private void delEntity()
+	public static Entity getEntityById(int id)
 	{
-		// first we need to delete the entity file TODO: make the entity drop all its stuff too
+		if (m_idList.containsKey(id))
+			return m_idList.get(id);
+		else
+			return null;
+	}
+	
+	/** debug list print */
+	public static void debug()
+	{
+		for (int i = 0; i < m_idList.size(); i++)
+		{
+			System.out.println(m_idList.get(i));
+		}
+	}
+	
+	/** Removes all references to this entity so that
+	 * java's garbage collector will clean it up whenever. */
+	protected void delEntity()
+	{
+		//TODO: make the entity drop all its stuff too
 		try
 		{
 			File file = new File("ent/" + toString() + ".xml");
 			
 			if (file.delete())
 			{
-				System.out.println("entity file deleted!");
+				Logger.log("Deleted: " + getFilePath());
 			}
 			else
 			{
 				System.out.println("!CRTICAL! ENTITY FILE NOT DELETED!");
+				throw new IllegalArgumentException("Could not delete entity file " + getFilePath());
 			}
 		}
 		catch (Exception e)
 		{
-			
+			System.out.println(e);
 		}
-		//no references, should clean up
-		delId(m_id);
+		delId(m_id); //no references, should clean up
 	}
 	
 	public String toString()

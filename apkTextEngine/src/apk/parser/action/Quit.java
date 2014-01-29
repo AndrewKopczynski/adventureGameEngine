@@ -10,7 +10,8 @@ public class Quit extends WordList
 	public Quit()
 	{
 		//input string			//meaning
-		list.put("quit",		m_d);
+		list.put("@quit",		m_d);
+		list.put("@forcequit",  m_d);
 		
 		list.put("err",	"It's just 'quit'. No need to get fancy.");	
 	}

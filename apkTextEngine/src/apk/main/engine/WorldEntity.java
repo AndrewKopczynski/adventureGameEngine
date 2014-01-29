@@ -60,7 +60,8 @@ public class WorldEntity extends Entity
 			m_name = invXML.getAttribute("entity", 0, "name");
 			
 			System.out.println("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
-			addId(m_id);
+			//addId(m_id);
+			addId(m_id, this);
 			
 			String temp = invXML.getAttribute("entity", 0, "coords");
 			String split[] = temp.split(",");
@@ -103,8 +104,10 @@ public class WorldEntity extends Entity
 		}
 		catch(Exception e)
 		{
-			System.out.println("Failed to load a WorldEntity!");
+			System.out.println();
 			System.out.println(e);
+			
+			//TODO: stop entity from being created
 			return;
 		}
 	}
@@ -255,7 +258,7 @@ public class WorldEntity extends Entity
 		 *  Returns true if the room contains a valid exit for that way OR contains an
 		 *  'any' or ambiguous exit (symbolized by a '?' mark)
 		 *  
-		 *  TODO: overhaul into a point map?
+		 *  TODO: overhaul into a point map
 		 */
 		if (!m_ignoresCollision && Map.isMapRoom(Map.roomArray, xDisp, yDisp, zDisp)) 
 		{

@@ -22,6 +22,8 @@ public class Admin extends WordList
 		
 		list.put("@heal",  		"heal");
 		
+		list.put("@debug", 		"debug");
+		
 		list.put("err",			"Probably not a valid admin command,"
 				+ " or you lack adimistrative permissions.");
 	}

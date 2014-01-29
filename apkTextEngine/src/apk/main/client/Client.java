@@ -7,7 +7,7 @@ public class Client
 {
 	public static void main(String[] args)
 	{
-		Server myServer = new Server();
+		/*Server myServer = new Server();
 
 		Scanner scan = new Scanner(System.in);
 		String input = "";
@@ -24,6 +24,6 @@ public class Client
 			}
 		}
 		scan.close();
-		myServer.save();
+		myServer.save();*/
 	}
 }

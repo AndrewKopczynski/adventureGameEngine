@@ -1,7 +1,7 @@
 package apk.main.engine;
 
 import apk.parser.action.*;
-import apk.parser.parameter.*;
+import apk.parser.target.*;
 
 public class Parse {
 	
@@ -45,6 +45,37 @@ public class Parse {
 		}
 		return temp;
 	}
+	
+	public String[] collapse(String[] input, int a, int b, String seperator)
+	{
+		int i = 0; //i = 0 first target //i = 1 second target
+		String t1 = "";
+		String t2 = "";
+		
+		for(; a < b; a++)
+		{
+			if (t1.length() > 0 && input[a].equals(seperator) && i < 1)
+			{
+				i++;
+			}
+			else
+			{
+				if (i == 0)
+					t1 += input[a];
+				else
+					t2 += input[a];
+				if (a + 1 < b)
+				{
+					if (i == 0 && (a + 1) < b)
+						t1 += " ";
+					else if (i == 1)
+						t2 += " ";
+				}
+			}
+		}
+		String[] temp = {t1, t2};
+		return temp;
+	}
 
 	/** Tests input and executes actions.
 	 * 
@@ -53,30 +84,31 @@ public class Parse {
 	 */
 	public String[] parse(WorldEntity entity, String input)
 	{
-		String[] vnn = input.split(" ");
+		//att - [action] [target] [target]
+		//eg. [look] [e]
+		//eg. [take] [item] from [box]
+		String[] att = input.split(" ");
 		
 		/** SHORT MOVEMENT ------------------------------------------------	|*/
-		if (m_shortMove.check(vnn)) 
+		if (m_shortMove.check(att)) 
 		{
-			entity.move(m_shortMove.getMeaning(vnn[0]));
+			entity.move(m_shortMove.getMeaning(att[0]));
 			return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
 		} 
 		
 		/** MOVEMENT ------------------------------------------------------	|*/
-		else if (m_move.check(vnn))
+		else if (m_move.check(att))
 		{
-			entity.move(m_direction.getMeaning(vnn[1]));
+			entity.move(m_direction.getMeaning(att[1]));
 			return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
 		}
 		
 		/** LOOK ----------------------------------------------------------	|*/
-		else if (m_look.check(vnn))
+		else if (m_look.check(att))
 		{
-			if (vnn.length == 1)
-			{
+			if (att.length == 1)
 				return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
-			}
-			else if (m_direction.check(vnn[1]) && vnn.length == 1)
+			else if (m_direction.check(att[1]) && att.length == 2)
 			{
 				//TODO: clean this and entity code up, rough pass for now
 				int n = 0;
@@ -86,47 +118,47 @@ public class Parse {
 				int u = 0;
 				int d = 0;
 				
-				if (m_direction.getMeaning(vnn[1]).equals("n"))
+				if (m_direction.getMeaning(att[1]).equals("n"))
 				{
 					n = 1;
 				}
-				else if (m_direction.getMeaning(vnn[1]).equals("ne"))
+				else if (m_direction.getMeaning(att[1]).equals("ne"))
 				{
 					n = 1;
 					e = 1;
 				}
-				else if (m_direction.getMeaning(vnn[1]).equals("e"))
+				else if (m_direction.getMeaning(att[1]).equals("e"))
 				{
 					e = 1;
 				}
-				else if (m_direction.getMeaning(vnn[1]).equals("se"))
+				else if (m_direction.getMeaning(att[1]).equals("se"))
 				{
 					s = 1;
 					e = 1;
 				}
-				else if (m_direction.getMeaning(vnn[1]).equals("s"))
+				else if (m_direction.getMeaning(att[1]).equals("s"))
 				{
 					s = 1;
 				}
-				else if (m_direction.getMeaning(vnn[1]).equals("sw"))
+				else if (m_direction.getMeaning(att[1]).equals("sw"))
 				{
 					s = 1;
 					w = 1;
 				}
-				else if (m_direction.getMeaning(vnn[1]).equals("w"))
+				else if (m_direction.getMeaning(att[1]).equals("w"))
 				{
 					w = 1;
 				}
-				else if (m_direction.getMeaning(vnn[1]).equals("nw"))
+				else if (m_direction.getMeaning(att[1]).equals("nw"))
 				{
 					n = 1;
 					w = 1;
 				}
-				else if (m_direction.getMeaning(vnn[1]).equals("u"))
+				else if (m_direction.getMeaning(att[1]).equals("u"))
 				{
 					u = 1;
 				}
-				else if (m_direction.getMeaning(vnn[1]).equals("d"))
+				else if (m_direction.getMeaning(att[1]).equals("d"))
 				{
 					d = 1;
 				}
@@ -142,71 +174,77 @@ public class Parse {
 		}
 		
 		/** TAKE ----------------------------------------------------------	|*/
-		else if (m_take.check(vnn))
+		else if (m_take.check(att))
 		{
-			msg[0] = "Not implimented, but detected 'take'.";
+			if (!m_take.check(att))
+				msg[0] = "detected 'take " + collapse(att, 1, att.length) + "'.";
+			else if (m_take.check(att))
+			{
+				String[] tmp = collapse(att, 1, att.length, m_take.getMeaning("mod"));
+				msg[0] = "detected 'take " + tmp[0] + tmp[1] + "'.";
+				System.out.println(tmp[0] + " l: " + tmp[0].length());
+				System.out.println(tmp[1] + " l: " + tmp[1].length());
+			}
 			return msg;
 		}
 		
 		/** PUT -----------------------------------------------------------	|*/
-		else if (m_put.check(vnn))
+		else if (m_put.check(att))
 		{
 			msg[0] = "Not implimented, but detected 'put'.";
 			return msg;
 		}
 		
 		/** DROP ----------------------------------------------------------	|*/
-		else if (m_drop.check(vnn))
+		else if (m_drop.check(att))
 		{
 			msg[0] = "Not implimented, but detected 'drop'.";
 			return msg;
 		}
 		
 		/** ST*ATUS -------------------------------------------------------	|*/
-		else if (m_status.check(vnn))
+		else if (m_status.check(att))
 		{
-			
 			msg[0] = entity.printMeter(entity.getHP(), entity.getHP(), entity.getHPMax(), 30);
 			return msg;
 		}
 		
 		/** TAC*TICAL -----------------------------------------------------	|*/
-		else if (m_tactical.check(vnn))
+		else if (m_tactical.check(att))
 		{
-			
 			msg[0] = entity.printNamedHealthBar();
 			return msg;
 		}
 		
 		/** ADMIN STUFF ---------------------------------------------------	|*/
-		else if (m_admin.check(vnn))
+		else if (m_admin.check(att))
 		{
 			/** setRange */
-			if ((m_admin.getMeaning(vnn[0]).equals("setVis")))
+			if (m_admin.getMeaning(att[0]).equals("setVis"))
 			{
 				try
 				{
-					Render_ASCII.setRange(Integer.parseInt(vnn[1]));
-					msg[0] = "Set visibility range to " + vnn[1];
+					Render_ASCII.setRange(Integer.parseInt(att[1]));
+					msg[0] = "Set visibility range to " + att[1];
 					return msg;
 				}
 				
 				catch(Exception e)
 				{	
-					msg[0] = "Usage: " + vnn[0] + " [number]";
+					msg[0] = "Usage: " + att[0] + " [number]";
 					return msg;
 				}
 			}
 			
 			/** giveItem 
 			 * TODO: give items to any entity, not just the player */
-			else if ((m_admin.getMeaning(vnn[0]).equals("add")))
+			else if (m_admin.getMeaning(att[0]).equals("add"))
 			{
 				try
 				{
 					//setup name, hp (assume full hp)
-					String name = collapse(vnn, 1, vnn.length - 1);
-					int hpMax = Integer.parseInt(vnn[vnn.length - 1]);
+					String name = collapse(att, 1, att.length - 1);
+					int hpMax = Integer.parseInt(att[att.length - 1]);
 					
 					if (entity.addToInventory(new Entity(name, hpMax)))
 					{
@@ -222,16 +260,16 @@ public class Parse {
 				
 				catch(Exception e)
 				{
-					msg[0] = "Usage: " + vnn[0] + " [itemName] [maxHp]";
+					msg[0] = "Usage: " + att[0] + " [itemName] [maxHp]";
 					return msg;
 				}
 			}
 			/** deleteItem */
-			else if ((m_admin.getMeaning(vnn[0]).equals("del")))
+			else if (m_admin.getMeaning(att[0]).equals("del"))
 			{
 				try
 				{
-					String name = collapse(vnn, 1, vnn.length);
+					String name = collapse(att, 1, att.length);
 					
 					if (entity.delFromInventory(name))
 					{
@@ -249,66 +287,71 @@ public class Parse {
 				catch(Exception e)
 				{
 					
-					msg[0] = "Usage: " + vnn[0] + " [itemName]";
+					msg[0] = "Usage: " + att[0] + " [itemName]";
 					return msg;
 				}
 			}
 			/** noclip */
-			else if ((m_admin.getMeaning(vnn[0]).equals("noclip")))
+			else if (m_admin.getMeaning(att[0]).equals("noclip"))
 			{
 				try
 				{
-					entity.ignoresCollision(Boolean.parseBoolean(vnn[1]));
+					entity.ignoresCollision(Boolean.parseBoolean(att[1]));
 
-					
-					msg[0] = "noclip = " + vnn[1];
+					msg[0] = "noclip = " + att[1];
 					return msg;
 				}
 				catch(Exception e)
 				{
-					
-					msg[0] = "Usage: " + vnn[0] + " [true/false]";
+					msg[0] = "Usage: " + att[0] + " [true/false]";
 					return msg;
 				}
 			}
 			/** hurt */
-			else if ((m_admin.getMeaning(vnn[0]).equals("hurt")))
+			else if (m_admin.getMeaning(att[0]).equals("hurt"))
 			{
 				try
 				{
-					entity.hurt(Integer.parseInt(vnn[1]));
+					entity.hurt(Integer.parseInt(att[1]));
 					
-					msg[0] = "Inflicted " + vnn[1] + " point(s) of damage to '" 
+					msg[0] = "Inflicted " + att[1] + " point(s) of damage to '" 
 						+ entity.toString() + "'.";
 					return msg;
 				}
 				catch(Exception e)
 				{
-					msg[0] = "Usage: " + vnn[0] + " [value]";
+					msg[0] = "Usage: " + att[0] + " [value]";
 					return msg;
 				}
 			}
 			/** heal */
-			else if ((m_admin.getMeaning(vnn[0]).equals("heal")))
+			else if (m_admin.getMeaning(att[0]).equals("heal"))
 			{
 				try
 				{
-					entity.heal(Integer.parseInt(vnn[1]));
+					entity.heal(Integer.parseInt(att[1]));
 					
-					msg[0] = "Healed " + vnn[1] + " point(s) of damage from '" 
+					msg[0] = "Healed " + att[1] + " point(s) of damage from '" 
 							+ entity.toString() + "'.";
 					return msg;
 				}
 				catch(Exception e)
 				{
-					msg[0] = "Usage: " + vnn[0] + " [value]";
+					msg[0] = "Usage: " + att[0] + " [value]";
 					return msg;
 				}
+			}
+			/** debug */
+			else if (m_admin.getMeaning(att[0]).equals("debug"))
+			{
+				Entity.debug();
+				msg[0] = "Printed debug.";
+				return msg;
 			}
 			/** if invalid */
 			else
 			{
-				msg[0] = "'" + vnn[0] + "' doesn't seem to be a valid command.";
+				msg[0] = "'" + att[0] + "' doesn't seem to be a valid command.";
 				return msg;
 			}
 		}
@@ -316,7 +359,7 @@ public class Parse {
 		/** QUIT ----------------------------------------------------------	|
 		 * Short: quit
 		 */
-		else if (m_quit.check(vnn))
+		else if (m_quit.check(att))
 		{
 			
 			msg[0] = "Saving and quitting...";

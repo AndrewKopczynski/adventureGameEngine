@@ -21,6 +21,14 @@ public class WordList
 		return false;
 	}
 	
+	public boolean checkForMod(String[] in)
+	{
+		for (int i = 0; i < in.length; i++)
+			if (getMeaning(in[i]) != null)
+				return true;
+		return false;
+	}
+	
 	public boolean check(String in)
 	{
 		if (getMeaning(in) != null)

@@ -22,6 +22,8 @@ public class Take extends WordList
 		list.put("obtain", 		m_d);
 		list.put("grab", 		m_d);
 		
+		list.put("mod",			"from"); //TODO: come up with a better name
+		
 		list.put("err", 	"Can't take that.");
 	}
 }
