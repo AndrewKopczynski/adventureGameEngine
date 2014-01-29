@@ -17,6 +17,11 @@ public class Admin extends WordList
 		
 		list.put("@noclip",		"noclip");
 		
+		list.put("@hurt",		"hurt");
+		list.put("@damage", 	"hurt");
+		
+		list.put("@heal",  		"heal");
+		
 		list.put("err",			"Probably not a valid admin command,"
 				+ " or you lack adimistrative permissions.");
 	}

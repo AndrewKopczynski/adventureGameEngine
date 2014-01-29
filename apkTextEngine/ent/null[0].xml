@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<entity id="0" name="null" coords="0,0,0">
+	<health hpMax="0" hp="0"/>
+	<inventory>
+	</inventory>
+</entity>

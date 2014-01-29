@@ -31,4 +31,13 @@ public class ShortMove extends WordList
 		
 		list.put("err", 		"I can't go that way.");
 	}
+	
+	/** SHORT MOVEMENT ------------------------------------------------	|
+	 * Short: north
+	 */
+	/*if (vnn.length == 1 && m_shortMove.contains(vnn[0])) 
+	{
+		entity.move(m_shortMove.getMeaning(vnn[0]));
+		return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
+	} */
 }

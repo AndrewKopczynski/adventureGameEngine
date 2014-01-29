@@ -16,8 +16,12 @@ public class Parse {
 	private Drop m_drop = new Drop();
 	private Quit m_quit = new Quit();
 	private Admin m_admin = new Admin();
+	private Status m_status = new Status();
+	private Tactical m_tactical = new Tactical();
 	
 	private Direction m_direction = new Direction();
+	
+	private String[] msg = new String[1]; //TODO replace with something nicer probably
 	
 	public Parse()
 	{
@@ -47,40 +51,32 @@ public class Parse {
 	 * @param input Input phrase to test
 	 * @return True if should return map, false if not.
 	 */
-	public boolean parse(WorldEntity entity, String input)
+	public String[] parse(WorldEntity entity, String input)
 	{
 		String[] vnn = input.split(" ");
 		
-		/** SHORT MOVEMENT ------------------------------------------------	|
-		 * Short: north
-		 */
-		if (vnn.length == 1 && m_shortMove.contains(vnn[0])) 
+		/** SHORT MOVEMENT ------------------------------------------------	|*/
+		if (m_shortMove.check(vnn)) 
 		{
 			entity.move(m_shortMove.getMeaning(vnn[0]));
-			return true;
+			return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
 		} 
 		
-		/** MOVEMENT ------------------------------------------------------	|
-		 * Long: go north
-		 */
-		else if (vnn.length == 2 && m_move.contains(vnn[0]))
+		/** MOVEMENT ------------------------------------------------------	|*/
+		else if (m_move.check(vnn))
 		{
 			entity.move(m_direction.getMeaning(vnn[1]));
-			return true;
+			return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
 		}
 		
-		/** LOOK ----------------------------------------------------------	|
-		 * Short: look
-		 * Mixed: look [item] or look [place] //TODO: look item support
-		 * Long: look at [item] or look to [direction] //TODO: implement
-		 */
-		else if (m_look.contains(vnn[0]))
+		/** LOOK ----------------------------------------------------------	|*/
+		else if (m_look.check(vnn))
 		{
 			if (vnn.length == 1)
 			{
-				return true;
+				return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
 			}
-			else if (vnn.length == 2 && m_direction.contains(vnn[1]))
+			else if (m_direction.check(vnn[1]) && vnn.length == 1)
 			{
 				//TODO: clean this and entity code up, rough pass for now
 				int n = 0;
@@ -138,50 +134,52 @@ public class Parse {
 				Render_ASCII.setxOffset(e - w);
 				Render_ASCII.setyOffset(s - n);
 				Render_ASCII.setzOffset(u - d);
-				return true;
+				return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
 			}
-			return false;
+			
+			msg[0] = "Look where?";
+			return msg; //TODO replace with per-action error fetches
 		}
 		
-		/** TAKE ----------------------------------------------------------	|
-		 * Short: get item
-		 * Mixed: get item crate
-		 * Long: get item from crate
-		 */
-		else if ((vnn.length == 2 || vnn.length == 3 || vnn.length == 4)
-				&& m_take.contains(vnn[0]))
+		/** TAKE ----------------------------------------------------------	|*/
+		else if (m_take.check(vnn))
 		{
-			System.out.println("Not implimented, but detected 'take'.");
-			return false;
+			msg[0] = "Not implimented, but detected 'take'.";
+			return msg;
 		}
 		
-		/** PUT -----------------------------------------------------------	|
-		 * Short: put item crate
-		 * Long: put huge sword in large crate
-		 */
-		else if ((vnn.length == 3 || vnn.length == 4) 
-				&& m_put.contains(vnn[0]))
+		/** PUT -----------------------------------------------------------	|*/
+		else if (m_put.check(vnn))
 		{
-			System.out.println("Not implimented, but detected 'put'.");
-			return false;
+			msg[0] = "Not implimented, but detected 'put'.";
+			return msg;
 		}
-		/** DROP ----------------------------------------------------------	|
-		 * Short: drop item
-		 */
-		else if (vnn.length == 2 && m_drop.contains(vnn[0]))
+		
+		/** DROP ----------------------------------------------------------	|*/
+		else if (m_drop.check(vnn))
 		{
-			System.out.println("Not implimented, but detected 'drop'.");
-			return false;
+			msg[0] = "Not implimented, but detected 'drop'.";
+			return msg;
 		}
-		/*else if (vnn.length == 3 && m_drop.contains(vnn[0]))
+		
+		/** ST*ATUS -------------------------------------------------------	|*/
+		else if (m_status.check(vnn))
 		{
 			
-		}*/
+			msg[0] = entity.printMeter(entity.getHP(), entity.getHP(), entity.getHPMax(), 30);
+			return msg;
+		}
 		
-		/** ADMIN STUFF ---------------------------------------------------	|
-		 * General: admin [command] [parameter]
-		 */
-		else if (m_admin.contains(vnn[0]))
+		/** TAC*TICAL -----------------------------------------------------	|*/
+		else if (m_tactical.check(vnn))
+		{
+			
+			msg[0] = entity.printNamedHealthBar();
+			return msg;
+		}
+		
+		/** ADMIN STUFF ---------------------------------------------------	|*/
+		else if (m_admin.check(vnn))
 		{
 			/** setRange */
 			if ((m_admin.getMeaning(vnn[0]).equals("setVis")))
@@ -189,14 +187,14 @@ public class Parse {
 				try
 				{
 					Render_ASCII.setRange(Integer.parseInt(vnn[1]));
-					System.out.println("Set visibility range to " + vnn[1]);
-					return true;
+					msg[0] = "Set visibility range to " + vnn[1];
+					return msg;
 				}
 				
 				catch(Exception e)
-				{
-					System.out.println("Usage: " + vnn[0] + " [number]");
-					return false;
+				{	
+					msg[0] = "Usage: " + vnn[0] + " [number]";
+					return msg;
 				}
 			}
 			
@@ -212,23 +210,23 @@ public class Parse {
 					
 					if (entity.addToInventory(new Entity(name, hpMax)))
 					{
-						System.out.println("Gave " + name + " to " + entity.toString());
-						return false;
+						msg[0] = "Gave " + name + " to " + entity.toString();
+						return msg;
 					}
 					else
 					{
-						System.out.println("Couldn't give " + name + " to " + entity.toString());
-						return false;
+						msg[0] = "Couldn't give " + name + " to " + entity.toString();
+						return msg;
 					}
 				}
 				
 				catch(Exception e)
 				{
-					System.out.println("Usage: " + vnn[0] + " [itemName] [maxHp]");
-					return false;
+					msg[0] = "Usage: " + vnn[0] + " [itemName] [maxHp]";
+					return msg;
 				}
 			}
-			/** deleteItem */ //TODO: convert everything to getMeaning!
+			/** deleteItem */
 			else if ((m_admin.getMeaning(vnn[0]).equals("del")))
 			{
 				try
@@ -237,20 +235,22 @@ public class Parse {
 					
 					if (entity.delFromInventory(name))
 					{
-						System.out.println("Deleted " + name + " from " + entity.toString());
-						return false;
+						
+						msg[0] = "Deleted " + name + " from " + entity.toString();
+						return msg;
 					}
 					else
 					{
-						System.out.println("Couldn't delete " + name + " from " + entity.toString());
-						return false;
+						
+						msg[0] = "Couldn't delete " + name + " from " + entity.toString();
+						return msg;
 					}
 				}
-				
 				catch(Exception e)
 				{
-					System.out.println("Usage: " + vnn[0] + " [itemName]");
-					return false;
+					
+					msg[0] = "Usage: " + vnn[0] + " [itemName]";
+					return msg;
 				}
 			}
 			/** noclip */
@@ -259,40 +259,77 @@ public class Parse {
 				try
 				{
 					entity.ignoresCollision(Boolean.parseBoolean(vnn[1]));
-					return false;
+
+					
+					msg[0] = "noclip = " + vnn[1];
+					return msg;
 				}
-				
 				catch(Exception e)
 				{
-					System.out.println("Usage: " + vnn[0] + " [true/false]");
-					return false;
+					
+					msg[0] = "Usage: " + vnn[0] + " [true/false]";
+					return msg;
 				}
 			}
-			
+			/** hurt */
+			else if ((m_admin.getMeaning(vnn[0]).equals("hurt")))
+			{
+				try
+				{
+					entity.hurt(Integer.parseInt(vnn[1]));
+					
+					msg[0] = "Inflicted " + vnn[1] + " point(s) of damage to '" 
+						+ entity.toString() + "'.";
+					return msg;
+				}
+				catch(Exception e)
+				{
+					msg[0] = "Usage: " + vnn[0] + " [value]";
+					return msg;
+				}
+			}
+			/** heal */
+			else if ((m_admin.getMeaning(vnn[0]).equals("heal")))
+			{
+				try
+				{
+					entity.heal(Integer.parseInt(vnn[1]));
+					
+					msg[0] = "Healed " + vnn[1] + " point(s) of damage from '" 
+							+ entity.toString() + "'.";
+					return msg;
+				}
+				catch(Exception e)
+				{
+					msg[0] = "Usage: " + vnn[0] + " [value]";
+					return msg;
+				}
+			}
+			/** if invalid */
 			else
 			{
-				System.out.println("'" + vnn[0] + "' doesn't seem to be a valid command.");
-				return false;
+				msg[0] = "'" + vnn[0] + "' doesn't seem to be a valid command.";
+				return msg;
 			}
 		}
 		
 		/** QUIT ----------------------------------------------------------	|
 		 * Short: quit
 		 */
-		else if (vnn.length == 1
-				&& m_quit.getMeaning(vnn[0]).equalsIgnoreCase("quit"))
+		else if (m_quit.check(vnn))
 		{
-			System.out.println("Saving and quitting...");
-			return false;
+			
+			msg[0] = "Saving and quitting...";
+			return msg;
 		}
 		
 		/** NO MATCH ------------------------------------------------------	|
 		 */
 		else
 		{
-			System.out.println(input + " for entity " 
-				+ entity + " isn't a valid command.");
-			return false;
+			
+			msg[0] = input + " for entity " + entity + " isn't a valid command.";
+			return msg;
 		}
 	}
 }

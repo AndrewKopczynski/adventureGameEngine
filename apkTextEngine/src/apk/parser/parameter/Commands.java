@@ -2,9 +2,9 @@ package apk.parser.parameter;
 
 import apk.parser.reference.WordList;
 
-public class AdminCommands extends WordList
+public class Commands extends WordList
 {
-	public AdminCommands()
+	public Commands()
 	{
 		//defunct
 	}

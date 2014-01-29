@@ -46,54 +46,67 @@ public class WorldEntity extends Entity
 	
 	public WorldEntity(String filePath)
 	{	
-		String[] entElements = {"entity", "health", "inventory"};
-		XMLReader invXML = new XMLReader(filePath, entElements);
-		
-		m_id = Integer.parseInt(invXML.getAttribute(entElements[0], 0, "id"));
-		m_name = invXML.getAttribute("entity", 0, "name");
-		
-		System.out.println("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
-		addId(m_id);
-		
-		String temp = invXML.getAttribute("entity", 0, "coords");
-		String split[] = temp.split(",");
-		
-		if (!split[0].equals("inInventory"))
+		try
 		{
-			m_x = Integer.parseInt(split[0]);
-			m_y = Integer.parseInt(split[1]);
-			m_z = Integer.parseInt(split[2]);
-		}
-		else
-		{
-			String err = "CRTICAL! ENTITY " + toString() + "TRIED TO LOAD"
-					+ " AN ENTITY WITH NO COORDINATES AS A WORLDENTITY!";
-			System.out.println(err);
-			Logger.log(err);
-		}
-		
-		m_hpMax = Integer.parseInt(invXML.getAttribute("health", 0, "hpMax"));
-		m_hp = Integer.parseInt(invXML.getAttribute("health", 0, "hp"));
-		
-		System.out.println("printing inventory...");
-		String ents[] = invXML.getChildren("inventory", 0);
-		for (int a = 1; a < ents.length; a += 2)
-		{
-			System.out.println("found ent: " + ents[a]);
-			if (!ents[a].equals(toString()))
+			Logger.log("Creating new entity from '" + filePath + "'...");
+			
+			String[] entElements = {"entity", "health", "inventory"};
+			
+			XMLReader invXML;
+			
+			invXML = new XMLReader(filePath, entElements);
+			
+			m_id = Integer.parseInt(invXML.getAttribute(entElements[0], 0, "id"));
+			m_name = invXML.getAttribute("entity", 0, "name");
+			
+			System.out.println("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
+			addId(m_id);
+			
+			String temp = invXML.getAttribute("entity", 0, "coords");
+			String split[] = temp.split(",");
+			
+			if (!split[0].equals("inInventory"))
 			{
-				addToInventory(new Entity("ent/" + ents[a] + ".xml"));
+				m_x = Integer.parseInt(split[0]);
+				m_y = Integer.parseInt(split[1]);
+				m_z = Integer.parseInt(split[2]);
 			}
 			else
 			{
-				String err = "!CRTICAL! ENTITY " + toString() + "TRIED TO LOAD ITSELF!"
-						+ " CHECK ENTITY FILE " + getFilePath() + "!";
+				String err = "CRTICAL! ENTITY " + toString() + "TRIED TO LOAD"
+						+ " AN ENTITY WITH NO COORDINATES AS A WORLDENTITY!";
 				System.out.println(err);
 				Logger.log(err);
 			}
+			
+			m_hpMax = Integer.parseInt(invXML.getAttribute("health", 0, "hpMax"));
+			m_hp = Integer.parseInt(invXML.getAttribute("health", 0, "hp"));
+			
+			System.out.println("printing inventory...");
+			String ents[] = invXML.getChildren("inventory", 0);
+			for (int a = 1; a < ents.length; a += 2)
+			{
+				System.out.println("found ent: " + ents[a]);
+				if (!ents[a].equals(toString()))
+				{
+					addToInventory(new Entity("ent/" + ents[a] + ".xml"));
+				}
+				else
+				{
+					String err = "!CRTICAL! ENTITY " + toString() + "TRIED TO LOAD ITSELF!"
+							+ " CHECK ENTITY FILE " + getFilePath() + "!";
+					System.out.println(err);
+					Logger.log(err);
+				}
+			}
+			writeSave();
 		}
-		
-		writeSave();
+		catch(Exception e)
+		{
+			System.out.println("Failed to load a WorldEntity!");
+			System.out.println(e);
+			return;
+		}
 	}
 	
 	public void writeSave()

@@ -44,20 +44,24 @@ public class XMLReader {
 		m_elements = elements;
 		
 		try {
-			
-			// Setup File
 			m_fileXML = new File(m_filePath);
 			m_docFactoryXML = DocumentBuilderFactory.newInstance();
 			m_docBuilderXML = m_docFactoryXML.newDocumentBuilder();
 			m_docXML = m_docBuilderXML.parse(m_fileXML);
+	
 			m_docXML.getDocumentElement().normalize();
 			
 			// Setup NodeList
 			setupNodeList();
 			
-		} catch (Exception e) {
-			Logger.log(m_fileXML.getName() + " failed to load! " + e);
-			e.printStackTrace();
+		}
+		catch (Exception e)
+		{
+			String err = m_filePath + " failed to load!";
+			System.out.println(err);
+			Logger.log(err);
+			
+			return;
 		}
 	}
 	
@@ -112,7 +116,7 @@ public class XMLReader {
 	 */
 	public String getAttribute(String element, int n, String attribute)
 	{
-		String temp = "NULL"; // returner
+		String temp = null; // returner
 		int index = -1;
 		
 		for (int i = 0; i < m_elements.length; i++)
@@ -129,7 +133,19 @@ public class XMLReader {
 			return temp;
 		}
 		
-		Node nNode = m_docNodeList.get(index).item(n);
+		// ----------
+		Node nNode;
+		
+		try
+		{
+			nNode = m_docNodeList.get(index).item(n);
+		}
+		catch (Exception e)
+		{
+			System.out.println("Tried to get elements from an .xml that was not loaded!");
+			return null;
+		}
+		
 		
 		if (nNode.getNodeType() == Node.ELEMENT_NODE)
 		{

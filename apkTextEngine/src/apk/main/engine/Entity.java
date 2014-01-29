@@ -210,6 +210,185 @@ public class Entity
 	{
 		return m_hp;
 	}
+	/** Damage this entity.
+	 * <p>
+	 * TODO: flags
+	 * <br>
+	 * If this entity does not have the admin_GODMODE flag,
+	 * and the damage brings the entities hp to or below
+	 * 0, then it will check isAlive().
+	 * 
+	 * @param amount Amount to damage the entity by.
+	 */
+	public void hurt(int amount)
+	{
+		if (amount < 0)
+		{
+			//reroute to heal if negative
+			heal(amount * -1);
+			return;
+		}
+		
+		int temp = m_hp;
+		
+		if (m_hp - amount <= 0)
+		{
+			System.out.println(printMeter(temp, 0, m_hpMax, 30) + " ow.");
+			die();
+		}
+		else
+		{
+			m_hp = Math.min(m_hp - amount, m_hpMax);
+			
+			System.out.println(printMeter(temp, m_hp, m_hpMax, 30) + " ow.");
+		}
+	}
+	/** Heal this entity.
+	 * <p>
+	 * TODO: flags
+	 * <br>
+	 * <ul>Situations
+	 * <li>overheal_PERM - will overheal and never lose extra HP
+	 * <li>overheal_TEMP - will overheal and decay overhead overtime
+	 * <li>none (default) - will not overheal
+	 * </ul>
+	 * 
+	 * @param amount Amount to heal the entity by.
+	 */
+	public void heal(int amount)
+	{	
+		//precheck - is negative?
+		if (amount < 0)
+		{
+			//reroute to damage if negative
+			hurt(amount * -1);
+			return;
+		}
+		else if (m_hp == m_hpMax)
+		{
+			//already maxhp
+			return;
+		}
+		
+		String str = "PLACEHOLDER_flag";
+		
+		if (str.equals("PLACEHOLDER_overheal_PERM"))
+		{
+			m_hp += amount;
+			System.out.println(printMeter(m_hp, m_hp + amount, m_hpMax, 30) + " Ahh.");
+		}
+		else if (str.equals("PLACEHOLDER_overheal_TEMP"))
+		{
+			m_hp += amount;
+			System.out.println(printMeter(m_hp, m_hp + amount, m_hpMax, 30) + " Ahh.");
+		}
+		else
+		{
+			int temp = m_hp;
+			
+			m_hp = Math.min(m_hp + amount, m_hpMax);
+			System.out.println(printMeter(temp, m_hp, m_hpMax, 30) + " Ahh.");
+		}
+	}
+	
+	private void die()
+	{
+		m_hp = 0;
+		
+		String msg = "'" + toString() + "' died in inventory.";
+		System.out.println(msg);
+		Logger.log(msg);
+	}
+	
+	/** Meters.
+	 * <br>
+	 * Examples:
+	 * <br>
+	 * [||||||||||] 50/50
+	 * <br>
+	 * [|| ] 20/40 
+	 * 
+	 * @param cur Current value (eg. hp)
+	 * @param max Maximum value (eg. hpMax)
+	 * @param length Length of meter in characters
+	 * @return Meter
+	 */
+	public String printMeter(int pre, int post, int max, int length)
+	{
+		//TODO: does it matter enough to use doubles?
+		int tickValue = max / length;
+		
+		String str = "";
+		
+		str += "[";
+		
+		
+		for (int i = 0; i < max; i += tickValue)
+		{
+			if ((i <= pre || i <= post) && pre == post)
+			{
+				str += "|";
+				//System.out.println(" tcknorm ");
+			}
+			else if (i < pre && pre < post)
+			{
+				str += "|";
+				//System.out.println(" tckhurt ");
+			}
+			else if (i < post && post < pre)
+			{
+				str += "|";
+				//System.out.println(" tckhheal ");
+			}
+			else if (i >= post - pre && i < pre)
+			{
+				str += "=";
+				//System.out.println(" hurt ");
+			}
+			else if (i >= pre - post && i < post)
+			{
+				str += "*";
+				//System.out.println(" heal ");
+			}
+			else
+			{
+				str += " ";
+				//System.out.println(" spc ");
+			}
+		}
+		str += "] " + post + "/" + max;
+		
+		return str;
+	}
+	
+	/** [player****] 10/10 */
+	public String printNamedHealthBar()
+	{
+		String str = "";
+		
+		str += "[";
+		
+		for (int i = 0; i < m_hpMax; i++)
+		{
+			if (i < m_name.length())
+			{
+				System.out.println(m_name.substring(i, i + 1));
+				str += m_name.substring(i, i + 1);
+			}
+			else if (i < m_hp)
+			{
+				str += "*";
+			}
+			else
+			{
+				str += " ";
+			}
+		}
+		
+		str += "] " + m_hp + "/" + m_hpMax;
+		
+		return str;
+	}
 
 	public boolean addToInventory(Entity entity)
 	{
