@@ -1,9 +1,5 @@
 package apk.main.client;
 
-import java.io.*;
-import java.net.*;
-
-import java.io.DataInputStream;
 import java.io.PrintStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -21,7 +17,10 @@ public class Client implements Runnable
 	private static PrintStream os = null;
 
 	// The input stream
-	private static DataInputStream is = null;
+	//private static DataInputStream is = null;
+	
+	//z - new input stream because some of DataInputStream's methods are deprecated
+	private static BufferedReader m_in = null;
 
 	private static BufferedReader inputLine = null;
 	private static boolean closed = false;
@@ -52,7 +51,7 @@ public class Client implements Runnable
 			clientSocket = new Socket(host, portNumber);
 			inputLine = new BufferedReader(new InputStreamReader(System.in));
 			os = new PrintStream(clientSocket.getOutputStream());
-			is = new DataInputStream(clientSocket.getInputStream());
+			m_in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); //z - changed from DataStream to BufferedReader
 		}
 		catch (UnknownHostException e)
 		{
@@ -67,7 +66,7 @@ public class Client implements Runnable
 		/* If everything has been initialized then we want to write some data to the
 		* socket we have opened a connection to on the port portNumber.
 		*/
-		if (clientSocket != null && os != null && is != null)
+		if (clientSocket != null && os != null && m_in != null)
 		{
 			try
 			{
@@ -81,7 +80,7 @@ public class Client implements Runnable
 				
 				/* Close the output stream, close the input stream, close the socket. */
 				os.close();
-				is.close();
+				m_in.close(); //z
 				clientSocket.close();
 			}
 			catch (IOException e)
@@ -105,7 +104,7 @@ public class Client implements Runnable
 		String responseLine;
 		try
 		{
-		while ((responseLine = is.readLine()) != null)
+		while ((responseLine = m_in.readLine()) != null) //z
 		{
 			System.out.println(responseLine);
 			if (responseLine.indexOf("*** Bye") != -1)

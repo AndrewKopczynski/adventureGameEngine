@@ -5,11 +5,7 @@ import apk.main.engine.Map;
 import apk.main.engine.Parse;
 import apk.main.engine.WorldEntity;*/
 
-/*import java.net.*;
-import java.io.*;*/
-
 import java.io.BufferedReader;
-//import java.io.DataInputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.IOException;
@@ -32,10 +28,9 @@ private static final clientThread[] threads = new clientThread[maxClientsCount];
 
 public static void main(String args[])
 {
-	/**all modified lines will start with //z for the sake of clairity*/
+	/**all modified lines will start with //z for the sake of clarity*/
 	
-	//z
-	System.out.println("Starting server...");
+	System.out.println("Starting server..."); //z
 	
 	// The default port number.
 	int portNumber = 2222;
@@ -116,7 +111,7 @@ class clientThread extends Thread
 	
 	private String clientName = null;
 	//private DataInputStream is = null;
-	private BufferedReader m_in = null; // mine
+	private BufferedReader m_in = null; // z - mine
 	private PrintStream os = null;
 	private Socket clientSocket = null;
 	private final clientThread[] threads;
