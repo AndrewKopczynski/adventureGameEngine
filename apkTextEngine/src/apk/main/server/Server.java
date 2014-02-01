@@ -1,9 +1,9 @@
 package apk.main.server;
 
-/*import apk.main.engine.Logger;
+import apk.main.engine.Logger;
 import apk.main.engine.Map;
 import apk.main.engine.Parse;
-import apk.main.engine.WorldEntity;*/
+import apk.main.engine.WorldEntity;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -28,7 +28,10 @@ private static final clientThread[] threads = new clientThread[maxClientsCount];
 
 public static void main(String args[])
 {
-	/**all modified lines will start with //z for the sake of clarity*/
+	/**all modified lines are marked with //z for the sake of clarity*/
+	
+	Logger.clear(); //z
+	new Map("maps/test_map.xml", "gfx/standard_tileset.xml"); //z
 	
 	System.out.println("Starting server..."); //z
 	
@@ -106,9 +109,10 @@ public static void main(String args[])
 * routes the private message to the particular client. When a client leaves the
 * chat room this thread informs also all the clients about that and terminates.
 */
+
+/* the above may or may not be relevant by the time i'm done converting this to my engine */
 class clientThread extends Thread
-{
-	
+{	
 	private String clientName = null;
 	//private DataInputStream is = null;
 	private BufferedReader m_in = null; // z - mine
@@ -116,6 +120,8 @@ class clientThread extends Thread
 	private Socket clientSocket = null;
 	private final clientThread[] threads;
 	private int maxClientsCount;
+	
+	ServerProtocol protocol = null; //z
 	
 	public clientThread(Socket clientSocket, clientThread[] threads)
 	{
@@ -128,7 +134,7 @@ class clientThread extends Thread
 	{
 		int maxClientsCount = this.maxClientsCount;
 		clientThread[] threads = this.threads;
-		
+
 		try
 		{
 		
@@ -158,7 +164,7 @@ class clientThread extends Thread
 			
 			/* Welcome the new the client. */
 			os.println(name + " has connected."
-					+ "\nTo leave enter /quit in a new line.");
+					+ "\n@quit to disconnect.");
 
 			synchronized (this)
 			{
@@ -166,7 +172,8 @@ class clientThread extends Thread
 				{
 					if (threads[i] != null && threads[i] == this)
 					{
-						clientName = "@" + name;
+						clientName = "player_" + name;
+						protocol = new ServerProtocol(clientName); //z
 						break;
 					}
 				}
@@ -184,15 +191,41 @@ class clientThread extends Thread
 			{
 				//String line = is.readLine();
 				String line = m_in.readLine();
-				if (line.startsWith("/quit"))
+				if (line.startsWith("@quit"))
 				{
 					break;
 				}
 				/** PRIVATE MESSAGE - STUDY THIS AND FIGURE IT OUT */
 				/* If the message is private sent it to the given client. */
-				if (line.startsWith("@"))
+				//if (line.startsWith("@")) //z
+				
+				//TODO: clean up later, just want to get something rough working
+				
+				String get = (protocol.processInput(line));
+				
+				//debug //System.out.println("CLI: " + clientName);
+				//debug //System.out.println("GET: " + get);
+				
+				if (get.startsWith(clientName))
 				{
-					String[] words = line.split("\\s", 2);
+					
+					get = get.substring(clientName.length(), get.length());
+					//debug //System.out.println("GET: " + get);
+					
+					synchronized (this)
+					{
+						for (int i = 0; i < maxClientsCount; i++)
+						{
+							if (threads[i] != null && threads[i] == this && threads[i].clientName != null)
+							{
+								//this.os.println(get);
+								threads[i].os.println(get);
+								//threads[i].os.println(protocol.processInput(line));
+							}
+						}
+					}
+						
+					/*String[] words = line.split("\\s", 2);
 					if (words.length > 1 && words[1] != null)
 					{
 						words[1] = words[1].trim();
@@ -207,17 +240,18 @@ class clientThread extends Thread
 											&& threads[i].clientName.equals(words[0]))
 									{
 										threads[i].os.println("<" + name + "> " + words[1]);
-										/*
+										
 										* Echo this message to let the client know the private
 										* message was sent.
-										*/
+										
 										this.os.println(">" + name + "> " + words[1]);
+										//this.os.println(get);
 										break;
 									}
 								}
 							}
 						}
-					}
+					}*/
 				} 
 				else
 				{
@@ -228,7 +262,9 @@ class clientThread extends Thread
 						{
 							if (threads[i] != null && threads[i].clientName != null)
 							{
-								threads[i].os.println("<" + name + "> " + line);
+								//threads[i].os.println("<" + name + "> " + line);
+								/*TODO: first attempt to hook up the game to the engine: */
+								//threads[i].os.println(protocol.processInput(line)); //TODO: cleanup
 							}
 						}
 					}
@@ -240,7 +276,7 @@ class clientThread extends Thread
 				{
 					if (threads[i] != null && threads[i] != this && threads[i].clientName != null)
 					{
-						threads[i].os.println("*** " + name + " disconnected from the chatroom. ***");
+						threads[i].os.println("*** " + name + " disconnected. ***");
 					}
 				}
 			}
@@ -275,7 +311,7 @@ class clientThread extends Thread
 	}
 }
 
-
+/** older attempts at server-client code, can be ignored. */
 /*public class Server extends Thread
 {
 	final static int m_portNumber = 4000; //TODO: change later
@@ -460,7 +496,7 @@ class clientThread extends Thread
 		}
 	}*/
 
-	/** old server-client code */
+	/** even older server-client code */
 	/*public static void main(String[] args) throws IOException
 	{	
 		Logger.clear();
@@ -512,20 +548,34 @@ class clientThread extends Thread
 	}
 }*/
 
-/*class ServerProtocol
+class ServerProtocol
 {
-	private WorldEntity ent = new WorldEntity("ent/player[0].xml");
+	private WorldEntity ent = null;
 	private static Parse m_p = new Parse();
+	private String m_name = null; //z TODO: rework probably, rough pass
 	
 	private static final int WAITING_FOR_LOGIN = 0;
 	private static final int CONNECTED = 1;
 	
-	private int state = WAITING_FOR_LOGIN;
+	private static int state = CONNECTED;
 	
+	public ServerProtocol(String name)
+	{
+		m_name = name;
+		
+		/* I spent half an hour trying to figure out why m_p.parse() was
+		 * causing null pointer exceptions only to realize that I didn't
+		 * assign the new WorldEntity to ent.
+		 */
+		ent = new WorldEntity(0, 0, 0, name, 30, 30);
+		
+	}
 	public String processInput(String in) 
 	{	
 		String msg[] = {""};
-		String tmp = "";
+		String tmp = m_name; 
+		//TODO: apologize to the world for this terrible method of message sending,
+		//but i really just want something to show
 		
 		if (state == WAITING_FOR_LOGIN)
 		{
@@ -538,8 +588,8 @@ class clientThread extends Thread
 		}	
 		for (int i = 0; i < msg.length; i++)
 		{
-			tmp += msg[i] + "#";
+			tmp += msg[i] + "\n";
 		}
 		return tmp;
 	}
-}*/
+}

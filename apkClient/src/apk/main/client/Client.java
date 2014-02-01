@@ -43,9 +43,7 @@ public class Client implements Runnable
 			portNumber = Integer.valueOf(args[1]).intValue();
 		}
 
-		/*
-		* Open a socket on a given host and port. Open input and output streams.
-		*/
+		/* Open a socket on a given host and port. Open input and output streams.*/
 		try
 		{
 			clientSocket = new Socket(host, portNumber);

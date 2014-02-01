@@ -429,7 +429,7 @@ public class Entity
 	 * @param id ID to remove
 	 * @return true if removed, false if not removed
 	 */
-	private static boolean delId(int id)
+	protected static boolean delId(int id)
 	{
 		if (m_idList.containsKey(id))
 		{
@@ -451,7 +451,7 @@ public class Entity
 	 * 
 	 * @return The lowest available ID
 	 */
-	private static int getNextId()
+	protected static int getNextId()
 	{
 		int i = 0;
 		//while(m_idList.contains(i))
@@ -507,5 +507,4 @@ public class Entity
 	{
 		return m_name + "[" + m_id + "]";
 	}
-	
 }

@@ -22,7 +22,7 @@ public class Parse {
 	
 	private Direction m_direction = new Direction();
 	
-	private String[] msg = new String[1]; //TODO replace with something nicer probably
+	private String[] msg; //TODO replace with something nicer probably
 	
 	public Parse()
 	{
@@ -85,6 +85,10 @@ public class Parse {
 	 */
 	public String[] parse(WorldEntity entity, String input)
 	{
+		//clear msg;
+		
+		msg = new String[1];
+		
 		//att - [action] [target] [target]
 		//eg. [look] [e]
 		//eg. [take] [item] from [box]
@@ -93,22 +97,32 @@ public class Parse {
 		/** SHORT MOVEMENT ------------------------------------------------	|*/
 		if (m_shortMove.check(att)) 
 		{
-			entity.move(m_shortMove.getMeaning(att[0]));
-			return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
-		} 
-		
-		/** MOVEMENT ------------------------------------------------------	|*/
-		else if (m_move.check(att))
-		{
-			String temp = entity.move(m_direction.getMeaning(att[1]));
+			String temp = entity.move(m_shortMove.getMeaning(att[0]));
 			msg = Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
 			
 			String[] arr = new String[msg.length + 1];
 			System.arraycopy(msg, 0, arr, 0, msg.length);
 			
 			msg = arr;
-			msg[msg.length] = temp;
+			msg[msg.length - 1] = temp;
 			
+			return msg;
+		} 
+		
+		/** MOVEMENT ------------------------------------------------------	|*/
+		else if (m_move.check(att))
+		{
+			if (m_direction.check(att[att.length - 1]))
+			{
+				String temp = entity.move(m_direction.getMeaning(att[1]));
+				msg = Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
+				
+				String[] arr = new String[msg.length + 1];
+				System.arraycopy(msg, 0, arr, 0, msg.length);
+				
+				msg = arr;
+				msg[msg.length - 1] = temp;
+			}
 			return msg;
 		}
 		
@@ -116,7 +130,9 @@ public class Parse {
 		else if (m_look.check(att))
 		{
 			if (att.length == 1)
+			{
 				return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
+			}
 			else if (m_direction.check(att[1]) && att.length == 2)
 			{
 				//TODO: clean this and entity code up, rough pass for now

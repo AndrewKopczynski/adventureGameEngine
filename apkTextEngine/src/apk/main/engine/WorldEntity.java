@@ -33,6 +33,9 @@ public class WorldEntity extends Entity
 	 */
 	public WorldEntity(int x, int y, int z, String name, int hpMax, int hp)
 	{
+		m_id = getNextId();
+		addId(m_id, this);
+		
 		m_x = x;
 		m_y = y;
 		m_z = z;
@@ -151,7 +154,7 @@ public class WorldEntity extends Entity
 	
 	public String move(String dir)
 	{
-		boolean isDisplaced = false;
+		//boolean isDisplaced = false;
 		boolean cond1; // contains direction you want to go
 		boolean cond2; // contains ? any room modifier
 		
@@ -294,7 +297,7 @@ public class WorldEntity extends Entity
 			return "I can't go that way.";
 		}
 		
-		isDisplaced = true;
+		//isDisplaced = true;
 		
 		/* For some reason when I first programmed the line of code below,
 		 * I used player.getX(), player.getY(), etc instead of just using

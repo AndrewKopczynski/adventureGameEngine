@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<entity id="0" name="player" coords="7,5,5">
+<entity id="1" name="player_The_Dude" coords="0,0,0">
 	<health hpMax="30" hp="30"/>
 	<inventory>
 	</inventory>
