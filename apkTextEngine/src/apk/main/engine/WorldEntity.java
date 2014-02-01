@@ -149,7 +149,7 @@ public class WorldEntity extends Entity
 	}
 	
 	
-	public boolean move(String dir)
+	public String move(String dir)
 	{
 		boolean isDisplaced = false;
 		boolean cond1; // contains direction you want to go
@@ -232,8 +232,8 @@ public class WorldEntity extends Entity
 		}
 		else 
 		{
-			System.out.println(dir + " is not a valid direction.");
-			return isDisplaced;
+			System.out.println(toString() + " tried to go invalid direction '" + dir + "'.");
+			return "'" + dir + "' is not a valid direction.";
 		}
 		
 		int xDisp = getX() + (e - w);
@@ -248,8 +248,8 @@ public class WorldEntity extends Entity
 			|| getUp(u) > (Map.HEIGHT_LIMIT - 1) 
 			|| getDown(d) < 0)
 		{
-			System.out.println("You don't think that exit leads anywhere.");
-			return isDisplaced;
+			System.out.println(toString() + " was blocked from going out of bounds of map.");
+			return "That doesn't go anywhere.";
 		}
 		
 		/** Checks if the room has the correct exits to move in the requested direction,
@@ -275,8 +275,8 @@ public class WorldEntity extends Entity
 		}	
 		else
 		{
-			System.out.println("There's no exit that way.");
-			return isDisplaced;
+			System.out.println(toString() + " tried to a room that didn't have the appropriate opposite exit.");
+			return "I can't seem to go that way.";
 		}
 		
 		if (cond1 && cond2) 
@@ -290,8 +290,8 @@ public class WorldEntity extends Entity
 		} 
 		else
 		{
-			System.out.println("There isn't an exit that way.");
-			return isDisplaced;
+			System.out.println(toString() + " tried to go through an exit that doesn't exist.");
+			return "I can't go that way.";
 		}
 		
 		isDisplaced = true;
@@ -302,9 +302,16 @@ public class WorldEntity extends Entity
 		 * 
 		 * Probably a good reminder to focus less on the player and more on
 		 * getting other entities into the game. */
-		System.out.println("LOC: " + getX() + ", " + getY() + ", " + getZ());
 		
-		return isDisplaced;
+		/* It's me again, I did another dumb thing. I used getX(), getY(), and getZ()
+		 * even though it would have been far better to just use the getXYZ() method
+		 * I made for this exact purpose.
+		 * 
+		 * TODO: review code, there's probably a lot of this stufff.
+		 */
+		System.out.println(toString() + " moved to " + getXYZ());
+		
+		return "LOC: " + getXYZ();
 	}
 	
 	/** Returns X coordinate of entity.

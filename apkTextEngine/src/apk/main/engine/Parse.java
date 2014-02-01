@@ -18,6 +18,7 @@ public class Parse {
 	private Admin m_admin = new Admin();
 	private Status m_status = new Status();
 	private Tactical m_tactical = new Tactical();
+	private Say m_say = new Say();
 	
 	private Direction m_direction = new Direction();
 	
@@ -99,8 +100,16 @@ public class Parse {
 		/** MOVEMENT ------------------------------------------------------	|*/
 		else if (m_move.check(att))
 		{
-			entity.move(m_direction.getMeaning(att[1]));
-			return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
+			String temp = entity.move(m_direction.getMeaning(att[1]));
+			msg = Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
+			
+			String[] arr = new String[msg.length + 1];
+			System.arraycopy(msg, 0, arr, 0, msg.length);
+			
+			msg = arr;
+			msg[msg.length] = temp;
+			
+			return msg;
 		}
 		
 		/** LOOK ----------------------------------------------------------	|*/
@@ -171,6 +180,12 @@ public class Parse {
 			
 			msg[0] = "Look where?";
 			return msg; //TODO replace with per-action error fetches
+		}
+		/** SAY -----------------------------------------------------------	|*/
+		else if (m_say.check(att))
+		{
+			msg[0] = entity.getName() + " says: \"" + collapse(att, 1, att.length) + "\"";
+			return msg;
 		}
 		
 		/** TAKE ----------------------------------------------------------	|*/
