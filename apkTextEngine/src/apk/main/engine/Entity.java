@@ -44,7 +44,7 @@ public class Entity
 	/** Inventory of entity. */
 	protected List<Entity> m_inv = new ArrayList<Entity>();
 	
-	protected static Map<Integer, Entity> m_idList = new HashMap<Integer, Entity>();
+	private static Map<Integer, Entity> m_entites = new HashMap<Integer, Entity>();
 	
 	/** Unique ID */
 	protected int m_id;
@@ -67,36 +67,19 @@ public class Entity
 	
 	public Entity()
 	{
-		/*m_id = getNextId();
-		addId(m_id);*/
+		
 	}
 	
-	public Entity(String name, int hpMax)
+	public Entity(String name, int hpMax, int hp)
 	{
-		m_id = getNextId();
-		//addId(m_id);
-		addId(m_id, this);
+		m_id = ID.getNext();
+		add(m_id, this);
 		
 		m_name = name;
 		m_hpMax = hpMax;
 		m_hp = hpMax;
 		
 		Logger.log("Created new ent '" + toString() +  "' @ " + "inventory?");
-		
-		writeSave();
-	}
-	
-	public Entity(String name, int hpMax, int hp)
-	{
-		m_id = getNextId();
-		//addId(m_id);
-		addId(m_id, this);
-		
-		m_name = name;
-		m_hpMax = hpMax;
-		m_hp = hp;
-		
-		Logger.log("Created new ent '" + toString() + "'.");
 		
 		writeSave();
 	}
@@ -118,7 +101,7 @@ public class Entity
 		
 		Logger.log("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
 		//m_idList.add(m_id);
-		m_idList.put(m_id, this);
+		m_entites.put(m_id, this);
 		
 		m_hpMax = Integer.parseInt(invXML.getAttribute("health", 0, "hpMax"));
 		m_hp = Integer.parseInt(invXML.getAttribute("health", 0, "hp"));
@@ -144,7 +127,7 @@ public class Entity
 	}
 	
 	/** Write to save file. */
-	private void writeSave()
+	public void writeSave()
 	{
 		//create file (eg. ent/player[0].xml)
 		XMLWriter w = new XMLWriter(getFilePath());
@@ -178,6 +161,36 @@ public class Entity
 		//close file writer
 		w.close();
 		Logger.log("Wrote " + toString() +"'s inventory to " + getFilePath());
+	}
+	
+	private static boolean add(int id, Entity entity)
+	{
+		if (!ID.exists(id))
+		{
+			m_entites.put(id, entity);
+			return true;
+		}
+		else
+		{
+			String err = "!CRTICAL! DUPLICATE ID '" + id + "'.";
+			System.out.println(err);
+			Logger.log(err);
+			
+			throw new IllegalArgumentException("Method addId(id) failed due to duplicate ID.");
+		}
+	}
+	
+	private static boolean del(int id)
+	{
+		if (m_entites.containsKey(id))
+		{
+			m_entites.remove(id);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	public int getId()
@@ -400,80 +413,51 @@ public class Entity
 		return false;
 	}
 	
-	/** Adds an ID to the list of IDs
-	 * 
-	 * @param id ID to add
-	 * @return true if added, false if not added.
-	 */
-	protected static boolean addId(int id, Entity entity)
-	{
-		System.out.println("ID: " + id);
-		//if (!m_idList.contains(id))
-		if (!m_idList.containsKey(id))
-		{
-			//return m_idList.add(id);
-			m_idList.put(id, entity);
-			return true;
-		}
-		else
-		{
-			String err = "!CRTICAL! DUPLICATE ID '" + id + "'.";
-			System.out.println(err);
-			Logger.log(err);
-			
-			throw new IllegalArgumentException("Method addId(id) failed due to duplicate ID.");
-		}
-	}
-	/** Removes an ID from the ID list TODO: faster ID recycle
-	 * 
-	 * @param id ID to remove
-	 * @return true if removed, false if not removed
-	 */
-	protected static boolean delId(int id)
-	{
-		if (m_idList.containsKey(id))
-		{
-			m_idList.remove(id);
-			return true;
-		}
-		/*for (int i = 0; i < m_idList.size() - 1; i++)
-		{
-			if (m_idList.get(i) == id)
-			{
-				m_idList.remove(i);
-				return true;
-			}	
-		}*/
-		return false;
-	}
-	/** Gets the next free ID
-	 * TODO: make second array track free IDs instead of looping through list.
-	 * 
-	 * @return The lowest available ID
-	 */
-	protected static int getNextId()
-	{
-		int i = 0;
-		//while(m_idList.contains(i))
-		while(m_idList.containsKey(i))
-			i++;
-		return i;
-	}
-	
 	public static Entity getEntityById(int id)
 	{
-		if (m_idList.containsKey(id))
-			return m_idList.get(id);
+		if (m_entites.containsKey(id))
+			return m_entites.get(id);
 		else
 			return null;
+	}
+	
+	public static boolean existsById(int id)
+	{
+		if (m_entites.containsKey(id))
+			return true;
+		else
+			return false;
+	}
+	
+	public static Entity getEntityByName(String name)
+	{
+		for (int i = 0; i < m_entites.size(); i++)
+		{
+			System.out.println("checking " + name + " against " + m_entites.get(i).getName() + " (" + m_entites.get(i).toString() + ")");
+			if (m_entites.get(i).getName().equalsIgnoreCase(name))
+			{
+				return m_entites.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public static boolean existsByName(String name)
+	{
+		for (int i = 0; i < m_entites.size(); i++)
+		{
+			if (m_entites.get(i).toString().equalsIgnoreCase(name))
+				return true;
+		}
+		return false;
 	}
 	
 	/** debug list print */
 	public static void debug()
 	{
-		for (int i = 0; i < m_idList.size(); i++)
+		for (int i = 0; i < m_entites.size(); i++)
 		{
-			System.out.println(m_idList.get(i));
+			System.out.println(m_entites.get(i));
 		}
 	}
 	
@@ -500,7 +484,7 @@ public class Entity
 		{
 			System.out.println(e);
 		}
-		delId(m_id); //no references, should clean up
+		del(m_id); //no references, should clean up
 	}
 	
 	public String toString()

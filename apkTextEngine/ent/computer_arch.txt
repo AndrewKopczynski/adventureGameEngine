@@ -1,0 +1,63 @@
+COMP ARCH
+---------
+
+- new assignment by Friday
+
+SECONDARY MEMORY
+MEMORY HIERARCHIES
+
+               .
+              / \
+             /   \
+            /     \ 
+           /       \
+          /         \
+         / Registers \
+        /-------------\          ^ FASTER (Smaller storage space, more costly)
+       / Cache         \         |
+      /-----------------\ 
+     / Main memory       \       |
+    /---------------------\      v SLOWER (More storage space, cheaper)
+   / Magnetic or SSD       \
+  /-------------------------\
+ / Tape       | Optical disk \
+<----------------------------->
+
+Magnetic Disks (1)
+- Unless you're really interested, not really worth reading about magnetic disk really. Everything from here to the rest of the chapter is optional reading.
+- They've got sectors, tracks contain sectors, there's X tracks per disk.
+
+Integrated Circuits
+- Figure 3-10
+- Common types of integrated-circuit packages, including a dual-inline package (a), pin grid array(b) and land grid array (c).
+- a looks a lot like those chips in electronics, like the 555 timer
+- b looks a lot like a CPU
+- c is a typical CPU nowadays too
+
+- Most of a chip is just a protective shell usually, the chip is almost always a fraction of the size. Chips need such huge chips because they generate an OBSCENE amount of heat.
+
+Multiplexers (1)
+- Figure 3-11
+
+- Remember the Sum of Products: For outputs ABC, you write them for the outputs of 1
+
+A | B | C | OUT
+------------
+0 | 0 | 0 | 0
+0 | 0 | 1 | 1
+0 | 1 | 0 | 1
+
+M = ((NOT A) AND (NOT B) AND C) OR (NOT A) AND B AND (NOT C)
+
+also written as
+
+M = ¬A¬BC * ¬AB¬C
+
+- Figure 3-11 is an 8 pin multiplexer
+- Designed for a certain number of inputs (control lines)
+- For a particular setting of control lines, it will control the 8 inputs to change the output
+- Don't worry about why, just understand that it has 8 inputs and can be controlled by the control lines to change the output
+
+- Multiplexers are basically a hard-wired truth table
+- You can put whatever truth table you want into it too.
+

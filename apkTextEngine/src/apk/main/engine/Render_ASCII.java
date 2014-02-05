@@ -70,9 +70,9 @@ public class Render_ASCII
 			map[i] = renderMapLine(entX + m_xOffset, entY + m_yOffset, entZ + m_zOffset, y);
 			i++;
 		}
-		if (Map.isMapRoom(Map.roomArray, entX, entY, entZ))
+		if (World.isMapRoom(World.roomArray, entX, entY, entZ))
 		{
-			map[i] = ("Exits: " + Map.roomArray[entX][entY][entZ].getRoomExits());
+			map[i] = ("Exits: " + World.roomArray[entX][entY][entZ].getRoomExits());
 		}
 		else
 		{
@@ -96,7 +96,7 @@ public class Render_ASCII
 		String line = "";
 		for (int x = entX + 1 - m_range; x < entX + m_range; x++)
 		{
-			if (Map.isMapRoom(Map.roomArray, x, y, entZ))
+			if (World.isMapRoom(World.roomArray, x, y, entZ))
 			{
 				//ignore offset for player drawing
 				if (x == entX - m_xOffset && y == entY - m_yOffset)
@@ -106,7 +106,7 @@ public class Render_ASCII
 				
 				else
 				{
-					line += Map.roomArray[x][y][entZ].getRoomGraphic();
+					line += World.roomArray[x][y][entZ].getRoomGraphic();
 				}
 			} 
 			
@@ -136,9 +136,9 @@ public class Render_ASCII
 	{
 		if (m_range > 0)
 		{
-			return Map.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(0, 1)
+			return World.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(0, 1)
 			+ Graphic.getGraphic("plyr")
-			+ Map.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(2, 3);
+			+ World.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(2, 3);
 		}
 		else
 		{

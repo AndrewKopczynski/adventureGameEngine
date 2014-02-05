@@ -83,7 +83,7 @@ public class Parse {
 	 * @param input Input phrase to test
 	 * @return True if should return map, false if not.
 	 */
-	public String[] parse(WorldEntity entity, String input)
+	public String[] parse(Actor entity, String input)
 	{
 		//clear msg;
 		
@@ -131,7 +131,15 @@ public class Parse {
 		{
 			if (att.length == 1)
 			{
-				return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
+				msg = Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
+				
+				String[] arr = new String[msg.length + 1];
+				System.arraycopy(msg, 0, arr, 0, msg.length);
+				
+				msg = arr;
+				msg[msg.length - 1] = "temp";
+				
+				return msg;
 			}
 			else if (m_direction.check(att[1]) && att.length == 2)
 			{
@@ -275,9 +283,9 @@ public class Parse {
 				{
 					//setup name, hp (assume full hp)
 					String name = collapse(att, 1, att.length - 1);
-					int hpMax = Integer.parseInt(att[att.length - 1]);
+					int hp = Integer.parseInt(att[att.length - 1]);
 					
-					if (entity.addToInventory(new Entity(name, hpMax)))
+					if (entity.addToInventory(new Entity(name, hp, hp)))
 					{
 						msg[0] = "Gave " + name + " to " + entity.toString();
 						return msg;

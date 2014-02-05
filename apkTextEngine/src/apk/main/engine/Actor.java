@@ -1,5 +1,8 @@
 package apk.main.engine;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /** Represents an entity in the world (a world entity).
  * <p>
  * A world entity has:
@@ -13,8 +16,11 @@ package apk.main.engine;
  * <li>An inventory (list of entities)
  * </ul>
  * */
-public class WorldEntity extends Entity
+public class Actor extends Entity
 {
+	/**List of ID/Actors */
+	private static Map<Integer, Object> m_actors = new HashMap<Integer, Object>();
+	
 	/** Entities' X (across the screen) coordinate. */
 	private int m_x;
 	/** Entities' Y (vertically on screen) coordinate. */
@@ -31,10 +37,10 @@ public class WorldEntity extends Entity
 	 * @param hpMax Value the entity has at maxmimum health
 	 * @param hp Current HP, always less than maxmium HP
 	 */
-	public WorldEntity(int x, int y, int z, String name, int hpMax, int hp)
+	public Actor(int x, int y, int z, String name, int hpMax, int hp)
 	{
-		m_id = getNextId();
-		addId(m_id, this);
+		m_id = ID.getNext();
+		add(m_id, this);
 		
 		m_x = x;
 		m_y = y;
@@ -47,7 +53,7 @@ public class WorldEntity extends Entity
 		writeSave();
 	}
 	
-	public WorldEntity(String filePath)
+	public Actor(String filePath)
 	{	
 		try
 		{
@@ -64,7 +70,7 @@ public class WorldEntity extends Entity
 			
 			System.out.println("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
 			//addId(m_id);
-			addId(m_id, this);
+			add(m_id, this);
 			
 			String temp = invXML.getAttribute("entity", 0, "coords");
 			String split[] = temp.split(",");
@@ -115,6 +121,7 @@ public class WorldEntity extends Entity
 		}
 	}
 	
+	@Override
 	public void writeSave()
 	{
 		//create file (eg. ent/player[0].xml)
@@ -150,7 +157,6 @@ public class WorldEntity extends Entity
 		w.close();
 		System.out.println("Wrote " + toString() +"'s inventory to " + getFilePath());
 	}
-	
 	
 	public String move(String dir)
 	{
@@ -245,10 +251,10 @@ public class WorldEntity extends Entity
 		
 		/** Boundary check to avoid bad checks in array. */
 		if (getNorth(n) < 0 
-			|| getEast(e) > (Map.mapSize - 1) 
-			|| getSouth(s) > (Map.mapSize - 1) 
+			|| getEast(e) > (World.mapSize - 1) 
+			|| getSouth(s) > (World.mapSize - 1) 
 			|| getWest(w) < 0 
-			|| getUp(u) > (Map.HEIGHT_LIMIT - 1) 
+			|| getUp(u) > (World.HEIGHT_LIMIT - 1) 
 			|| getDown(d) < 0)
 		{
 			System.out.println(toString() + " was blocked from going out of bounds of map.");
@@ -263,12 +269,12 @@ public class WorldEntity extends Entity
 		 *  
 		 *  TODO: overhaul into a point map
 		 */
-		if (!m_ignoresCollision && Map.isMapRoom(Map.roomArray, xDisp, yDisp, zDisp)) 
+		if (!m_ignoresCollision && World.isMapRoom(World.roomArray, xDisp, yDisp, zDisp)) 
 		{
-			cond1 = Map.roomArray[getX()][getY()][getZ()].getRoomExits().contains(dir)
-					|| Map.roomArray[getX()][getY()][getZ()].getRoomExits().contains(any);
-			cond2 = Map.roomArray[xDisp][yDisp][zDisp].getRoomExits().contains(oppDir)
-					|| Map.roomArray[xDisp][yDisp][zDisp].getRoomExits().contains(any);
+			cond1 = World.roomArray[getX()][getY()][getZ()].getRoomExits().contains(dir)
+					|| World.roomArray[getX()][getY()][getZ()].getRoomExits().contains(any);
+			cond2 = World.roomArray[xDisp][yDisp][zDisp].getRoomExits().contains(oppDir)
+					|| World.roomArray[xDisp][yDisp][zDisp].getRoomExits().contains(any);
 		
 		} 
 		else if (m_ignoresCollision)
@@ -392,6 +398,11 @@ public class WorldEntity extends Entity
 	private void goDown(int d)
 	{
 		m_z -= d;
+	}
+	
+	public static Actor[] getActors(String xyz)
+	{
+		return null;
 	}
 	
 }

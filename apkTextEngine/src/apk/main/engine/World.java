@@ -1,6 +1,6 @@
 package apk.main.engine;
 
-public class Map 
+public class World 
 {
 	//TODO: overhaul map system, make it a point map instead of exit-based
 	//TODO: level editor, should not be writing any maps by hand anymore
@@ -19,7 +19,7 @@ public class Map
 	 * @param mapFilePath Filepath to the map.xml
 	 * @param tileFilePath Filepath to the tileset.xml
 	 */
-	public Map(String mapFilePath, String tileFilePath)
+	public World(String mapFilePath, String tileFilePath)
 	{	
 		/** Tileset */
 		try 

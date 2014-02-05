@@ -5,7 +5,6 @@ public class Room
 	private String m_mapName;
 	private String m_roomName;
 	private String m_type;
-	private Inventory m_inv;
 	private int m_coords[] = new int[3];
 	
 	private static final int X = 0;
