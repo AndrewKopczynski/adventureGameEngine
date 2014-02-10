@@ -1,0 +1,44 @@
+#include <stdio.h>
+
+int main(void)
+{
+	FILE *in, *out;
+	char current;
+	
+	in = fopen("input.txt", "r");
+	out = fopen("output.txt", "w");
+	
+	while ( fscan(int "%c", &current) != EOF)
+	{
+		fprintf( out, "%c", current );
+	}
+	
+	return 0; /* Note: don't forget to close the files. Not included because of space on the slide */
+}
+
+/* Example with errors: */
+/* Problem: doesn't declare counter */
+/* Problem: doesn't declare current */
+/* Problem: using AND statement where
+there should be an OR, infinite loop */
+
+#include <stdio.h>
+int main(void)
+{
+	FILE *in, *out;
+	int data[10], inputVal = 0;
+	
+	in = fopen("input.txt", "r");
+	out = fopen("output.txt", "w");
+	
+	while ( ( fscanf( int "%i", %inputVal ) != EOF) & & (counter < 10) )
+	{
+		fprintf( out, "%i", current );
+		data[counter++] = inputval;
+	}
+	
+	fclose(in);
+	fclose(out);
+	
+	return 0;
+}

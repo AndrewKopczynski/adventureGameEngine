@@ -175,7 +175,7 @@ class clientThread extends Thread
 					{
 						clientName = "player_" + name;
 						//protocol = new ServerProtocol(clientName); //z
-						if ((m_ent = (Actor) Entity.getEntityByName(clientName)) == null)
+						if ((m_ent = (Actor) Entity.getByName(clientName)) == null)
 						{
 							m_ent = new Actor(0, 0, 0, clientName, 30, 30);
 						}
@@ -205,67 +205,77 @@ class clientThread extends Thread
 				String msgFormatted = "";
 				for (int i = 0; i < msgRecieved.length; i++)
 				{
-					msgFormatted += msgRecieved[i] + "\n";
-				}
-				
-				synchronized (this)
-				{
-					for (int i = 0; i < maxClientsCount; i++)
+					msgFormatted += msgRecieved[i];
+					if (i < msgRecieved.length - 1)
 					{
-						/** MESSAGE_TYPE_SELF */
-						if (threads[i] != null
-								&& threads[i] == this
-								&& threads[i].clientName != null
-								&& msgRecieved[0].equals(m_ent.getName()))
-						{
-							System.out.println("did self message for " + m_ent.getName());
-							//this.os.println(get);
-							threads[i].os.println(msgFormatted);
-							//threads[i].os.println(protocol.processInput(line));
-						}
-						
-						/** MESSAGE_TYPE_ROOM */
-						if (threads[i] != null 
-								&& threads[i].clientName != null
-								&& threads[i].m_ent.getXYZ().equals(m_ent.getXYZ()))
-						{
-							System.out.println("did room message for " + m_ent.getXYZ());
-							threads[i].os.println(msgFormatted);
-							/*TODO: first attempt to hook up the game to the engine: */
-							//threads[i].os.println(protocol.processInput(line)); //TODO: cleanup
-						}
+						msgFormatted += "\n";
 					}
 				}
 				
-				if (msgRecieved.length > 0 && msgRecieved[0].equals("@quit"))
+				if(msgRecieved.length > 0 && msgRecieved[0] != null)
 				{
+					System.out.println("recieved is GREATER THAN 0 THINGS");
+					System.out.println(msgRecieved[0]);
+					
 					synchronized (this)
 					{
 						for (int i = 0; i < maxClientsCount; i++)
 						{
-							if (threads[i] != null && threads[i] != this && threads[i].clientName != null)
+							/** MESSAGE_TYPE_SELF */
+							if (threads[i] != null
+									&& threads[i] == this
+									&& threads[i].clientName != null
+									&& msgRecieved[0].equals(m_ent.getName()))
 							{
-								threads[i].os.println("*** " + name + " disconnected. ***");
+								System.out.println("did self message for " + m_ent.getName());
+								//this.os.println(get);
+								threads[i].os.println(msgFormatted);
+								//threads[i].os.println(protocol.processInput(line));
+							}
+							
+							/** MESSAGE_TYPE_ROOM */
+							if (threads[i] != null 
+									&& threads[i].clientName != null
+									&& threads[i].m_ent.getXYZ().equals(m_ent.getXYZ()))
+							{
+								//System.out.println("did room message for " + m_ent.getXYZ());
+								threads[i].os.println(msgFormatted);
+								/*TODO: first attempt to hook up the game to the engine: */
+								//threads[i].os.println(protocol.processInput(line)); //TODO: cleanup
 							}
 						}
 					}
-					os.println("*** Disconected " + name + " ***");
-				
-					/*
-					* Clean up. Set the current thread variable to null so that a new client
-					* could be accepted by the server.
-					*/
-					synchronized (this)
+					
+					if (msgRecieved.length > 0 && msgRecieved[0].equals("@quit"))
 					{
-						for (int i = 0; i < maxClientsCount; i++)
+						synchronized (this)
 						{
-							if (threads[i] == this)
+							for (int i = 0; i < maxClientsCount; i++)
 							{
-								threads[i] = null;
+								if (threads[i] != null && threads[i] != this && threads[i].clientName != null)
+								{
+									threads[i].os.println("*** " + name + " disconnected. ***");
+								}
 							}
 						}
+						os.println("*** Disconected " + name + " ***");
+					
+						/*
+						* Clean up. Set the current thread variable to null so that a new client
+						* could be accepted by the server.
+						*/
+						synchronized (this)
+						{
+							for (int i = 0; i < maxClientsCount; i++)
+							{
+								if (threads[i] == this)
+								{
+									threads[i] = null;
+								}
+							}
+						}
+						break;
 					}
-					break;
 				}
 			}
 			/*

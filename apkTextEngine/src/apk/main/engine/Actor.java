@@ -1,6 +1,9 @@
 package apk.main.engine;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /** Represents an entity in the world (a world entity).
@@ -19,13 +22,10 @@ import java.util.Map;
 public class Actor extends Entity
 {
 	/**List of ID/Actors */
-	private static Map<Integer, Object> m_actors = new HashMap<Integer, Object>();
+	private static Map<Integer, Actor> m_actors = new HashMap<Integer, Actor>();
 	
-	/** Entities' X (across the screen) coordinate. */
 	private int m_x;
-	/** Entities' Y (vertically on screen) coordinate. */
 	private int m_y;
-	/** Entities' Z (game world height/depth) coordinate. */
 	private int m_z;
 	
 	/** Creates an entity, and sets their max/current HP.
@@ -39,8 +39,8 @@ public class Actor extends Entity
 	 */
 	public Actor(int x, int y, int z, String name, int hpMax, int hp)
 	{
-		m_id = ID.getNext();
-		add(m_id, this);
+		m_id = ID.add();
+		m_actors.put(m_id, this);
 		
 		m_x = x;
 		m_y = y;
@@ -58,19 +58,16 @@ public class Actor extends Entity
 		try
 		{
 			Logger.log("Creating new entity from '" + filePath + "'...");
-			
 			String[] entElements = {"entity", "health", "inventory"};
-			
-			XMLReader invXML;
-			
-			invXML = new XMLReader(filePath, entElements);
+			XMLReader invXML = new XMLReader(filePath, entElements);
 			
 			m_id = Integer.parseInt(invXML.getAttribute(entElements[0], 0, "id"));
+			ID.add(m_id);
+			
 			m_name = invXML.getAttribute("entity", 0, "name");
 			
 			System.out.println("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
-			//addId(m_id);
-			add(m_id, this);
+			
 			
 			String temp = invXML.getAttribute("entity", 0, "coords");
 			String split[] = temp.split(",");
@@ -111,13 +108,9 @@ public class Actor extends Entity
 			}
 			writeSave();
 		}
-		catch(Exception e)
+		catch(IDConflictException e)
 		{
-			System.out.println();
-			System.out.println(e);
-			
-			//TODO: stop entity from being created
-			return;
+			System.out.println(e.getMessage());
 		}
 	}
 	
@@ -160,6 +153,10 @@ public class Actor extends Entity
 	
 	public String move(String dir)
 	{
+		if (dir == null)
+		{
+			return "Go where?";
+		}
 		//boolean isDisplaced = false;
 		boolean cond1; // contains direction you want to go
 		boolean cond2; // contains ? any room modifier
@@ -400,9 +397,154 @@ public class Actor extends Entity
 		m_z -= d;
 	}
 	
-	public static Actor[] getActors(String xyz)
+	/** Returns a list of actors at specific coordinates.
+	 * 
+	 * @param x X coordinate
+	 * @param y Y coordinate
+	 * @param z Z coordinate
+	 * @return List of actors at those coordinates
+	 */
+	/*public static List<Actor> getActors(int x, int y, int z)
 	{
+		List<Actor> temp = new ArrayList<Actor>();
+		for (int i = 0; i < ID.size(); i++)
+		{
+			if (m_actors.get(ID.get(i)) != null
+				&& m_actors.get(ID.get(i)).getX() == x
+				&& m_actors.get(ID.get(i)).getY() == y
+				&& m_actors.get(ID.get(i)).getZ() == z)
+			{
+				temp.add(m_actors.get(ID.get(i)));
+			}
+		}
+		return temp;
+	}*/
+	
+	public static Actor[] getActors(int x, int y, int z)
+	{
+		int index = 0;
+		Actor[] temp = new Actor[m_actors.size()];
+		
+		for (int i = 0; i < ID.size(); i++)
+		{
+			if (m_actors.get(ID.get(i)) != null
+				&& m_actors.get(ID.get(i)).getX() == x
+				&& m_actors.get(ID.get(i)).getY() == y
+				&& m_actors.get(ID.get(i)).getZ() == z)
+			{
+				temp[index] = m_actors.get(i);
+				index++;
+			}
+		}
+		return temp;
+	}
+	
+	/** Get all actors BESIDES the one specified. */
+	public static Actor[] getActors(Actor actor, int x, int y, int z)
+	{
+		int index = 0;
+		Actor[] actors = new Actor[0];
+		
+		for (int i = 0; i < ID.size(); i++)
+		{
+			if (m_actors.get(ID.get(i)) != null
+				&& m_actors.get(ID.get(i)) != actor
+				&& m_actors.get(ID.get(i)).getX() == x
+				&& m_actors.get(ID.get(i)).getY() == y
+				&& m_actors.get(ID.get(i)).getZ() == z)
+			{
+				Actor[] temp = new Actor[actors.length + 1];
+				temp[index] = m_actors.get(i);
+				//System.arraycopy(actor, 0, temp, 0, temp.length);
+				actors = temp;
+				
+				/*msg = Render_ASCII.renderMap(actor.getX(), actor.getY(), actor.getZ());
+				
+				String[] arr = new String[msg.length + 1];
+				System.arraycopy(msg, 0, arr, 0, msg.length);*/
+				
+				System.out.println("index: " + index);
+				System.out.println(m_actors.get(i));
+				index++;
+			}
+		}
+		System.out.println("arr: " + actors.length);
+		
+		return actors;
+	}
+	
+	public static Actor getById(int id)
+	{
+		if (m_actors.containsKey(id))
+			return m_actors.get(id);
+		else
+			return null;
+	}
+	
+	public static boolean existsById(int id)
+	{
+		if (m_actors.containsKey(id))
+			return true;
+		else
+			return false;
+	}
+	
+	public static Entity getByName(String name)
+	{
+		for (int i = 0; i < m_actors.size(); i++)
+		{
+			System.out.println("checking " + name + " against " + m_actors.get(i).getName() + " (" + m_actors.get(i).toString() + ")");
+			if (m_actors.get(i).getName().equalsIgnoreCase(name))
+			{
+				return m_actors.get(i);
+			}
+		}
 		return null;
+	}
+	
+	public static boolean existsByName(String name)
+	{
+		for (int i = 0; i < m_actors.size(); i++)
+		{
+			if (m_actors.get(i).toString().equalsIgnoreCase(name))
+				return true;
+		}
+		return false;
+	}
+	
+	/** debug list print */
+	public static void debug()
+	{
+		for (int i = 0; i < m_actors.size(); i++)
+		{
+			System.out.println(m_actors.get(i));
+		}
+	}
+	
+	/** Removes all references to this entity so that
+	 * java's garbage collector will clean it up whenever. */
+	@Override
+	public void kill()
+	{
+		try //TODO: make the entity drop all its stuff too
+		{
+			File file = new File("ent/" + toString() + ".xml");
+			
+			if (file.delete())
+				Logger.log("Deleted: " + getFilePath());
+			else
+			{
+				System.out.println("!CRTICAL! ENTITY FILE NOT DELETED!");
+				throw new IllegalArgumentException("Could not delete entity file " + getFilePath());
+			}
+		}
+		catch (Exception e)
+		{
+			System.out.println(e);
+		}
+		m_actors.remove(m_id); //no references, should clean up
+		m_name = null;
+		m_inv = null;
 	}
 	
 }

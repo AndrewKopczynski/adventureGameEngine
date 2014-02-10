@@ -2,6 +2,7 @@ package apk.main.engine;
 
 public class Room 
 {
+	private int m_id;
 	private String m_mapName;
 	private String m_roomName;
 	private String m_type;
@@ -21,14 +22,14 @@ public class Room
 	 */
 	public Room(String map, String name, String type, String coords)
 	{
-		String[] temp;
+		m_id = ID.add();
 		
 		m_mapName = map;
 		m_roomName = name;
 		m_type = type;
+
+		String[] temp;
 		
-		//TODO: Redo coordinates system in a way that makes sense.
-		//TODO: 3D maps, rendered 2D?
 		temp = coords.split(",");
 		int array[] = {Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2])};
 		m_coords = array;
@@ -110,7 +111,7 @@ public class Room
 	 */
 	public String getXYZ()
 	{
-		return m_coords[X] + "-" + m_coords[Y] + "-" + m_coords[Z];
+		return m_coords[X] + "," + m_coords[Y] + "," + m_coords[Z];
 	}
 	
 	/*public Inventory getInventory()
@@ -127,6 +128,6 @@ public class Room
 	 * @return Retuns all room information. */
 	public String toString()
 	{
-		return m_roomName + "[" + getXYZ() + "]";
+		return m_roomName + "[" + m_id + "]";
 	}
 }

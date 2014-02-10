@@ -1,5 +1,7 @@
 package apk.main.engine;
 
+import java.util.List;
+
 import apk.parser.action.*;
 import apk.parser.target.*;
 
@@ -22,7 +24,7 @@ public class Parse {
 	
 	private Direction m_direction = new Direction();
 	
-	private String[] msg; //TODO replace with something nicer probably
+	private String[] msg = new String[1]; //TODO replace with something nicer probably
 	
 	public Parse()
 	{
@@ -33,7 +35,7 @@ public class Parse {
 	}
 	
 	/** Collapses a string array from a to b in a String array. */
-	public String collapse(String[] input, int a, int b)
+	private String collapse(String[] input, int a, int b)
 	{
 		String temp = "";
 		for (; a < b; a++)
@@ -47,7 +49,7 @@ public class Parse {
 		return temp;
 	}
 	
-	public String[] collapse(String[] input, int a, int b, String seperator)
+	private String[] collapse(String[] input, int a, int b, String seperator)
 	{
 		int i = 0; //i = 0 first target //i = 1 second target
 		String t1 = "";
@@ -83,7 +85,7 @@ public class Parse {
 	 * @param input Input phrase to test
 	 * @return True if should return map, false if not.
 	 */
-	public String[] parse(Actor entity, String input)
+	public String[] parse(Actor actor, String input)
 	{
 		//clear msg;
 		
@@ -97,8 +99,8 @@ public class Parse {
 		/** SHORT MOVEMENT ------------------------------------------------	|*/
 		if (m_shortMove.check(att)) 
 		{
-			String temp = entity.move(m_shortMove.getMeaning(att[0]));
-			msg = Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
+			String temp = actor.move(m_shortMove.getMeaning(att[0]));
+			msg = Render_ASCII.renderMap(actor.getX(), actor.getY(), actor.getZ());
 			
 			String[] arr = new String[msg.length + 1];
 			System.arraycopy(msg, 0, arr, 0, msg.length);
@@ -112,16 +114,20 @@ public class Parse {
 		/** MOVEMENT ------------------------------------------------------	|*/
 		else if (m_move.check(att))
 		{
-			if (m_direction.check(att[att.length - 1]))
+			if (att.length == 2 && m_direction.check(att[att.length - 1]))
 			{
-				String temp = entity.move(m_direction.getMeaning(att[1]));
-				msg = Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
+				String temp = actor.move(m_direction.getMeaning(att[1]));
+				msg = Render_ASCII.renderMap(actor.getX(), actor.getY(), actor.getZ());
 				
 				String[] arr = new String[msg.length + 1];
 				System.arraycopy(msg, 0, arr, 0, msg.length);
 				
 				msg = arr;
 				msg[msg.length - 1] = temp;
+			}
+			else
+			{
+				msg[0] = actor.move(m_direction.getMeaning(att[att.length - 1]));
 			}
 			return msg;
 		}
@@ -131,13 +137,64 @@ public class Parse {
 		{
 			if (att.length == 1)
 			{
-				msg = Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
+				int x = actor.getX();
+				int y = actor.getY();
+				int z = actor.getZ();
+				String temp = "";
 				
-				String[] arr = new String[msg.length + 1];
+				Actor[] actors = Actor.getActors(actor, x, y, z); //gets all actors besides this one
+				
+				msg = Render_ASCII.renderMap(x, y, z);
+				
+				String[] arr = new String[msg.length + actors.length];
 				System.arraycopy(msg, 0, arr, 0, msg.length);
 				
+				//System.out.println(arr.length);
+				//System.out.println(actors.length);
+				
 				msg = arr;
-				msg[msg.length - 1] = "temp";
+				
+				System.out.println("got " + actors.length + " actors at " + actor.getXYZ());
+				for (int i = 0; i < actors.length; i++)
+				{
+					//if (actors[i] != null)
+					//{
+						System.out.println(actors[i]);
+					//}
+				}
+				
+				if (actors.length > 0) //remember: did not include this actor in actors
+					temp = "You see ";
+				else
+					return msg;
+				
+				//give up for now, too complicated :(
+				//figure something else out.
+				for (int i = 0; i < actors.length; i++)
+				{
+					System.out.println(actors[i].getName());
+					temp += actors[i].getName();
+					
+					if (actors.length - 1 - i == 1)
+					{
+						System.out.println("2");
+						temp += " and ";
+					}
+					else if (actors.length - 1 - i > 1)
+					{
+						System.out.println("3");
+						temp += ", ";
+					}
+					else if (actors.length - 1 - i == 0)
+					{
+						System.out.println("4");
+					}
+				}
+				
+				if (temp.length() > 0)
+					 temp += " standing here.";
+				
+				msg[msg.length - 1] = temp;
 				
 				return msg;
 			}
@@ -199,7 +256,7 @@ public class Parse {
 				Render_ASCII.setxOffset(e - w);
 				Render_ASCII.setyOffset(s - n);
 				Render_ASCII.setzOffset(u - d);
-				return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
+				return Render_ASCII.renderMap(actor.getX(), actor.getY(), actor.getZ());
 			}
 			
 			msg[0] = "Look where?";
@@ -208,7 +265,7 @@ public class Parse {
 		/** SAY -----------------------------------------------------------	|*/
 		else if (m_say.check(att))
 		{
-			msg[0] = entity.getName() + " says: \"" + collapse(att, 1, att.length) + "\"";
+			msg[0] = actor.getName() + " says: \"" + collapse(att, 1, att.length) + "\"";
 			return msg;
 		}
 		
@@ -244,14 +301,14 @@ public class Parse {
 		/** ST*ATUS -------------------------------------------------------	|*/
 		else if (m_status.check(att))
 		{
-			msg[0] = entity.printMeter(entity.getHP(), entity.getHP(), entity.getHPMax(), 30);
+			msg[0] = actor.printMeter(actor.getHP(), actor.getHP(), actor.getHPMax(), 30);
 			return msg;
 		}
 		
 		/** TAC*TICAL -----------------------------------------------------	|*/
 		else if (m_tactical.check(att))
 		{
-			msg[0] = entity.printNamedHealthBar();
+			msg[0] = actor.printNamedHealthBar();
 			return msg;
 		}
 		
@@ -285,14 +342,14 @@ public class Parse {
 					String name = collapse(att, 1, att.length - 1);
 					int hp = Integer.parseInt(att[att.length - 1]);
 					
-					if (entity.addToInventory(new Entity(name, hp, hp)))
+					if (actor.addToInventory(new Entity(name, hp, hp)))
 					{
-						msg[0] = "Gave " + name + " to " + entity.toString();
+						msg[0] = "Gave " + name + " to " + actor.toString();
 						return msg;
 					}
 					else
 					{
-						msg[0] = "Couldn't give " + name + " to " + entity.toString();
+						msg[0] = "Couldn't give " + name + " to " + actor.toString();
 						return msg;
 					}
 				}
@@ -310,16 +367,16 @@ public class Parse {
 				{
 					String name = collapse(att, 1, att.length);
 					
-					if (entity.delFromInventory(name))
+					if (actor.delFromInventory(name))
 					{
 						
-						msg[0] = "Deleted " + name + " from " + entity.toString();
+						msg[0] = "Deleted " + name + " from " + actor.toString();
 						return msg;
 					}
 					else
 					{
 						
-						msg[0] = "Couldn't delete " + name + " from " + entity.toString();
+						msg[0] = "Couldn't delete " + name + " from " + actor.toString();
 						return msg;
 					}
 				}
@@ -335,7 +392,7 @@ public class Parse {
 			{
 				try
 				{
-					entity.ignoresCollision(Boolean.parseBoolean(att[1]));
+					actor.ignoresCollision(Boolean.parseBoolean(att[1]));
 
 					msg[0] = "noclip = " + att[1];
 					return msg;
@@ -351,10 +408,10 @@ public class Parse {
 			{
 				try
 				{
-					entity.hurt(Integer.parseInt(att[1]));
+					actor.hurt(Integer.parseInt(att[1]));
 					
 					msg[0] = "Inflicted " + att[1] + " point(s) of damage to '" 
-						+ entity.toString() + "'.";
+						+ actor.toString() + "'.";
 					return msg;
 				}
 				catch(Exception e)
@@ -368,10 +425,10 @@ public class Parse {
 			{
 				try
 				{
-					entity.heal(Integer.parseInt(att[1]));
+					actor.heal(Integer.parseInt(att[1]));
 					
 					msg[0] = "Healed " + att[1] + " point(s) of damage from '" 
-							+ entity.toString() + "'.";
+							+ actor.toString() + "'.";
 					return msg;
 				}
 				catch(Exception e)
@@ -383,7 +440,10 @@ public class Parse {
 			/** debug */
 			else if (m_admin.getMeaning(att[0]).equals("debug"))
 			{
+				System.out.println("ENTITY:");
 				Entity.debug();
+				System.out.println("ACTOR:");
+				Actor.debug();
 				msg[0] = "Printed debug.";
 				return msg;
 			}
@@ -410,7 +470,7 @@ public class Parse {
 		else
 		{
 			
-			msg[0] = input + " for entity " + entity + " isn't a valid command.";
+			msg[0] = input + " for entity " + actor + " isn't a valid command.";
 			return msg;
 		}
 	}

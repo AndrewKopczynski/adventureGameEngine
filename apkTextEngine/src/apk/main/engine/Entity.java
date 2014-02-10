@@ -37,43 +37,21 @@ import java.util.Map;
  * */
 public class Entity
 {	
-	/** Grand list of IDs */
-	//testing hashmap instead of list
-	//protected static List<Integer> m_idList = new ArrayList<Integer>();
-	
-	/** Inventory of entity. */
-	protected List<Entity> m_inv = new ArrayList<Entity>();
-	
 	private static Map<Integer, Entity> m_entites = new HashMap<Integer, Entity>();
 	
-	/** Unique ID */
+	protected List<Entity> m_inv = new ArrayList<Entity>();
 	protected int m_id;
-	
-	/** Name of entity. */
 	protected String m_name;
-	/** Maximum health of entity. */
 	protected int m_hpMax;
-	/** Current health of entity. */
 	protected int m_hp;
-	
-	/** Ignores collision checks, may go to any tile within array range.
-	 * <p>
-	 * <ul>
-	 * <li>False: Normal checks (cannot go through walls, must have appropriate exits)
-	 * <li>True: 'Noclip', ignores collision checks, can 'fly'/pass through walls.
-	 * </ul>
-	 */
 	protected boolean m_ignoresCollision = false;
 	
-	public Entity()
-	{
-		
-	}
+	public Entity() {}
 	
 	public Entity(String name, int hpMax, int hp)
 	{
-		m_id = ID.getNext();
-		add(m_id, this);
+		m_id = ID.add();
+		m_entites.put(m_id, this);
 		
 		m_name = name;
 		m_hpMax = hpMax;
@@ -93,37 +71,44 @@ public class Entity
 	 */
 	public Entity(String filePath)
 	{	
-		String[] entElements = {"entity", "health", "inventory"};
-		XMLReader invXML = new XMLReader(filePath, entElements);
-		
-		m_id = Integer.parseInt(invXML.getAttribute(entElements[0], 0, "id"));
-		m_name = invXML.getAttribute("entity", 0, "name");
-		
-		Logger.log("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
-		//m_idList.add(m_id);
-		m_entites.put(m_id, this);
-		
-		m_hpMax = Integer.parseInt(invXML.getAttribute("health", 0, "hpMax"));
-		m_hp = Integer.parseInt(invXML.getAttribute("health", 0, "hp"));
-		
-		//System.out.println("printing inventory...");
-		String ents[] = invXML.getChildren("inventory", 0);
-		for (int a = 1; a < ents.length; a += 2)
+		try
 		{
-			//System.out.println("found ent: " + ents[a]);
-			if (!ents[a].equals(toString()))
+			String[] entElements = {"entity", "health", "inventory"};
+			XMLReader invXML = new XMLReader(filePath, entElements);
+			
+			m_id = Integer.parseInt(invXML.getAttribute(entElements[0], 0, "id"));
+			ID.add(m_id);
+			
+			m_entites.put(m_id, this);
+			
+			m_name = invXML.getAttribute("entity", 0, "name");
+			Logger.log("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
+			
+			m_hpMax = Integer.parseInt(invXML.getAttribute("health", 0, "hpMax"));
+			m_hp = Integer.parseInt(invXML.getAttribute("health", 0, "hp"));
+			
+			String ents[] = invXML.getChildren("inventory", 0);
+			for (int a = 1; a < ents.length; a += 2)
 			{
-				addToInventory(new Entity("ent/" + ents[a] + ".xml"));
+				//System.out.println("found ent: " + ents[a]);
+				if (!ents[a].equals(toString()))
+				{
+					addToInventory(new Entity("ent/" + ents[a] + ".xml"));
+				}
+				else
+				{
+					String err = "!CRTICAL! ENTITY " + toString() + "TRIED TO LOAD ITSELF!"
+							+ " CHECK ENTITY FILE " + getFilePath() + "!";
+					System.out.println(err);
+					Logger.log(err);
+				}
 			}
-			else
-			{
-				String err = "!CRTICAL! ENTITY " + toString() + "TRIED TO LOAD ITSELF!"
-						+ " CHECK ENTITY FILE " + getFilePath() + "!";
-				System.out.println(err);
-				Logger.log(err);
-			}
+			writeSave();
 		}
-		writeSave();
+		catch (IDConflictException e)
+		{
+			kill();
+		}
 	}
 	
 	/** Write to save file. */
@@ -161,36 +146,6 @@ public class Entity
 		//close file writer
 		w.close();
 		Logger.log("Wrote " + toString() +"'s inventory to " + getFilePath());
-	}
-	
-	private static boolean add(int id, Entity entity)
-	{
-		if (!ID.exists(id))
-		{
-			m_entites.put(id, entity);
-			return true;
-		}
-		else
-		{
-			String err = "!CRTICAL! DUPLICATE ID '" + id + "'.";
-			System.out.println(err);
-			Logger.log(err);
-			
-			throw new IllegalArgumentException("Method addId(id) failed due to duplicate ID.");
-		}
-	}
-	
-	private static boolean del(int id)
-	{
-		if (m_entites.containsKey(id))
-		{
-			m_entites.remove(id);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
 	}
 	
 	public int getId()
@@ -403,7 +358,7 @@ public class Entity
 			if (m_inv.get(i).getName().equals(entityName))
 			{
 				//System.out.println("found item!");
-				m_inv.get(i).delEntity();
+				m_inv.get(i).kill();
 				m_inv.remove(i);
 				return true;
 			}	
@@ -413,13 +368,15 @@ public class Entity
 		return false;
 	}
 	
-	public static Entity getEntityById(int id)
+	
+	public static Entity getById(int id)
 	{
 		if (m_entites.containsKey(id))
 			return m_entites.get(id);
 		else
 			return null;
 	}
+	
 	
 	public static boolean existsById(int id)
 	{
@@ -429,7 +386,7 @@ public class Entity
 			return false;
 	}
 	
-	public static Entity getEntityByName(String name)
+	public static Entity getByName(String name)
 	{
 		for (int i = 0; i < m_entites.size(); i++)
 		{
@@ -463,17 +420,14 @@ public class Entity
 	
 	/** Removes all references to this entity so that
 	 * java's garbage collector will clean it up whenever. */
-	protected void delEntity()
+	public void kill()
 	{
-		//TODO: make the entity drop all its stuff too
-		try
+		try //TODO: make the entity drop all its stuff too
 		{
 			File file = new File("ent/" + toString() + ".xml");
 			
 			if (file.delete())
-			{
 				Logger.log("Deleted: " + getFilePath());
-			}
 			else
 			{
 				System.out.println("!CRTICAL! ENTITY FILE NOT DELETED!");
@@ -484,7 +438,9 @@ public class Entity
 		{
 			System.out.println(e);
 		}
-		del(m_id); //no references, should clean up
+		m_entites.remove(m_id); //no references, should clean up
+		m_name = null;
+		m_inv = null;
 	}
 	
 	public String toString()
