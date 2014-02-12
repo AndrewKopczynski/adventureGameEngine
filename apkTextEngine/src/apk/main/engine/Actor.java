@@ -151,169 +151,48 @@ public class Actor extends Entity
 		System.out.println("Wrote " + toString() +"'s inventory to " + getFilePath());
 	}
 	
-	public String move(String dir)
+	/** Refactoring from move because it just did too much in one method. */
+	public String[] requestTile(int[] vel)
 	{
-		//boolean isDisplaced = false;
-		boolean cond1; // contains direction you want to go
-		boolean cond2; // contains ? any room modifier
+		int x = vel[0];
+		int y = vel[1];
+		int z = vel[2];
 		
-		int n = 0;
-		int e = 0;
-		int s = 0;
-		int w = 0;
-		int u = 0;
-		int d = 0;
+		String[] msg = new String[0];
 		
-		String north = "n";
-		String east = "e";
-		String south = "s";
-		String west = "w";
-		String northeast = "ne";
-		String northwest = "nw";
-		String southeast = "se";
-		String southwest = "sw";
-		String up = "u";
-		String down = "d";
-		
-		String oppDir;
-		String any = "?";
-		
-		if (dir.equals(north))
+		/* Boundary check to avoid bad checks in array. */
+		if (getNorth(y) < 0 
+			|| getEast(x) > (World.mapSize - 1) 
+			|| getSouth(y) > (World.mapSize - 1) 
+			|| getWest(x) < 0 
+			|| getUp(z) > (World.HEIGHT_LIMIT - 1) 
+			|| getDown(z) < 0)
 		{
-			n = 1;
-			oppDir = south;
-		} 
-		else if (dir.equals(east))
-		{
-			e = 1;
-			oppDir = west;
-		} 
-		else if (dir.equals(south))
-		{
-			s = 1;
-			oppDir = north;
-		} 
-		else if (dir.equals(west))
-		{
-			w = 1;
-			oppDir = east;
-		} 
-		else if (dir.equals(northeast))
-		{
-			n = 1;
-			e = 1;
-			oppDir = southwest;
-		} 
-		else if (dir.equals(southeast))
-		{
-			s = 1;
-			e = 1;
-			oppDir = northwest;
-		} 
-		else if (dir.equals(southwest))
-		{
-			s = 1;
-			w = 1;
-			oppDir = northeast;
-		} 
-		else if (dir.equals(northwest))
-		{
-			n = 1;
-			w = 1;
-			oppDir = southeast;
-		} 
-		else if (dir.equals(up))
-		{
-			u = 1;
-			oppDir = down;
+			
 		}
-		else if (dir.equals(down))
-		{
-			d = 1;
-			oppDir = up;
-		}
-		else 
-		{
-			System.out.println(toString() + " tried to go invalid direction '" + dir + "'.");
-			return "'" + dir + "' is not a valid direction.";
-		}
+		return null;
+	}
+	
+	public void move(int[] vel)
+	{
+		int x = vel[0];
+		int y = vel[1];
+		int z = vel[2];
 		
-		int xDisp = getX() + (e - w);
-		int yDisp = getY() + (s - n);
-		int zDisp = getZ() + (u - d);
-		
-		/** Boundary check to avoid bad checks in array. */
-		if (getNorth(n) < 0 
-			|| getEast(e) > (World.mapSize - 1) 
-			|| getSouth(s) > (World.mapSize - 1) 
-			|| getWest(w) < 0 
-			|| getUp(u) > (World.HEIGHT_LIMIT - 1) 
-			|| getDown(d) < 0)
-		{
-			System.out.println(toString() + " was blocked from going out of bounds of map.");
-			return "That doesn't go anywhere.";
-		}
-		
-		/** Checks if the room has the correct exits to move in the requested direction,
-		 * and then checks if the connecting room also has that exit.
-		 * 
-		 *  Returns true if the room contains a valid exit for that way OR contains an
-		 *  'any' or ambiguous exit (symbolized by a '?' mark)
-		 *  
-		 *  TODO: overhaul into a point map
-		 */
-		if (!m_ignoresCollision && World.isMapRoom(World.roomArray, xDisp, yDisp, zDisp)) 
-		{
-			cond1 = World.roomArray[getX()][getY()][getZ()].getRoomExits().contains(dir)
-					|| World.roomArray[getX()][getY()][getZ()].getRoomExits().contains(any);
-			cond2 = World.roomArray[xDisp][yDisp][zDisp].getRoomExits().contains(oppDir)
-					|| World.roomArray[xDisp][yDisp][zDisp].getRoomExits().contains(any);
-		
-		} 
-		else if (m_ignoresCollision)
-		{
-			cond1 = true;
-			cond2 = true;
-		}	
+		if (x > 0)
+			goEast(x);
 		else
-		{
-			System.out.println(toString() + " tried to a room that didn't have the appropriate opposite exit.");
-			return "I can't seem to go that way.";
-		}
+			goWest(x);
 		
-		if (cond1 && cond2) 
-		{
-			goNorth(n);
-			goEast(e);
-			goSouth(s);
-			goWest(w);
-			goUp(u);
-			goDown(d);
-		} 
+		if (y > 0)
+			goSouth(y);
 		else
-		{
-			System.out.println(toString() + " tried to go through an exit that doesn't exist.");
-			return "I can't go that way.";
-		}
+			goNorth(y);
 		
-		//isDisplaced = true;
-		
-		/* For some reason when I first programmed the line of code below,
-		 * I used player.getX(), player.getY(), etc instead of just using
-		 * getX(), getY() to make it entity inspecific.
-		 * 
-		 * Probably a good reminder to focus less on the player and more on
-		 * getting other entities into the game. */
-		
-		/* It's me again, I did another dumb thing. I used getX(), getY(), and getZ()
-		 * even though it would have been far better to just use the getXYZ() method
-		 * I made for this exact purpose.
-		 * 
-		 * TODO: review code, there's probably a lot of this stufff.
-		 */
-		System.out.println(toString() + " moved to " + getXYZ());
-		
-		return "LOC: " + getXYZ();
+		if (z > 0)
+			goUp(z);
+		else
+			goDown(z);
 	}
 	
 	/** Returns X coordinate of entity.

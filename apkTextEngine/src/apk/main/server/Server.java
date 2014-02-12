@@ -217,7 +217,7 @@ class clientThread extends Thread
 					
 					synchronized (this)
 					{
-						for (int i = 0; i < maxClientsCount; i++)
+						for (int i = 0; i < threads.length; i++) //max clients -> threads
 						{
 							/** MESSAGE_TYPE_SELF */
 							if (threads[i] != null
@@ -256,11 +256,11 @@ class clientThread extends Thread
 				}
 			}//end of while
 					
-				//System.out.println(msgRecieved[0]);
+			//System.out.println(msgRecieved[0]);
 				
 			synchronized (this)
 			{
-				for (int i = 0; i < maxClientsCount; i++)
+				for (int i = 0; i < threads.length; i++)
 				{
 					if (threads[i] != null && threads[i] != this && threads[i].clientName != null)
 					{
@@ -299,6 +299,17 @@ class clientThread extends Thread
 		{
 			//z something should be here probs
 		}
+		/*catch (Exception e) //TODO drop client if they get an exception
+		{
+			for (int i = 0; i < threads.length; i++)
+			{
+				if (threads[i] != null && threads[i] == this)
+				{
+					threads[i].os.println("Something went wrong!");
+					System.out.println(e.getMessage());
+				}
+			}
+		}*/
 	}
 }
 

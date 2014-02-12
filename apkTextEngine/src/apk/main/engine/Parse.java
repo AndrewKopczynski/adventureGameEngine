@@ -85,10 +85,8 @@ public class Parse {
 	 * @param input Input phrase to test
 	 * @return True if should return map, false if not.
 	 */
-	public String[] parse(Actor actor, String input)
-	{
-		//clear msg;
-		
+	public String[] parse(Actor actor, String input) //TODO: make more brief
+	{	
 		msg = new String[1];
 		
 		//att - [action] [target] [target]
@@ -100,20 +98,27 @@ public class Parse {
 		if (m_shortMove.check(att))
 		{
 			if (att.length == 1)
-				return m_shortMove.doAction(actor, att[0]);
-			else
 			{
-				return m_move.getError();
+				//parse meaning
+				//attempt to fetch requested tile
+				//move
+				int[] vel = m_shortMove.parse(att[0]);
+				msg = actor.requestTile(vel);
+				return msg;
 			}
+			else
+				return m_shortMove.getError();
 		} 
 		else if (m_move.check(att))
 		{
 			if (att.length == 2 && m_shortMove.check(att[1]))
-				return m_shortMove.doAction(actor, att[1]);
-			else
 			{
-				return m_shortMove.getError();
+				int[] vel = m_shortMove.parse(att[1]);
+				msg = actor.requestTile(vel);
+				return msg;
 			}
+			else
+				return m_move.getError();
 		}
 		
 		/** LOOK ----------------------------------------------------------	|*/
@@ -154,12 +159,16 @@ public class Parse {
 					
 					return msg;
 				}
+				else if (att.length == 2)
+				{
+					
+				}
 				else
 				{
 					return msg;
 				}
 			}
-			else if (m_direction.check(att[1]) && att.length == 2)
+			else if (att.length == 2 && m_direction.check(att[1]))
 			{
 				//TODO: clean this and entity code up, rough pass for now
 				int n = 0;
@@ -281,7 +290,7 @@ public class Parse {
 			{
 				try
 				{
-					Render_ASCII.setRange(Integer.parseInt(att[1]));
+					Render_ASCII.setVisionRange(Integer.parseInt(att[1]));
 					msg[0] = "Set visibility range to " + att[1];
 					return msg;
 				}
@@ -432,7 +441,7 @@ public class Parse {
 		else if (m_quit.check(att))
 		{
 			
-			msg[0] = "Saving and quitting...";
+			msg[0] = "Logging out...";
 			return msg;
 		}
 		

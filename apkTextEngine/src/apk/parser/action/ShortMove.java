@@ -34,23 +34,60 @@ public class ShortMove extends WordList
 		list.put("err", 		"[SHORTMOVE] Go where?");
 	}
 	
-	/** SHORT MOVEMENT ------------------------------------------------	|
-	 * Short: north
-	 */
-	public String[] doAction(Actor actor, String dir)
+	public int[] parse(String dir)
 	{
-		String[] msg;
+		int x = 0;
+		int y = 0;
+		int z = 0;
 		
-		String temp = actor.move(list.get(dir));
-		msg = Render_ASCII.renderMap(actor.getX(), actor.getY(), actor.getZ());
+		String north = "n";
+		String east = "e";
+		String south = "s";
+		String west = "w";
+		String northeast = "ne";
+		String northwest = "nw";
+		String southeast = "se";
+		String southwest = "sw";
+		String up = "u";
+		String down = "d";
 		
-		String[] arr = new String[msg.length + 1];
-		System.arraycopy(msg, 0, arr, 0, msg.length);
+		if (dir.equals(north))
+			y--;
+		else if (dir.equals(east))
+			x++;
+		else if (dir.equals(south))
+			y++;
+		else if (dir.equals(west))
+			x--;
+		else if (dir.equals(northeast))
+		{
+			y--;
+			x++;
+		} 
+		else if (dir.equals(southeast))
+		{
+			y++;
+			x++;
+		} 
+		else if (dir.equals(southwest))
+		{
+			y++;
+			x--;
+		} 
+		else if (dir.equals(northwest))
+		{
+			x--;
+			y--;
+		} 
+		else if (dir.equals(up))
+			z++;
+		else if (dir.equals(down))
+			z--;
+		else 
+			return null;
 		
-		msg = arr;
-		msg[msg.length - 1] = temp;
+		int[] vel = {x, y, z};
 		
-		return msg;
+		return vel;
 	}
-	
 }
