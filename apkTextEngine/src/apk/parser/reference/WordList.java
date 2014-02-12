@@ -7,18 +7,11 @@ public class WordList
 {
 	protected Map<String, String> list = new HashMap<String, String>();
 	
-	public String getMeaning(String input)
+	public String getMeaning(String input) //TODO remove
 	{
 		if (list.containsKey(input))
 			return list.get(input);
 		return null;
-	}
-	
-	public boolean check(String[] in)
-	{
-		if (getMeaning(in[0]) != null)
-			return true;
-		return false;
 	}
 	
 	public boolean checkForMod(String[] in)
@@ -31,16 +24,23 @@ public class WordList
 	
 	public boolean check(String in)
 	{
-		if (getMeaning(in) != null)
+		if (list.containsKey(in))
 			return true;
 		return false;
 	}
-		
-
-	public String getError(String input)
+	
+	public boolean check(String[] in)
 	{
-		if (list.containsKey("err") || list.get(input).equalsIgnoreCase("null"))
-			return list.get("err");
-		return "MISSING_ERROR";
+		if (list.containsKey(in[0]))
+			return true;
+		return false;
+	}
+
+	public String[] getError()
+	{
+		String err[] = {"MISSING_ERROR"};
+		if (list.containsKey("err"))
+			err[0] = list.get("err");
+		return err;
 	}
 }

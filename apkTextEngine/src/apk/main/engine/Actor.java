@@ -1,9 +1,7 @@
 package apk.main.engine;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /** Represents an entity in the world (a world entity).
@@ -51,6 +49,8 @@ public class Actor extends Entity
 		m_hp = hp;
 		
 		writeSave();
+		
+		System.out.println("created" + getName() + "@" + getXYZ());
 	}
 	
 	public Actor(String filePath)
@@ -153,10 +153,6 @@ public class Actor extends Entity
 	
 	public String move(String dir)
 	{
-		if (dir == null)
-		{
-			return "Go where?";
-		}
 		//boolean isDisplaced = false;
 		boolean cond1; // contains direction you want to go
 		boolean cond2; // contains ? any room modifier
@@ -442,7 +438,6 @@ public class Actor extends Entity
 	/** Get all actors BESIDES the one specified. */
 	public static Actor[] getActors(Actor actor, int x, int y, int z)
 	{
-		int index = 0;
 		Actor[] actors = new Actor[0];
 		
 		for (int i = 0; i < ID.size(); i++)
@@ -454,18 +449,12 @@ public class Actor extends Entity
 				&& m_actors.get(ID.get(i)).getZ() == z)
 			{
 				Actor[] temp = new Actor[actors.length + 1];
-				temp[index] = m_actors.get(i);
-				//System.arraycopy(actor, 0, temp, 0, temp.length);
+				System.arraycopy(actors, 0, temp, 0, actors.length);
+				temp[temp.length - 1] = m_actors.get(ID.get(i));
+				
 				actors = temp;
 				
-				/*msg = Render_ASCII.renderMap(actor.getX(), actor.getY(), actor.getZ());
-				
-				String[] arr = new String[msg.length + 1];
-				System.arraycopy(msg, 0, arr, 0, msg.length);*/
-				
-				System.out.println("index: " + index);
-				System.out.println(m_actors.get(i));
-				index++;
+				System.out.println(m_actors.get(ID.get(i)));
 			}
 		}
 		System.out.println("arr: " + actors.length);

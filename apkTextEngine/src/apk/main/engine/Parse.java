@@ -1,7 +1,5 @@
 package apk.main.engine;
 
-import java.util.List;
-
 import apk.parser.action.*;
 import apk.parser.target.*;
 
@@ -9,6 +7,8 @@ public class Parse {
 	
 	// TODO: Is loading everything for a 'server' side a concern?
 	// Does slow loading for a server start up matter?
+	
+	// TODO: parse does too much, needs refactor
 	
 	private ShortMove m_shortMove = new ShortMove();
 	private Move m_move = new Move();
@@ -24,12 +24,10 @@ public class Parse {
 	
 	private Direction m_direction = new Direction();
 	
-	private String[] msg = new String[1]; //TODO replace with something nicer probably
+	private String[] msg; //TODO replace with something nicer probably
 	
 	public Parse()
 	{
-		//TODO: Needed or refactor?
-		//Tempt message in the meanwhile
 		Logger.log("Loading parsers and wordlists...");
 		System.out.println("Loading parser...");
 	}
@@ -51,32 +49,34 @@ public class Parse {
 	
 	private String[] collapse(String[] input, int a, int b, String seperator)
 	{
-		int i = 0; //i = 0 first target //i = 1 second target
+		int target = 0; //i = 0 first target //i = 1 second target
 		String t1 = "";
 		String t2 = "";
 		
-		for(; a < b; a++)
+		while(a < b)
 		{
-			if (t1.length() > 0 && input[a].equals(seperator) && i < 1)
+			if (t1.length() > 0 && input[a].equals(seperator) && target < 1)
 			{
-				i++;
+				target++;
 			}
 			else
 			{
-				if (i == 0)
+				if (target == 0)
 					t1 += input[a];
 				else
 					t2 += input[a];
-				if (a + 1 < b)
+				
+				if ((a + 1) < b)
 				{
-					if (i == 0 && (a + 1) < b)
+					if ((target == 0))
 						t1 += " ";
-					else if (i == 1)
+					else if (target == 1)
 						t2 += " ";
 				}
 			}
+			a++;
 		}
-		String[] temp = {t1, t2};
+		String[] temp = {t1.trim(), t2.trim()};
 		return temp;
 	}
 
@@ -96,40 +96,24 @@ public class Parse {
 		//eg. [take] [item] from [box]
 		String[] att = input.split(" ");
 		
-		/** SHORT MOVEMENT ------------------------------------------------	|*/
-		if (m_shortMove.check(att)) 
-		{
-			String temp = actor.move(m_shortMove.getMeaning(att[0]));
-			msg = Render_ASCII.renderMap(actor.getX(), actor.getY(), actor.getZ());
-			
-			String[] arr = new String[msg.length + 1];
-			System.arraycopy(msg, 0, arr, 0, msg.length);
-			
-			msg = arr;
-			msg[msg.length - 1] = temp;
-			
-			return msg;
-		} 
-		
 		/** MOVEMENT ------------------------------------------------------	|*/
-		else if (m_move.check(att))
+		if (m_shortMove.check(att))
 		{
-			if (att.length == 2 && m_direction.check(att[att.length - 1]))
-			{
-				String temp = actor.move(m_direction.getMeaning(att[1]));
-				msg = Render_ASCII.renderMap(actor.getX(), actor.getY(), actor.getZ());
-				
-				String[] arr = new String[msg.length + 1];
-				System.arraycopy(msg, 0, arr, 0, msg.length);
-				
-				msg = arr;
-				msg[msg.length - 1] = temp;
-			}
+			if (att.length == 1)
+				return m_shortMove.doAction(actor, att[0]);
 			else
 			{
-				msg[0] = actor.move(m_direction.getMeaning(att[att.length - 1]));
+				return m_move.getError();
 			}
-			return msg;
+		} 
+		else if (m_move.check(att))
+		{
+			if (att.length == 2 && m_shortMove.check(att[1]))
+				return m_shortMove.doAction(actor, att[1]);
+			else
+			{
+				return m_shortMove.getError();
+			}
 		}
 		
 		/** LOOK ----------------------------------------------------------	|*/
@@ -140,63 +124,40 @@ public class Parse {
 				int x = actor.getX();
 				int y = actor.getY();
 				int z = actor.getZ();
-				String temp = "";
+				String objectsInRoom;
 				
-				Actor[] actors = Actor.getActors(actor, x, y, z); //gets all actors besides this one
-				
+				Actor[] actors = Actor.getActors(actor, x, y, z);
 				msg = Render_ASCII.renderMap(x, y, z);
 				
-				String[] arr = new String[msg.length + actors.length];
-				System.arraycopy(msg, 0, arr, 0, msg.length);
-				
-				//System.out.println(arr.length);
-				//System.out.println(actors.length);
-				
-				msg = arr;
-				
-				System.out.println("got " + actors.length + " actors at " + actor.getXYZ());
-				for (int i = 0; i < actors.length; i++)
+				if (actors.length > 0)
 				{
-					//if (actors[i] != null)
-					//{
-						System.out.println(actors[i]);
-					//}
-				}
-				
-				if (actors.length > 0) //remember: did not include this actor in actors
-					temp = "You see ";
-				else
-					return msg;
-				
-				//give up for now, too complicated :(
-				//figure something else out.
-				for (int i = 0; i < actors.length; i++)
-				{
-					System.out.println(actors[i].getName());
-					temp += actors[i].getName();
+					String[] arr = new String[msg.length + 1];
+					System.arraycopy(msg, 0, arr, 0, msg.length);
+					msg = arr;
 					
-					if (actors.length - 1 - i == 1)
+					objectsInRoom = "You see ";
+					
+					for (int i = 0; i < actors.length; i++)
 					{
-						System.out.println("2");
-						temp += " and ";
+						objectsInRoom += actors[i].getName();
+						
+						if (actors.length - 1 - i == 1)
+							objectsInRoom += " and ";
+						else if (actors.length - 1 - i > 1)
+							objectsInRoom += ", ";
+						else if (actors.length - 1 - i == 0)
+							System.out.println("4");
 					}
-					else if (actors.length - 1 - i > 1)
-					{
-						System.out.println("3");
-						temp += ", ";
-					}
-					else if (actors.length - 1 - i == 0)
-					{
-						System.out.println("4");
-					}
+					
+					objectsInRoom += " standing here.";
+					msg[msg.length - 1] = objectsInRoom;
+					
+					return msg;
 				}
-				
-				if (temp.length() > 0)
-					 temp += " standing here.";
-				
-				msg[msg.length - 1] = temp;
-				
-				return msg;
+				else
+				{
+					return msg;
+				}
 			}
 			else if (m_direction.check(att[1]) && att.length == 2)
 			{
@@ -277,7 +238,7 @@ public class Parse {
 			else if (m_take.check(att))
 			{
 				String[] tmp = collapse(att, 1, att.length, m_take.getMeaning("mod"));
-				msg[0] = "detected 'take " + tmp[0] + tmp[1] + "'.";
+				msg[0] = "detected 'take " + tmp[0] + " " + tmp[1] + "'.";
 				System.out.println(tmp[0] + " l: " + tmp[0].length());
 				System.out.println(tmp[1] + " l: " + tmp[1].length());
 			}
@@ -445,6 +406,16 @@ public class Parse {
 				System.out.println("ACTOR:");
 				Actor.debug();
 				msg[0] = "Printed debug.";
+				return msg;
+			}
+			/** test */
+			else if (m_admin.getMeaning(att[0]).equals("test"))
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					new Actor(actor.getX(), actor.getY(), actor.getZ(), "test" + i, 30, 30);
+				}
+				msg[0] = "created some dummy npcs at " + actor.getXYZ();
 				return msg;
 			}
 			/** if invalid */

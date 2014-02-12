@@ -134,11 +134,30 @@ public class Render_ASCII
 	 */
 	private static String getPlayerGraphic(int x, int y, int entZ)
 	{
+		String temp;
+		String r = World.roomArray[x][y][entZ - m_zOffset].getRoomGraphic();
+		String p;
+		
 		if (m_range > 0)
 		{
-			return World.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(0, 1)
-			+ Graphic.getGraphic("plyr")
-			+ World.roomArray[x][y][entZ - m_zOffset].getRoomGraphic().substring(2, 3);
+			if ((p = Graphic.getGraphic("plyr")).length() % 2 == 0) // is even length
+			{
+				temp = r.substring(0, (int) (r.length() / 2) - p.length()/2);
+				temp += Graphic.getGraphic("plyr");
+				temp += r.substring((int) (r.length() / 2) + p.length()/2, r.length());
+						
+				return temp;
+			}
+			else //player graphic is odd length
+			{
+				p = Graphic.getGraphic("plyr");
+				
+				temp = r.substring(0, (int) ((r.length() - 0.5) / 2) - p.length()/2);
+				temp += Graphic.getGraphic("plyr");
+				temp += r.substring((int) (((r.length() - 0.5) / 2) + 1) + p.length()/2, r.length());
+				
+				return temp;
+			}
 		}
 		else
 		{

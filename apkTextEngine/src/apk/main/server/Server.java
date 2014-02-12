@@ -25,7 +25,7 @@ public class Server
 	private static Socket clientSocket = null;
 	
 	// This chat server can accept up to maxClientsCount clients' connections.
-	private static final int maxClientsCount = 10;
+	private static final int maxClientsCount = 3; //z lowered for testing
 	private static final clientThread[] threads = new clientThread[maxClientsCount];
 	
 	public static void main(String args[])
@@ -128,6 +128,8 @@ class clientThread extends Thread
 	private Actor m_ent = null;
 	private static Parse m_p = new Parse();
 	
+	private boolean m_connected = true;
+	
 	public clientThread(Socket clientSocket, clientThread[] threads)
 	{
 		this.clientSocket = clientSocket;
@@ -192,13 +194,9 @@ class clientThread extends Thread
 			}
 			
 			/* Start the conversation. */
-			while (true)
+			while (m_connected)
 			{
 				String line = m_in.readLine();
-				if (line.startsWith("@quit"))
-				{
-					break;
-				}
 				
 				/** collapse input first */
 				String[] msgRecieved  = m_p.parse(m_ent, line);
@@ -214,8 +212,8 @@ class clientThread extends Thread
 				
 				if(msgRecieved.length > 0 && msgRecieved[0] != null)
 				{
-					System.out.println("recieved is GREATER THAN 0 THINGS");
-					System.out.println(msgRecieved[0]);
+					//System.out.println("recieved is GREATER THAN 0 THINGS");
+					//System.out.println(msgRecieved[0]);
 					
 					synchronized (this)
 					{
@@ -243,41 +241,52 @@ class clientThread extends Thread
 								/*TODO: first attempt to hook up the game to the engine: */
 								//threads[i].os.println(protocol.processInput(line)); //TODO: cleanup
 							}
+							
+							if (line.equalsIgnoreCase("@quit"))
+							{
+								m_connected = false;
+							}
+							if (line.length() > 0)
+							{
+								System.out.println(line);
+								System.out.println(line.equalsIgnoreCase("@quit"));
+							}
 						}
 					}
+				}
+			}//end of while
 					
-					if (msgRecieved.length > 0 && msgRecieved[0].equals("@quit"))
+				//System.out.println(msgRecieved[0]);
+				
+			synchronized (this)
+			{
+				for (int i = 0; i < maxClientsCount; i++)
+				{
+					if (threads[i] != null && threads[i] != this && threads[i].clientName != null)
 					{
-						synchronized (this)
-						{
-							for (int i = 0; i < maxClientsCount; i++)
-							{
-								if (threads[i] != null && threads[i] != this && threads[i].clientName != null)
-								{
-									threads[i].os.println("*** " + name + " disconnected. ***");
-								}
-							}
-						}
+						threads[i].os.println("*** " + name + " disconnected. ***");
+						System.out.println("*** Disconected " + name + " ***");
 						os.println("*** Disconected " + name + " ***");
-					
-						/*
-						* Clean up. Set the current thread variable to null so that a new client
-						* could be accepted by the server.
-						*/
-						synchronized (this)
-						{
-							for (int i = 0; i < maxClientsCount; i++)
-							{
-								if (threads[i] == this)
-								{
-									threads[i] = null;
-								}
-							}
-						}
-						break;
 					}
 				}
 			}
+			
+		
+			/*
+			* Clean up. Set the current thread variable to null so that a new client
+			* could be accepted by the server.
+			*/
+			synchronized (this)
+			{
+				for (int i = 0; i < maxClientsCount; i++)
+				{
+					if (threads[i] == this)
+					{
+						threads[i] = null;
+					}
+				}
+			}
+			
 			/*
 			* Close the output stream, close the input stream, close the socket.
 			*/

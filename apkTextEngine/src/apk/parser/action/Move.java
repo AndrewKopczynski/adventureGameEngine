@@ -20,6 +20,6 @@ public class Move extends WordList {
 		list.put("jog", 		m_d);
 		list.put("head",		m_d);
 
-		list.put("err", 	"I can't go there.");
+		list.put("err", 	"[MOVE] Go where?");
 	}
 }

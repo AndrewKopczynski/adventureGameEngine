@@ -1,5 +1,7 @@
 package apk.parser.action;
 
+import apk.main.engine.Actor;
+import apk.main.engine.Render_ASCII;
 import apk.parser.reference.WordList;
 
 public class ShortMove extends WordList
@@ -29,15 +31,26 @@ public class ShortMove extends WordList
 		list.put("u", 			"u");
 		list.put("d", 			"d");
 		
-		list.put("err", 		"I can't go that way.");
+		list.put("err", 		"[SHORTMOVE] Go where?");
 	}
 	
 	/** SHORT MOVEMENT ------------------------------------------------	|
 	 * Short: north
 	 */
-	/*if (vnn.length == 1 && m_shortMove.contains(vnn[0])) 
+	public String[] doAction(Actor actor, String dir)
 	{
-		entity.move(m_shortMove.getMeaning(vnn[0]));
-		return Render_ASCII.renderMap(entity.getX(), entity.getY(), entity.getZ());
-	} */
+		String[] msg;
+		
+		String temp = actor.move(list.get(dir));
+		msg = Render_ASCII.renderMap(actor.getX(), actor.getY(), actor.getZ());
+		
+		String[] arr = new String[msg.length + 1];
+		System.arraycopy(msg, 0, arr, 0, msg.length);
+		
+		msg = arr;
+		msg[msg.length - 1] = temp;
+		
+		return msg;
+	}
+	
 }
