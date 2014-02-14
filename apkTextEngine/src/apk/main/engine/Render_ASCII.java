@@ -4,13 +4,14 @@ public class Render_ASCII
 {
 	/** Maximum allowed offset at any given time.
 	 * Precautionary. */
-	private static final int M_OFFSET_CAP = 1;
+	//private static final int M_OFFSET_CAP = 1;
+	
 	/** Offset for X vision. */
-	private static int m_xOffset = 0;
+	//private static int m_xOffset = 0;
 	/** Offset for Y vision. */
-	private static int m_yOffset = 0;
+	//private static int m_yOffset = 0;
 	/** Offset for Z vision. */
-	private static int m_zOffset = 0;
+	//private static int m_zOffset = 0;
 	
 	/** Sight range. 
 	 * <p>
@@ -66,23 +67,20 @@ public class Render_ASCII
 		int i = 0;
 		String[] map = new String[Math.max(0, (m_visionRange * 2))];
 		
-		for (int y = (entY + 1 - m_visionRange) + m_yOffset; y < (entY + m_visionRange) + m_yOffset; y++)
+		for (int y = (entY + 1 - m_visionRange); y < (entY + m_visionRange); y++)
 		{
-			map[i] = renderMapLine(entX + m_xOffset, entY + m_yOffset, entZ + m_zOffset, y);
+			map[i] = renderMapLine(entX, entY, entZ, y);
 			i++;
 		}
-		if (World.isMapRoom(World.roomArray, entX, entY, entZ))
-		{
-			map[i] = ("Exits: " + World.roomArray[entX][entY][entZ].getRoomExits());
-		}
-		else
-		{
-			map[i] = ("Exits: ?");
-		}
 		
-		m_xOffset = 0;
+		if (World.isMapRoom(World.roomArray, entX, entY, entZ))
+			map[i] = ("Exits: " + World.roomArray[entX][entY][entZ].getRoomExits());
+		else
+			map[i] = ("Exits: ?");
+		
+		/*m_xOffset = 0;
 		m_yOffset = 0;
-		m_zOffset = 0;
+		m_zOffset = 0;*/
 		return map;
 	}
 	
@@ -100,10 +98,10 @@ public class Render_ASCII
 			if (World.isMapRoom(World.roomArray, x, y, entZ))
 			{
 				//ignore offset for player drawing
-				if (x == entX - m_xOffset && y == entY - m_yOffset)
+				if (x == entX && y == entY)
 				{
 					line += insertIntoGraphic(Graphic.getGraphic("plyr"),
-							World.roomArray[x][y][entZ - m_zOffset].getRoomGraphic(),
+							World.roomArray[x][y][entZ].getRoomGraphic(),
 							x, y, entZ);
 				} 
 				
@@ -117,7 +115,7 @@ public class Render_ASCII
 			{
 				//ignore offset for play drawing
 				//TODO: figure out what the above comment even means
-				if (x == entX - m_xOffset && y == entY - m_yOffset)
+				if (x == entX && y == entY)
 				{
 					String player = " " + Graphic.getGraphic("plyr") + " ";
 					line += player;
@@ -186,7 +184,7 @@ public class Render_ASCII
 		m_visionRange = i;
 	}
 	
-	public static void setxOffset(int x)
+	/*public static void setxOffset(int x)
 	{
 		m_xOffset = Math.min(M_OFFSET_CAP, x);
 	}
@@ -199,5 +197,5 @@ public class Render_ASCII
 	public static void setzOffset(int z)
 	{
 		m_zOffset = Math.min(M_OFFSET_CAP, z);
-	}
+	}*/
 }

@@ -50,7 +50,7 @@ public class Actor extends Entity
 		
 		writeSave();
 		
-		System.out.println("created" + getName() + "@" + getXYZ());
+		//System.out.println("created" + getName() + "@" + getXYZ());
 	}
 	
 	public Actor(String filePath)
@@ -148,51 +148,76 @@ public class Actor extends Entity
 		
 		//close file writer
 		w.close();
-		System.out.println("Wrote " + toString() +"'s inventory to " + getFilePath());
+		//System.out.println("Wrote " + toString() +"'s inventory to " + getFilePath());
 	}
 	
 	/** Refactoring from move because it just did too much in one method. */
-	public String[] requestTile(int[] vel)
+	public String[] requestMap(int[] vel, boolean moveToLocation)
 	{
-		int x = vel[0];
-		int y = vel[1];
-		int z = vel[2];
+		String[] msg = new String[1];
+		boolean isInBounds;
+		boolean isConnected;
 		
-		String[] msg = new String[0];
+		int x = getX();
+		int y = getY();
+		int z = getZ();
 		
-		/* Boundary check to avoid bad checks in array. */
-		if (getNorth(y) < 0 
-			|| getEast(x) > (World.mapSize - 1) 
-			|| getSouth(y) > (World.mapSize - 1) 
-			|| getWest(x) < 0 
-			|| getUp(z) > (World.HEIGHT_LIMIT - 1) 
-			|| getDown(z) < 0)
+		//System.out.println("VEL: " + vel[0] + ", " + vel[1] + ", " + vel[2]);
+		if (vel != null)
 		{
-			
+			x += vel[0];
+			y += vel[1];
+			z += vel[2];
 		}
-		return null;
+		//System.out.println("GOING: " + x + ", " + y + ", " + z);
+		
+		isInBounds = boundryCheck(x, y, z);
+		isConnected = (m_ignoresCollision || exitCheck(x, y, z));
+		
+		System.out.println("Bound check: " + isInBounds);
+		System.out.println("Connected check: " + isConnected);
+		
+		if (isInBounds && isConnected)
+		{
+			msg = Render_ASCII.renderMap(x, y, z);
+			
+			if(moveToLocation)
+				move(vel);
+		}
+		else
+			msg[0] = "No map recieved.";
+		
+		return msg;
 	}
 	
-	public void move(int[] vel)
+	private boolean boundryCheck(int x, int y, int z)
+	{ // Boundary check to avoid bad checks in array.
+		/*System.out.println(x >= 0);
+		System.out.println(y >= 0);
+		System.out.println(z >= 0);
+		
+		System.out.println(x < World.mapSize - 1);
+		System.out.println(y < World.mapSize - 1);
+		System.out.println(z < World.HEIGHT_LIMIT - 1);
+		System.out.println(World.isMapRoom(World.roomArray, x, y, z));*/
+		
+		return (x >= 0 && y >= 0 && z >= 0
+				&& x < World.mapSize - 1
+				&& y < World.mapSize - 1
+				&& z < World.HEIGHT_LIMIT - 1
+				&& (World.isMapRoom(World.roomArray, x, y, z) || m_ignoresCollision));
+	}
+	
+	private boolean exitCheck(int x, int y, int z)
 	{
-		int x = vel[0];
-		int y = vel[1];
-		int z = vel[2];
-		
-		if (x > 0)
-			goEast(x);
-		else
-			goWest(x);
-		
-		if (y > 0)
-			goSouth(y);
-		else
-			goNorth(y);
-		
-		if (z > 0)
-			goUp(z);
-		else
-			goDown(z);
+		return true; //TODO do later
+	}
+	
+	private void move(int[] vel)
+	{
+		goX(vel[0]);
+		goY(vel[1]);
+		goZ(vel[2]);
 	}
 	
 	/** Returns X coordinate of entity.
@@ -219,58 +244,21 @@ public class Actor extends Entity
 	{
 		return m_x + "," + m_y + "," + m_z;
 	}
-
-	// getDirection
-	private int getNorth(int n) 
-	{
-		return m_y - n;
-	}
-	private int getEast(int e) 
-	{
-		return m_x + e;
-	}
-	private int getSouth(int s) 
-	{
-		return m_y + s;
-	}
-	public int getWest(int w) 
-	{
-		return m_x - w;
-	}
-	public int getUp(int u)
-	{
-		return m_z + u;
-	}
-	public int getDown(int d)
-	{
-		return m_z - d;
-	}
 	
 	// goDirection
-	private void goNorth(int n) 
+	private void goX(int x) 
 	{
-		m_y -= n;
+		m_x += x;
 	}
-	private void goEast(int e) 
+	private void goY(int y) 
 	{
-		m_x += e;
+		m_y += y;
 	}
-	private void goSouth(int s) 
+	private void goZ(int z) 
 	{
-		m_y += s;
+		m_z += z;
 	}
-	private void goWest(int w) 
-	{
-		m_x -= w;
-	}
-	private void goUp(int u)
-	{
-		m_z += u;
-	}
-	private void goDown(int d)
-	{
-		m_z -= d;
-	}
+	
 	
 	/** Returns a list of actors at specific coordinates.
 	 * 
@@ -278,23 +266,7 @@ public class Actor extends Entity
 	 * @param y Y coordinate
 	 * @param z Z coordinate
 	 * @return List of actors at those coordinates
-	 */
-	/*public static List<Actor> getActors(int x, int y, int z)
-	{
-		List<Actor> temp = new ArrayList<Actor>();
-		for (int i = 0; i < ID.size(); i++)
-		{
-			if (m_actors.get(ID.get(i)) != null
-				&& m_actors.get(ID.get(i)).getX() == x
-				&& m_actors.get(ID.get(i)).getY() == y
-				&& m_actors.get(ID.get(i)).getZ() == z)
-			{
-				temp.add(m_actors.get(ID.get(i)));
-			}
-		}
-		return temp;
-	}*/
-	
+	 */	
 	public static Actor[] getActors(int x, int y, int z)
 	{
 		int index = 0;
@@ -333,10 +305,10 @@ public class Actor extends Entity
 				
 				actors = temp;
 				
-				System.out.println(m_actors.get(ID.get(i)));
+				//System.out.println(m_actors.get(ID.get(i)));
 			}
 		}
-		System.out.println("arr: " + actors.length);
+		//System.out.println("arr: " + actors.length);
 		
 		return actors;
 	}
@@ -357,14 +329,17 @@ public class Actor extends Entity
 			return false;
 	}
 	
-	public static Entity getByName(String name)
+	public static Actor getByName(String name)
 	{
-		for (int i = 0; i < m_actors.size(); i++)
+		for (int i = 0; i < ID.size(); i++)
 		{
-			System.out.println("checking " + name + " against " + m_actors.get(i).getName() + " (" + m_actors.get(i).toString() + ")");
-			if (m_actors.get(i).getName().equalsIgnoreCase(name))
+			if(m_actors.get(ID.get(i)) != null)
 			{
-				return m_actors.get(i);
+				System.out.println("checking " + name + " against " + m_actors.get(i).getName() + " (" + m_actors.get(i).toString() + ")");
+				if (m_actors.get(i).getName().equalsIgnoreCase(name))
+				{
+					return m_actors.get(i);
+				}
 			}
 		}
 		return null;
@@ -372,9 +347,10 @@ public class Actor extends Entity
 	
 	public static boolean existsByName(String name)
 	{
-		for (int i = 0; i < m_actors.size(); i++)
+		for (int i = 0; i < ID.size(); i++)
 		{
-			if (m_actors.get(i).toString().equalsIgnoreCase(name))
+			if (m_actors.get(ID.get(i)) != null
+				&& m_actors.get(ID.get(i)).toString().equalsIgnoreCase(name))
 				return true;
 		}
 		return false;
@@ -383,7 +359,7 @@ public class Actor extends Entity
 	/** debug list print */
 	public static void debug()
 	{
-		for (int i = 0; i < m_actors.size(); i++)
+		for (int i = 0; i < ID.size(); i++)
 		{
 			System.out.println(m_actors.get(i));
 		}

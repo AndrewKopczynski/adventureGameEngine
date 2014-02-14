@@ -95,147 +95,47 @@ public class Parse {
 		String[] att = input.split(" ");
 		
 		/** MOVEMENT ------------------------------------------------------	|*/
-		if (m_shortMove.check(att))
+		if (m_shortMove.check(att) || m_move.check(att)) //check should stop bad movements
 		{
+			int[] vel; // requested direction to move actor
+			
 			if (att.length == 1)
+				vel = m_shortMove.parse(att[0]);
+			else if (att.length == 2)
+				vel = m_shortMove.parse(att[1]);
+			else
+				return m_shortMove.getError();
+			
+			if (vel != null)
 			{
-				//parse meaning
-				//attempt to fetch requested tile
-				//move
-				int[] vel = m_shortMove.parse(att[0]);
-				msg = actor.requestTile(vel);
+				msg = actor.requestMap(vel, true);
+				msg[msg.length - 1] = m_look.getActorsInRoom(actor, null);
 				return msg;
 			}
 			else
 				return m_shortMove.getError();
-		} 
-		else if (m_move.check(att))
-		{
-			if (att.length == 2 && m_shortMove.check(att[1]))
-			{
-				int[] vel = m_shortMove.parse(att[1]);
-				msg = actor.requestTile(vel);
-				return msg;
-			}
-			else
-				return m_move.getError();
 		}
 		
 		/** LOOK ----------------------------------------------------------	|*/
 		else if (m_look.check(att))
 		{
-			if (att.length == 1)
+			int vel[] = null;
+			
+			if (att.length == 2)
 			{
-				int x = actor.getX();
-				int y = actor.getY();
-				int z = actor.getZ();
-				String objectsInRoom;
-				
-				Actor[] actors = Actor.getActors(actor, x, y, z);
-				msg = Render_ASCII.renderMap(x, y, z);
-				
-				if (actors.length > 0)
-				{
-					String[] arr = new String[msg.length + 1];
-					System.arraycopy(msg, 0, arr, 0, msg.length);
-					msg = arr;
-					
-					objectsInRoom = "You see ";
-					
-					for (int i = 0; i < actors.length; i++)
-					{
-						objectsInRoom += actors[i].getName();
-						
-						if (actors.length - 1 - i == 1)
-							objectsInRoom += " and ";
-						else if (actors.length - 1 - i > 1)
-							objectsInRoom += ", ";
-						else if (actors.length - 1 - i == 0)
-							System.out.println("4");
-					}
-					
-					objectsInRoom += " standing here.";
-					msg[msg.length - 1] = objectsInRoom;
-					
-					return msg;
-				}
-				else if (att.length == 2)
-				{
-					
-				}
-				else
-				{
-					return msg;
-				}
-			}
-			else if (att.length == 2 && m_direction.check(att[1]))
-			{
-				//TODO: clean this and entity code up, rough pass for now
-				int n = 0;
-				int e = 0;
-				int s = 0;
-				int w = 0;
-				int u = 0;
-				int d = 0;
-				
-				if (m_direction.getMeaning(att[1]).equals("n"))
-				{
-					n = 1;
-				}
-				else if (m_direction.getMeaning(att[1]).equals("ne"))
-				{
-					n = 1;
-					e = 1;
-				}
-				else if (m_direction.getMeaning(att[1]).equals("e"))
-				{
-					e = 1;
-				}
-				else if (m_direction.getMeaning(att[1]).equals("se"))
-				{
-					s = 1;
-					e = 1;
-				}
-				else if (m_direction.getMeaning(att[1]).equals("s"))
-				{
-					s = 1;
-				}
-				else if (m_direction.getMeaning(att[1]).equals("sw"))
-				{
-					s = 1;
-					w = 1;
-				}
-				else if (m_direction.getMeaning(att[1]).equals("w"))
-				{
-					w = 1;
-				}
-				else if (m_direction.getMeaning(att[1]).equals("nw"))
-				{
-					n = 1;
-					w = 1;
-				}
-				else if (m_direction.getMeaning(att[1]).equals("u"))
-				{
-					u = 1;
-				}
-				else if (m_direction.getMeaning(att[1]).equals("d"))
-				{
-					d = 1;
-				}
-				//TODO: lazy, refactor this later
-				Render_ASCII.setxOffset(e - w);
-				Render_ASCII.setyOffset(s - n);
-				Render_ASCII.setzOffset(u - d);
-				return Render_ASCII.renderMap(actor.getX(), actor.getY(), actor.getZ());
+				if ((vel = m_shortMove.parse(att[1])) == null)
+					return m_look.getError();
 			}
 			
-			msg[0] = "Look where?";
-			return msg; //TODO replace with per-action error fetches
+			msg = actor.requestMap(vel, false);
+			msg[msg.length - 1] = m_look.getActorsInRoom(actor, vel);
+			return msg;
 		}
 		/** SAY -----------------------------------------------------------	|*/
 		else if (m_say.check(att))
 		{
-			msg[0] = actor.getName() + " says: \"" + collapse(att, 1, att.length) + "\"";
+			msg[0] = actor.getName() + " says, \"" + collapse(att, 1, att.length) + "\"";
+			msg[0].trim();
 			return msg;
 		}
 		
@@ -427,6 +327,21 @@ public class Parse {
 				msg[0] = "created some dummy npcs at " + actor.getXYZ();
 				return msg;
 			}
+			else if (m_admin.getMeaning(att[0]).equals("stress"))
+			{
+				for (int i = 0; i < Integer.MAX_VALUE; i++)
+				{
+					if (i % 100 == 0)
+						System.out.println(i);
+					new Actor(actor.getX(),
+							actor.getY(),
+							actor.getZ(),
+							"npc_" + i,
+							30,
+							30);
+				}
+				return msg;
+			}
 			/** if invalid */
 			else
 			{
@@ -440,7 +355,6 @@ public class Parse {
 		 */
 		else if (m_quit.check(att))
 		{
-			
 			msg[0] = "Logging out...";
 			return msg;
 		}
@@ -449,7 +363,6 @@ public class Parse {
 		 */
 		else
 		{
-			
 			msg[0] = input + " for entity " + actor + " isn't a valid command.";
 			return msg;
 		}

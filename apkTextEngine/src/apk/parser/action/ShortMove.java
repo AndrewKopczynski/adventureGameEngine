@@ -1,7 +1,5 @@
 package apk.parser.action;
 
-import apk.main.engine.Actor;
-import apk.main.engine.Render_ASCII;
 import apk.parser.reference.WordList;
 
 public class ShortMove extends WordList
@@ -51,14 +49,18 @@ public class ShortMove extends WordList
 		String up = "u";
 		String down = "d";
 		
-		if (dir.equals(north))
-			y--;
-		else if (dir.equals(east))
+		if (dir.equals(east))
 			x++;
-		else if (dir.equals(south))
-			y++;
 		else if (dir.equals(west))
 			x--;
+		else if (dir.equals(south))
+			y++;
+		else if (dir.equals(north))
+			y--;
+		else if (dir.equals(up))
+			z++;
+		else if (dir.equals(down))
+			z--;
 		else if (dir.equals(northeast))
 		{
 			y--;
@@ -78,11 +80,7 @@ public class ShortMove extends WordList
 		{
 			x--;
 			y--;
-		} 
-		else if (dir.equals(up))
-			z++;
-		else if (dir.equals(down))
-			z--;
+		}
 		else 
 			return null;
 		

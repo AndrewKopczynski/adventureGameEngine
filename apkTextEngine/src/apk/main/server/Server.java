@@ -177,7 +177,7 @@ class clientThread extends Thread
 					{
 						clientName = "player_" + name;
 						//protocol = new ServerProtocol(clientName); //z
-						if ((m_ent = (Actor) Entity.getByName(clientName)) == null)
+						if ((m_ent = Actor.getByName(clientName)) == null)
 						{
 							m_ent = new Actor(0, 0, 0, clientName, 30, 30);
 						}
@@ -201,6 +201,7 @@ class clientThread extends Thread
 				/** collapse input first */
 				String[] msgRecieved  = m_p.parse(m_ent, line);
 				String msgFormatted = "";
+				
 				for (int i = 0; i < msgRecieved.length; i++)
 				{
 					msgFormatted += msgRecieved[i];
@@ -248,8 +249,8 @@ class clientThread extends Thread
 							}
 							if (line.length() > 0)
 							{
-								System.out.println(line);
-								System.out.println(line.equalsIgnoreCase("@quit"));
+								//System.out.println(line);
+								//System.out.println(line.equalsIgnoreCase("@quit"));
 							}
 						}
 					}
