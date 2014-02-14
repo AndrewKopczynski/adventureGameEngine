@@ -13,6 +13,6 @@ public class Drop extends WordList
 		list.put("dump", 		m_d);
 		list.put("abandon", 	m_d);
 		
-		list.put("err", 	"I can't drop that.");
+		list.put("err", 	"%ACTION what?");
 	}
 }

@@ -11,6 +11,7 @@ public class Say extends WordList
 		list.put("\"", 			"say");
 		
 		// not sure why i would ever have an error saying stuff but sure
-		list.put("err", 		"Something went horribly wrong with 'say'!");
+		// TODO: secret achievement for breaking say?
+		list.put("err", 		"Say what?");
 	}
 }

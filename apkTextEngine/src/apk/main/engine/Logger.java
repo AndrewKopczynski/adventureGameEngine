@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.swing.Timer;
+
 /** Class for logging absolutely everything that happens,
  * will be super useful later on.
  * 
@@ -14,6 +16,10 @@ public class Logger
 {
 	/** Filename of output log file. */
 	private static final String m_filename = "log.log";
+	
+	//private static Timer m_timer = new Timer(0, ); TODO timer stuff for testing
+	
+	
 	/** Clears the log.txt file. */
 	public static void clear() 
 	{
@@ -58,4 +64,9 @@ public class Logger
 			System.out.println("!CRITICAL! An entry failed to be logged in the debug log!");
 		}
 	}
+	
+	//public static void start()
+	//{
+	//	
+	//}
 }

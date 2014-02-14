@@ -12,6 +12,8 @@ public class Put extends WordList
 		list.put("put", 		m_d);
 		list.put("store", 		m_d);
 		
-		list.put("err", 	"I can't put that there.");
+		list.put("%MOD", 		"in");
+		
+		list.put("err", 	"%ACTION %TARGET where?.");
 	}
 }

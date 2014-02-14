@@ -1,6 +1,0 @@
-<?xml version="1.0" ?>
-<entity id="32" name="player_abc" coords="0,0,0">
-	<health hpMax="30" hp="30"/>
-	<inventory>
-	</inventory>
-</entity>

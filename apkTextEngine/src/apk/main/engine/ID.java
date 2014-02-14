@@ -6,6 +6,7 @@ import java.util.List;
 public class ID
 {
 	private static List<Integer> m_id = new ArrayList<Integer>();
+	private static int m_lastID = 0;
 	
 	/** Adds to the ID list and returns the ID that was added.
 	 * 
@@ -51,12 +52,10 @@ public class ID
 	protected static boolean remove(int id)
 	{
 		if (m_id.contains(id))
-		{
 			m_id.remove(id);
-			return true;
-		}
 		else
 			return false;
+		return true;
 	}
 	
 	protected static void debug()
@@ -67,11 +66,16 @@ public class ID
 	
 	private static int getNext()
 	{
-		int i = 0;
+		//temporary faster id fetch doesn't recycle any IDs
+		int i = m_lastID;
+		m_lastID++;
+		
+		return i;
+		/*int i = 0;
 		//while(m_idList.contains(i))
 		while(m_id.contains(i))
 			i++;
-		return i;
+		return i;*/
 	}
 }
 

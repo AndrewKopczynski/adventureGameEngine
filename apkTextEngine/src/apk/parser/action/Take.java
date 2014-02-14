@@ -5,7 +5,7 @@ import apk.parser.reference.WordList;
 public class Take extends WordList
 {
 	/** Used in more general wordlists for easier changing. */
-	private String m_d = "steal";
+	private String m_d = "take";
 	
 	public Take()
 	{
@@ -22,8 +22,8 @@ public class Take extends WordList
 		list.put("obtain", 		m_d);
 		list.put("grab", 		m_d);
 		
-		list.put("mod",			"from"); //TODO: come up with a better name
+		list.put("%MOD",		"from"); //TODO: come up with a better name
 		
-		list.put("err", 	"Can't take that.");
+		list.put("err", 		"%ACTION what?");
 	}
 }

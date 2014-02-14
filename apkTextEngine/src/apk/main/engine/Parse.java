@@ -10,7 +10,6 @@ public class Parse {
 	
 	// TODO: parse does too much, needs refactor
 	
-	private ShortMove m_shortMove = new ShortMove();
 	private Move m_move = new Move();
 	private Look m_look = new Look();
 	private Take m_take = new Take();
@@ -94,17 +93,17 @@ public class Parse {
 		//eg. [take] [item] from [box]
 		String[] att = input.split(" ");
 		
-		/** MOVEMENT ------------------------------------------------------	|*/
-		if (m_shortMove.check(att) || m_move.check(att)) //check should stop bad movements
+		/** MOVEMENT - SHORT MOVE MERGED WITH MOVE ------------------------	|*/
+		if (m_direction.check(att) || m_move.check(att)) //check should stop bad movements
 		{
 			int[] vel; // requested direction to move actor
 			
 			if (att.length == 1)
-				vel = m_shortMove.parse(att[0]);
+				vel = m_direction.parse(att[0]);
 			else if (att.length == 2)
-				vel = m_shortMove.parse(att[1]);
+				vel = m_direction.parse(att[1]);
 			else
-				return m_shortMove.getError();
+				return m_move.getError();
 			
 			if (vel != null)
 			{
@@ -112,8 +111,7 @@ public class Parse {
 				msg[msg.length - 1] = m_look.getActorsInRoom(actor, null);
 				return msg;
 			}
-			else
-				return m_shortMove.getError();
+			return m_move.getError();
 		}
 		
 		/** LOOK ----------------------------------------------------------	|*/
@@ -123,49 +121,73 @@ public class Parse {
 			
 			if (att.length == 2)
 			{
-				if ((vel = m_shortMove.parse(att[1])) == null)
+				if ((vel = m_direction.parse(att[1])) == null)
 					return m_look.getError();
 			}
 			
 			msg = actor.requestMap(vel, false);
 			msg[msg.length - 1] = m_look.getActorsInRoom(actor, vel);
+			
 			return msg;
 		}
+		
 		/** SAY -----------------------------------------------------------	|*/
 		else if (m_say.check(att))
 		{
-			msg[0] = actor.getName() + " says, \"" + collapse(att, 1, att.length) + "\"";
-			msg[0].trim();
+			msg[0] = (actor.getName() 
+					+ " says, \"" + collapse(att, 1, att.length) 
+					+ "\"").trim();
+			
 			return msg;
 		}
 		
 		/** TAKE ----------------------------------------------------------	|*/
 		else if (m_take.check(att))
 		{
-			if (!m_take.check(att))
-				msg[0] = "detected 'take " + collapse(att, 1, att.length) + "'.";
-			else if (m_take.check(att))
+			if (!m_take.checkForMod(att) && att.length >= 2)
 			{
-				String[] tmp = collapse(att, 1, att.length, m_take.getMeaning("mod"));
-				msg[0] = "detected 'take " + tmp[0] + " " + tmp[1] + "'.";
-				System.out.println(tmp[0] + " l: " + tmp[0].length());
-				System.out.println(tmp[1] + " l: " + tmp[1].length());
+				msg[0] = "detected 'take [" + collapse(att, 1, att.length) + "]'.";
+				return msg;
 			}
-			return msg;
+			else if (m_take.checkForMod(att))
+			{
+				String[] temp = collapse(att, 1, att.length, m_take.getMod());
+				
+				if (temp.length >= 2 && temp[0].length() > 0 && temp[1].length() > 0)
+				{
+					msg[0] = "detected 'take [" + temp[0] + "] from [" + temp[1] + "]'.";
+					return msg;
+				}
+			}
+			return m_take.getError(att[0]);
+			
 		}
 		
 		/** PUT -----------------------------------------------------------	|*/
-		else if (m_put.check(att))
+		else if (m_put.check(att) && att.length >= 2)
 		{
-			msg[0] = "Not implimented, but detected 'put'.";
-			return msg;
+			if (m_put.checkForMod(att) && att.length >= 2)
+			{
+				String[] temp = collapse(att, 1, att.length, m_put.getMod());
+				
+				if (temp.length >= 2 && temp[0].length() > 0 && temp[1].length() > 0)
+				{
+					msg[0] = "detected 'put [" + temp[0] + "] in [" + temp[1] + "]'.";
+					return msg;
+				}
+			}
+			return m_put.getError(att[0], collapse(att, 1, att.length));
 		}
 		
 		/** DROP ----------------------------------------------------------	|*/
 		else if (m_drop.check(att))
-		{
-			msg[0] = "Not implimented, but detected 'drop'.";
-			return msg;
+		{	
+			if (att.length >= 2)
+			{
+				msg[0] = "detected 'drop [" + collapse(att, 1, att.length) + "]'.";
+				return msg;
+			}
+			return m_drop.getError(att[0]);
 		}
 		
 		/** ST*ATUS -------------------------------------------------------	|*/
@@ -317,7 +339,7 @@ public class Parse {
 				msg[0] = "Printed debug.";
 				return msg;
 			}
-			/** test */
+			/** test - spawns four actors at the caller's coordinates */
 			else if (m_admin.getMeaning(att[0]).equals("test"))
 			{
 				for (int i = 0; i < 4; i++)
@@ -329,7 +351,7 @@ public class Parse {
 			}
 			else if (m_admin.getMeaning(att[0]).equals("stress"))
 			{
-				for (int i = 0; i < Integer.MAX_VALUE; i++)
+				for (int i = 0; i < 999; i++)
 				{
 					if (i % 100 == 0)
 						System.out.println(i);

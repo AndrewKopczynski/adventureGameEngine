@@ -4,9 +4,9 @@ import apk.parser.reference.WordList;
 
 public class ShortMove extends WordList
 {
-	/** ShortMove is specific only. */
+	// deprecated by refactoring, replaced by action.Move and target.Direction
 	
-	public ShortMove()
+	/*public ShortMove()
 	{
 		list.put("north", 		"n");
 		list.put("east", 		"e");
@@ -30,62 +30,5 @@ public class ShortMove extends WordList
 		list.put("d", 			"d");
 		
 		list.put("err", 		"[SHORTMOVE] Go where?");
-	}
-	
-	public int[] parse(String dir)
-	{
-		int x = 0;
-		int y = 0;
-		int z = 0;
-		
-		String north = "n";
-		String east = "e";
-		String south = "s";
-		String west = "w";
-		String northeast = "ne";
-		String northwest = "nw";
-		String southeast = "se";
-		String southwest = "sw";
-		String up = "u";
-		String down = "d";
-		
-		if (dir.equals(east))
-			x++;
-		else if (dir.equals(west))
-			x--;
-		else if (dir.equals(south))
-			y++;
-		else if (dir.equals(north))
-			y--;
-		else if (dir.equals(up))
-			z++;
-		else if (dir.equals(down))
-			z--;
-		else if (dir.equals(northeast))
-		{
-			y--;
-			x++;
-		} 
-		else if (dir.equals(southeast))
-		{
-			y++;
-			x++;
-		} 
-		else if (dir.equals(southwest))
-		{
-			y++;
-			x--;
-		} 
-		else if (dir.equals(northwest))
-		{
-			x--;
-			y--;
-		}
-		else 
-			return null;
-		
-		int[] vel = {x, y, z};
-		
-		return vel;
-	}
+	}*/
 }
