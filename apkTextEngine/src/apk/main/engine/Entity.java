@@ -50,7 +50,7 @@ public class Entity
 	protected int m_hp;
 	protected boolean m_ignoresCollision = false;
 	
-	protected Entity m_parent;
+	private String m_parent;
 	protected int m_type;
 	
 	//TODO does this even make sense lol
@@ -62,8 +62,12 @@ public class Entity
 	public Entity() {}
 	
 	// entities can only be created in inventories of actors
-	public Entity(String name, int type, int hpMax, int hp, Actor parent) throws EntityIntializationException
+	public Entity(String name, int type, int hpMax, int hp, Actor parent) throws EntityIntializationException //actor
 	{		
+		System.out.println("---------------------------------");
+		System.out.println("CREATING ENTITY WITH ACTOR PARENT");
+		System.out.println("---------------------------------");
+		
 		m_id = ID.add();
 		m_entites.put(m_id, this);
 		
@@ -73,19 +77,29 @@ public class Entity
 		m_hpMax = hpMax;
 		m_hp = hp;
 		
-		if (m_parent != null)
-			m_parent = parent;
+		if (parent != null)
+		{
+			m_parent = parent.toString();
+		/*	
+			System.out.println(m_parent.getName());
+			System.out.println(m_parent.getId());
+			System.out.println(m_parent.toString());*/
+		}
 		else
 			throw new EntityIntializationException();
 		
-		Logger.log("Created new ent '" + getName() +  "' @ " + m_parent.getName() + "'s inventory.");
+		Logger.log("Created new ent '" + getName() +  "' @ " + m_parent + "'s inventory.");
 		
 		writeSave();
 	}
 	
 	// entities can only be created in inventories of actors
-	public Entity(String name, int type, int hpMax, int hp, Entity parent)
+	public Entity(String name, int type, int hpMax, int hp, Entity parent) //ent
 	{
+		System.out.println("----------------------------------");
+		System.out.println("CREATING ENTITY WITH ENTITY PARENT");
+		System.out.println("----------------------------------");
+		
 		m_id = ID.add();
 		m_entites.put(m_id, this);
 		
@@ -95,9 +109,9 @@ public class Entity
 		m_hpMax = hpMax;
 		m_hp = hp;
 		
-		m_parent = parent;
+		m_parent = parent.toString();
 		
-		Logger.log("Created new entity '" + getName() + "' @ " + m_parent.getName() + "'s inventory.");
+		Logger.log("Created new entity '" + getName() + "' @ " + m_parent + "'s inventory.");
 		
 		writeSave();
 	}
@@ -111,6 +125,10 @@ public class Entity
 	 */
 	public Entity(String filePath) throws FileNotFoundException
 	{	
+		System.out.println("------------------------");
+		System.out.println("LOADING ENTITY FROM FILE");
+		System.out.println("------------------------");
+		
 		try
 		{
 			String[] entElements = {"entity", "health", "inInventoryOf"};
@@ -130,7 +148,8 @@ public class Entity
 			System.out.println("WS: " + Actor.stripID(t2));
 			System.out.println("WS: " + Actor.getByName(t2));
 			
-			m_parent = Actor.getByName(invXML.getAttribute("entity", 0, "inInventoryOf"));
+			//m_parent = Actor.getByName(invXML.getAttribute("entity", 0, "inInventoryOf"));
+			m_parent = invXML.getAttribute("entity", 0, "inInventoryOf");
 			
 			Logger.log("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
 			
@@ -428,7 +447,11 @@ public class Entity
 	
 	public boolean addToInventory(Entity entity)
 	{
-		System.out.println("tried to add " + entity.toString() + " to " +  m_parent.toString() + "'s inventory.");
+		System.out.println("tried to add " 
+				+ entity.toString() 
+				+ " to " 
+				//+ ((Entity) m_parent).toString()
+				+ "'s inventory.");
 		if (m_inv.add(entity))
 		{
 			System.out.println("did!");

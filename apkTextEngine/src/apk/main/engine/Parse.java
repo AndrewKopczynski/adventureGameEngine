@@ -206,7 +206,8 @@ public class Parse {
 		/** TAC*TICAL -----------------------------------------------------	|*/
 		else if (m_tactical.check(att))
 		{
-			msg[0] = actor.printNamedHealthBar();
+			msg = m_tactical.getActorsTacticalInRoom(actor);
+			//msg[0] = actor.printNamedHealthBar();
 			return msg;
 		}
 		
@@ -247,7 +248,9 @@ public class Parse {
 					String name = collapse(att, 1, att.length - 1);
 					int hp = Integer.parseInt(att[att.length - 1]);
 					
-					if (actor.addToInventory(new Entity(name, ACTOR_OBJECT, hp, hp, actor)))
+					Entity entity = new Entity(name, ACTOR_OBJECT, hp, hp, actor);
+					
+					if (actor.addToInventory(entity))
 					{
 						msg[0] = "Gave " + name + " to " + actor.toString();
 						return msg;

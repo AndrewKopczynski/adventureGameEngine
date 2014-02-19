@@ -48,38 +48,40 @@ public class Direction extends WordList
 		String northeast = "ne";
 		String northwest = "nw";
 		String southeast = "se";
-		String southwest = "sw";
+		String southwest = "w";
 		String up = "u";
 		String down = "d";
+	
+		//if (list.get(east).equalsIgnorescase(dir));
 		
-		if (dir.equals(east))
+		if (list.get(dir).equalsIgnoreCase(east))
 			x++;
-		else if (dir.equals(west))
+		else if (list.get(dir).equalsIgnoreCase(west))
 			x--;
-		else if (dir.equals(south))
+		else if (list.get(dir).equalsIgnoreCase(south))
 			y++;
-		else if (dir.equals(north))
+		else if (list.get(dir).equalsIgnoreCase(north))
 			y--;
-		else if (dir.equals(up))
+		else if (list.get(dir).equalsIgnoreCase(up))
 			z++;
-		else if (dir.equals(down))
+		else if (list.get(dir).equalsIgnoreCase(down))
 			z--;
-		else if (dir.equals(northeast))
+		else if (list.get(dir).equalsIgnoreCase(northeast))
 		{
 			y--;
 			x++;
 		} 
-		else if (dir.equals(southeast))
+		else if (list.get(dir).equalsIgnoreCase(southeast))
 		{
 			y++;
 			x++;
 		} 
-		else if (dir.equals(southwest))
+		else if (list.get(dir).equalsIgnoreCase(southwest))
 		{
 			y++;
 			x--;
 		} 
-		else if (dir.equals(northwest))
+		else if (list.get(dir).equalsIgnoreCase(northwest))
 		{
 			x--;
 			y--;

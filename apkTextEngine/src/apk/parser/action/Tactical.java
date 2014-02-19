@@ -1,5 +1,6 @@
 package apk.parser.action;
 
+import apk.main.engine.Actor;
 import apk.parser.reference.WordList;
 
 public class Tactical extends WordList
@@ -9,5 +10,29 @@ public class Tactical extends WordList
 	{
 		list.put("tactical", 	"tactical");
 		list.put("tac", 		"tactical");
+	}
+	
+	public String[] getActorsTacticalInRoom(Actor actor)
+	{
+		String[] msg = new String[1];
+		
+		int x = actor.getX();
+		int y = actor.getY();
+		int z = actor.getZ();
+		
+		Actor[] actors = Actor.getActors(x, y, z);
+		
+		if (actors.length > 10)
+			msg[0] = "There's just too many people here to tactically appraise properly.";
+		else
+		{
+			msg = new String[actors.length];
+			
+			for (int i = 0; i < actors.length; i++)
+			{
+				msg[i] = actors[i].printNamedHealthBar();
+			}
+		}
+		return msg;
 	}
 }

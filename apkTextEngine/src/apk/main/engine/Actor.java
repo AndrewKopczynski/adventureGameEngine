@@ -41,6 +41,10 @@ public class Actor extends Entity
 	 */
 	public Actor(int x, int y, int z, String name, int type, int hpMax, int hp)
 	{
+		System.out.println("------------------");
+		System.out.println("CREATING NEW ACTOR");
+		System.out.println("------------------");
+		
 		m_id = ID.add();
 		m_actors.put(m_id, this);
 		
@@ -59,6 +63,10 @@ public class Actor extends Entity
 	
 	public Actor(int x, int y, int z, Entity entity)
 	{
+		System.out.println("--------------------------");
+		System.out.println("CREATING ACTOR FROM ENTITY");
+		System.out.println("--------------------------");
+		
 		//TODO can i just cast this stuff or no
 		m_id = entity.getId();
 		m_actors.put(m_id, this);
@@ -78,6 +86,10 @@ public class Actor extends Entity
 	
 	public Actor(String filePath) throws IDConflictException, FileNotFoundException, ActorIntializationException
 	{	
+		System.out.println("-----------------------");
+		System.out.println("LOADING ACTOR FROM FILE");
+		System.out.println("-----------------------");
+		
 			Logger.log("Creating new entity from '" + filePath + "'...");
 			String[] entElements = {"entity", "health", "inventory"};
 			XMLReader invXML = new XMLReader(filePath, entElements);
@@ -131,6 +143,9 @@ public class Actor extends Entity
 					throw new ActorIntializationException();
 				}
 			}
+			System.out.println("--------------------------------");
+			System.out.println("FINISHED LOADING ACTOR FROM FILE");
+			System.out.println("--------------------------------");
 			//writeSave();
 	}
 	
@@ -307,7 +322,7 @@ public class Actor extends Entity
 		
 		for (int i = 0; i < ID.size(); i++)
 		{
-			if (i > 200)
+			if (actors.length > 200)
 			{
 				/** If there's an ungodly amount of actors here
 				 * then forget fetching the list.
@@ -316,6 +331,36 @@ public class Actor extends Entity
 			}
 			if (m_actors.get(ID.get(i)) != null
 				&& m_actors.get(ID.get(i)) != actor
+				&& m_actors.get(ID.get(i)).getX() == x
+				&& m_actors.get(ID.get(i)).getY() == y
+				&& m_actors.get(ID.get(i)).getZ() == z)
+			{
+				Actor[] temp = new Actor[actors.length + 1];
+				System.arraycopy(actors, 0, temp, 0, actors.length);
+				temp[temp.length - 1] = m_actors.get(ID.get(i));
+				
+				actors = temp;
+			}
+		}
+		return actors;
+	}
+	
+	/** Gets all actors in room including this one. */
+	public static Actor[] getActors(int x, int y, int z)
+	{
+		Actor[] actors = new Actor[0];
+		
+		for (int i = 0; i < ID.size(); i++)
+		{
+			if (actors.length > 200)
+			{
+				/** If there's an ungodly amount of actors here
+				 * then forget fetching the list.
+				 */
+				return null;
+			}
+			if (m_actors.get(ID.get(i)) != null
+				//&& m_actors.get(ID.get(i)) != actor
 				&& m_actors.get(ID.get(i)).getX() == x
 				&& m_actors.get(ID.get(i)).getY() == y
 				&& m_actors.get(ID.get(i)).getZ() == z)
@@ -366,6 +411,7 @@ public class Actor extends Entity
 				}
 			}
 		}
+		System.out.println("failed to match " + name);
 		return null;
 		//throw new NullPointerException();
 	}

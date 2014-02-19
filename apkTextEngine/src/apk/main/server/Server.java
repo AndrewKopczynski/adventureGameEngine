@@ -128,7 +128,7 @@ class clientThread extends Thread
 	private int maxClientsCount;
 	
 	//private ServerProtocol protocol = null; //z
-	private Actor m_ent = null;
+	private Actor m_player = null;
 	private static Parse m_p = new Parse();
 	
 	private boolean m_connected = true;
@@ -180,29 +180,35 @@ class clientThread extends Thread
 					{
 						clientName = "player_" + name;
 						//protocol = new ServerProtocol(clientName); //z
-						if ((m_ent = Actor.getByName(clientName)) == null)
+						if ((m_player = Actor.getByName(clientName)) == null)
 						{
 							try
 							{
-								new Actor("ent/" + clientName + ".xml");
+								m_player = new Actor("ent/" + clientName + ".xml");
 							}
 							catch (ActorIntializationException e)
 							{
 								System.out.println("Actor failed to intialize!");
 								e.printStackTrace();
+								
+								System.out.println("DID NOT LOAD FROM FILE");
+								m_player = new Actor(0, 0, 0, clientName, ACTOR_ALIVE, 30, 30);
 							}
 							catch (IDConflictException e)
 							{
 								System.out.println("Conflicting IDs!");
 								e.printStackTrace();
+								
+								System.out.println("DID NOT LOAD FROM FILE");
+								m_player = new Actor(0, 0, 0, clientName, ACTOR_ALIVE, 30, 30);
 							}
 							catch (FileNotFoundException e)
 							{
 								System.out.println("ent/" + clientName + " not found!");
-							}
-							finally
-							{
-								m_ent = new Actor(0, 0, 0, clientName, ACTOR_ALIVE, 30, 30);
+								e.printStackTrace();
+								
+								System.out.println("DID NOT LOAD FROM FILE");
+								m_player = new Actor(0, 0, 0, clientName, ACTOR_ALIVE, 30, 30);
 							}
 						}
 						break;
@@ -223,7 +229,7 @@ class clientThread extends Thread
 				String line = m_in.readLine();
 				
 				/** collapse input first */
-				String[] msgRecieved  = m_p.parse(m_ent, line);
+				String[] msgRecieved  = m_p.parse(m_player, line);
 				String msgFormatted = "";
 				
 				for (int i = 0; i < msgRecieved.length; i++)
@@ -248,9 +254,9 @@ class clientThread extends Thread
 							if (threads[i] != null
 									&& threads[i] == this
 									&& threads[i].clientName != null
-									&& msgRecieved[0].equals(m_ent.getName()))
+									&& msgRecieved[0].equals(m_player.getName()))
 							{
-								System.out.println("did self message for " + m_ent.getName());
+								System.out.println("did self message for " + m_player.getName());
 								//this.os.println(get);
 								threads[i].os.println(msgFormatted);
 								//threads[i].os.println(protocol.processInput(line));
@@ -259,7 +265,7 @@ class clientThread extends Thread
 							/** MESSAGE_TYPE_ROOM */
 							if (threads[i] != null 
 									&& threads[i].clientName != null
-									&& threads[i].m_ent.getXYZ().equals(m_ent.getXYZ()))
+									&& threads[i].m_player.getXYZ().equals(m_player.getXYZ()))
 							{
 								//System.out.println("did room message for " + m_ent.getXYZ());
 								threads[i].os.println(msgFormatted);
@@ -309,7 +315,7 @@ class clientThread extends Thread
 				{
 					if (threads[i] == this)
 					{
-						m_ent.writeSave();
+						m_player.writeSave();
 						threads[i] = null;
 					}
 				}
