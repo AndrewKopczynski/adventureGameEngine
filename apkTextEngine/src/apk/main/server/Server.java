@@ -1,12 +1,15 @@
 package apk.main.server;
 
-import apk.main.engine.Entity;
+import static apk.parser.reference.ActorType.*;
+import apk.parser.reference.ActorIntializationException;
+import apk.parser.reference.IDConflictException;
 import apk.main.engine.Logger;
 import apk.main.engine.World;
 import apk.main.engine.Parse;
 import apk.main.engine.Actor;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.IOException;
@@ -179,7 +182,28 @@ class clientThread extends Thread
 						//protocol = new ServerProtocol(clientName); //z
 						if ((m_ent = Actor.getByName(clientName)) == null)
 						{
-							m_ent = new Actor(0, 0, 0, clientName, 30, 30);
+							try
+							{
+								new Actor("ent/" + clientName + ".xml");
+							}
+							catch (ActorIntializationException e)
+							{
+								System.out.println("Actor failed to intialize!");
+								e.printStackTrace();
+							}
+							catch (IDConflictException e)
+							{
+								System.out.println("Conflicting IDs!");
+								e.printStackTrace();
+							}
+							catch (FileNotFoundException e)
+							{
+								System.out.println("ent/" + clientName + " not found!");
+							}
+							finally
+							{
+								m_ent = new Actor(0, 0, 0, clientName, ACTOR_ALIVE, 30, 30);
+							}
 						}
 						break;
 					}
@@ -265,6 +289,8 @@ class clientThread extends Thread
 				{
 					if (threads[i] != null && threads[i] != this && threads[i].clientName != null)
 					{
+						//m_ent.writeSave();
+						
 						threads[i].os.println("*** " + name + " disconnected. ***");
 						System.out.println("*** Disconected " + name + " ***");
 						os.println("*** Disconected " + name + " ***");
@@ -283,6 +309,7 @@ class clientThread extends Thread
 				{
 					if (threads[i] == this)
 					{
+						m_ent.writeSave();
 						threads[i] = null;
 					}
 				}

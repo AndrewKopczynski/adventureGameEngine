@@ -1,0 +1,118 @@
+"language"					"english (canadian)"
+
+//PRONOUNS:
+//
+//Self 						(Refering to yourself. 										example: I walked into the room.)
+//Self alternative 			(Refering to yourself with improper grammar. 				example: Me strong. Me surivive.)
+//Male						(Refering to someone or something of male gender.			example: He travelled far north.)
+//Female					(Refering to someone or something of female gender.			example: She navigated the rapids.)
+//Neutral					(Refering to someone or something of neutral or no gender.	example: It's theirs, not yours. You can't do this to them.)
+//Object					(Refering, usually, to a non-living thing without a gender.	example: The ruined couch had its cushions damaged.)
+
+//Subjective pronouns (usually for refering to a particular person or object)
+"%SUBJECT_MOD"				"%SUBJECT"
+"%SUBJECT_SELF"				"I"
+"%SUBJECT_SELF_ALT"			"me"
+"%SUBJECT_MALE"				"he"
+"%SUBJECT_FEMALE"			"she"
+"%SUBJECT_NEUTRAL"			"they"
+"%SUBJECT_OBJECT"			"it"
+
+//Possessive pronouns (usually for refering to things owned)
+"%POSSESSIVE_MOD"			"%POSSESSIVE"
+"%POSSESIVE_SELF"			"my"
+"%POSSESIVE_SELF_ALT"		"mines"
+"%POSSESSIVE_MALE"			"his"
+"%POSSESSIVE_FEMALE"		"her"
+"%POSSESSIVE_NEUTRAL"		"their"
+"%POSSESSIVE_OBJECT"		"its"
+	
+//Objective pronouns (usually for refering to others)
+"%OBJECTIVE_MOD"			"%OBJECTIVE"
+"%OBJECTIVE_SELF"			"myself"
+"%OBJECTIVE_SELF_ALT"		"theys"
+"%OBJECTIVE_MALE" 			"him"
+"%OBJECTIVE_FEMALE"			"her"
+"%OBJECTIVE_NEUTRAL"		"them"
+"%OBJECTIVE_OBJECT"			"it"
+	
+//Intesive pronouns (usually for refering to one's self)
+"%INTENSIVE_MOD"			"%INTENSIVE"
+"%INTENSIVE_SELF"			"myself"
+"%INTENSIVE_SELF_ALT"		"me"
+"%INTENSIVE_MALE"			"himself"
+"%INTENSIVE_FEMALE"			"herself"
+"%INTENSIVE_NEUTRAL" 		"themselves"
+"%INTENSIVE_OBJECT"			"itself"
+
+//Character(s) used to break up lists (Item 50, item 49, item 48...... item 2, and item 1.)
+"%LIST_SEPERATOR"			","
+"%LIST_CONJUNCTION"			"and"
+
+
+"%CROWD_SIZE0" 				"You see %ACTORS standing here."
+"%CROWD_SIZE1" 				"You see a crowd of people here."
+"%CROWD_SIZE2" 				"You see a large crowd of people here."
+"%CROWD_SIZE3" 				"You see an absolutely massive crowding of people here."
+"%CROWD_SIZE4" 				"You feel dizzy and utterly lost amongst waves and waves of people in the crowd here."
+
+"%ADMIN_COMMAND_ERR"		"'%ACTION' isn't a valid admin command."
+"%ADMIN_PERMISSIONS_ERR"	"You don't have administrator permissions!"
+
+"%ADMIN_SET_VIS"			"Set visbility for %TARGET to %QUANTITY"
+"%ADMIN_SET_VIS_ERR"		"Usage: %ACTION [number]"
+"%ADMIN_SET_VIS_FAILED"		"Failed to set visiblity for %TARGET to %QUANTITY"
+			
+"%ADMIN_GIVE_ITEM"			"Gave %QUANTITY %TARGET to %TARGET2"
+"%ADMIN_GIVE_ITEM_ERR"		"Usage: %ACTION [quantity] [itemName] to [target2]"
+"%ADMIN_GIVE_ITEM_FAILED"	"Failed to give %QUANTITY %TARGET to %TARGET2"
+
+"%ADMIN_SPAWN_ITEM"			"Spawned %TARGET with %QUANTITY health in %TARGET2"
+"%ADMIN_SPAWN_ITEM_ERR"		"Usage: %ACTION [spawnable] [maxHp] in [target2]"
+"%ADMIN_SPAWN_ITEM_FAILED"	"Failed to spawn %TARGET with %QUANTITY health in %TARGET2"
+
+"%ADMIN_DELETE_ITEM"		"Deleted %QUANTITY %TARGET from %TARGET2"	
+"%ADMIN_DELETE_ITEM_ERR"	"Usage: %ACTION [quantity] [tager] from [target2]"
+"%ADMIN_DELETE_ITEM_FAILED"	"Failed to delete %QUANTITY %TARGET from %TARGET2"
+
+"%ADMIN_NOCLIP"				"Noclip is %QUANTITY"
+"%ADMIN_NOCLIP_ERR"			"Usage: %ACTION [true/false] or %ACTION [0/1]"
+"%ADMIN_NOCLIP_FAILED"		"Failed to set noclip to %QUANTITY"
+
+"%ADMIN_HEAL"				"Healed %TARGET for %QUANTITY health points."
+"%ADMIN_HEAL_ERR"			"Usage: %ACTION [target] for [quantity]"
+"%ADMIN_HEAL_FAILED"		"Failed to heal %TARGET for %QUANTITY"
+
+"%ADMIN_HURT"				"Hurt %TARGET for %QUANTITY health points."
+"%ADMIN_HURT_ERR"			"Usage: %ACTION [target] for [quantity]"
+"%ADMIN_HURT_FAILED"		"Failed to heal %TARGET for %QUANTITY"
+
+"%MOVE_DEFAULT"				"You %ACTION %DIRECTION."
+"%MOVE_SNOW"				"You trudge %DIRECTION through the snow."
+"%MOVE_SAND"				"You trudge %DIRECTION through the sand."
+"%MOVE_DUNES"				"You trudge %DIRECTION through the sandy dunes."
+"%MOVE_STREET"				"You %ACTION %DIRECTION down the street."
+"%MOVE_ERR"					"%ACTION where?"
+
+"%LOOK_DEFAULT"				"You look %DIRECTION..."
+"%LOOK_ERR"					"Look where?"
+
+"%TAKE_DEFAULT_INDOOR"		"You %ACTION the %TARGET from the floor."
+"%TAKE_DEFAULT_OUTDOOR"		"You %ACTION the %TARGET from the ground."
+"%TAKE_FROM_CONTAINER"		"You %ACTION the %TARGET from the %TARGET2"
+"%TAKE_ERR"					"%ACTION what?"
+
+"%PUT_DEFAULT"				"You %ACTION the %TARGET inside the %TARGET2"
+"%PUT_ERR"					"%ACTION %TARGET where?"
+
+"%DROP_DEFAULT_INDOOR"		"You %ACTION the %TARGET on the floor."
+"%DROP_DEFAULT"				"You %ACTION the %TARGET on the ground."
+"%DROP_SNOW"				"You %ACTION the %TARGET in the snow."
+"%DROP_SAND"				"You %ACTION the %TARGET in the sand."
+"%DROP_DUNES"				"You %ACTION the %TARGET in the sandy dunes."
+"%DROP_STREET"				"You %ACTION the %TARGET on the street."
+"%DROP_ERR"					"%ACTION what?"
+
+
+
+

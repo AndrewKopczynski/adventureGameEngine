@@ -1,0 +1,163 @@
+Dear Garry,
+
+This is a propsal for a networking Broadcast Sutdio which improves producitbity, quality, and cost-effectiveness of our new editing workflox in all sections of our news department.
+
+During the last couple of months that i have been working in the newsroom at Shaw TV I noticed that out editors spent a lot of time on tapy etransferand transcoding and deal with a lot of technical difficulties in wokring with analog machines.
+
+
+
+
+------- More contractual sort of letter.
+
+Dear Program Director:
+
+Enclosed is Jump Software's repsonse to West Central Job Partnership's Request for Proposal Numnber 4593, issued September 10, 2012, for a new Employee Management Software System.
+
+Jump Software agrees to be bound my all the provisions of this proposal, as submitted, for a preiod of at least ninety (90) calender days from the date of the submission.
+
+We're looking forward to working with you.
+
+
+
+----
+Title Page
+
+Genreally includes:
+- specifically worded title with subject and purpose of the report
+- name title and organization of the primary reader
+- name title and organization of the authors
+- date the report is issued
+
+The title page creates a first impression, so take special care with its apperance
+----
+Table of Contents
+
+Allows readers to find specific info obviously
+- shows what topics are covered
+- provides an outline of what topics are there and stuff related to above
+- shows organziation of the report
+- includes every major section heading
+- includes page numbers ffs
+- uses the same wording as the section headings in the report
+- just do it in word, okay? it does all this table o contents stuff for you
+
+Table of contents use roman numerals
+- this is because the most people don't consider the table of contents part of the report n stuff
+- refferred to as 'paginated in roman numerals'
+----
+References
+
+- full references for every source used
+- yes, every one
+- use APA format
+- see appendix B in textbook
+- search "apa format concordia"
+----
+Research and Documentation
+
+- physical research
+-> doing it yourself
+	- it's usually really really expensive
+	- not all research is good, can fail or be thrown out
+	- research generally means no revenue (while researching)
+	- research needs a lot of expensive talent
+	- gotta have research facilities
+
+- academic research
+-> reading about someone else who already research that thing
+	- why do it?
+	-> to access the brain trust already out there
+	- find out what's been done before
+	- it's cheaper to read about it than to do it
+	- use it as a starting point for your research
+
+- searches
+	- internet search engines
+	- wikipedia
+	- news sites
+	- gov't research
+	- library databases
+	- books
+	
+- top businesses searches (good stuff to search)
+	- locate buyers or new markets
+		- maybe it hasn't been done before because there's no market
+	- find market info for a business plan
+	- track gov't and industry bids and contract awards
+	
+- your academic research
+	- find out whats been done before
+	- provide a starting point for research
+	- incorperate their results
+		- provide a starting point
+			- once you know whats been done, then you can begin doing something different
+			- creativity doesn't exist in a vaccum (it comes from research and thinking of
+			what other people missed or didnt take adavantage of)
+			- if all you find is failure, then you know to do something else or do it
+			differently
+			
+			- people quote other people all the time:
+				- "I read there are droughts in Africa... it's all part of global warming."
+				- "The weatherman says it's going to rain."
+				- "Rotten Tomatoes rates Looper at 93%."
+					- some authories are better than others
+			- use others to support you
+				- their quotations are your evidence
+				- the quotations are used to support your claims and conclusions
+				- you might explicitiy refer to their authority
+				- "3 out of 4 doctors agree..."
+				- "According to John Dvorak, Apple doubled its value in the last two years."
+				- You can also quote someone to show how wrong they are
+					- "According to Micheal Delel in 1986 [apple should just shut down]"
+				- Your disagreement with someone can be the starting point of your argument
+				- Being really wrong ruins someone's authority
+				
+				- "Steve Jobs belieced that closed systems were the best; however, he quickly
+				lost market share to Microsoft when the rest of the world disagreed."
+				- For a long time, Jobs seemed to be wrong
+				- Lately, he seems to have been less wrong
+				
+				- "Apple believes that the future of computing lies with the cloud; however
+				bandwidth and security concerns may keep that future from taking place."
+				- Is this statement true? Or is the future merely delayed?
+				
+		- Quoting v Paraphrasing
+			- Quouting invovles using someone else's exact words
+			- Paraphrasing involves using your own words to summerize what someone else
+			has done or said
+			- If their words say it better, use their words
+			- If they said it in a very wordy or difficult to understand way, paraphrase
+				- "Success or failure in competitive activies exhibs no tendancy to be
+				commensurate iwith innate cpacity, a considerable element of the
+				unpredicatable must invarbily be taken into account" (Smith, 1998)
+				- Paraphrased: Sometimes, luck plays a significant part in sucess (Smith, 1998)
+				
+			- Have lead-in sentence to a quote, quote, then end punctutation and citation.
+				- According to John Dvoak, "Apple wants to make computers as common as toasters" (2010)
+				- Notice if we introduce the person in the sentence that we don't need to list their
+				name in the citation too
+				
+			- Avoid accusations of plagiarism
+				- srsly don't
+				- cheating is bad
+				- citing however, is good
+					- giving credit, doing research is good
+					- not giving credit is plagiarism
+		
+		- Citation Format
+			- Use APA format (no foot notes)
+			- See Appendix B in text
+			- owl.english.purdue.edu/owl/resource/560/01/
+			- tinyurl.com/qy22v
+			- don't care if you use version 5 or version 6, just be consistant
+			- keep track of references as you write
+	- iClicker
+		- The letter of transmittal is a:
+			- cover letter for the proposal
+			- means of transmitting formal info
+			- essential part of the report
+		- Citations are primarily a way to
+			- show what you've researched
+			- use authorities to support your claims
+			- provide detailed data
+

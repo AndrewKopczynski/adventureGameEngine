@@ -1,5 +1,6 @@
 package apk.main.engine;
 
+import static apk.parser.reference.ActorType.*;
 import apk.parser.action.*;
 import apk.parser.target.*;
 
@@ -20,6 +21,7 @@ public class Parse {
 	private Status m_status = new Status();
 	private Tactical m_tactical = new Tactical();
 	private Say m_say = new Say();
+	private Inventory m_inventory = new Inventory();
 	
 	private Direction m_direction = new Direction();
 	
@@ -184,7 +186,11 @@ public class Parse {
 		{	
 			if (att.length >= 2)
 			{
-				msg[0] = "detected 'drop [" + collapse(att, 1, att.length) + "]'.";
+				String t = collapse(att, 1, att.length);
+				msg[0] = actor.dropFromInventory(actor.getX(), actor.getY(), actor.getZ(), t);
+				
+				
+				//msg[0] = "detected 'drop [" + collapse(att, 1, att.length) + "]'.";
 				return msg;
 			}
 			return m_drop.getError(att[0]);
@@ -204,6 +210,12 @@ public class Parse {
 			return msg;
 		}
 		
+		/** I*NVENTORY ----------------------------------------------------	|*/
+		else if (m_inventory.check(att))
+		{
+			return actor.getInventory();
+		}
+		
 		/** ADMIN STUFF ---------------------------------------------------	|*/
 		else if (m_admin.check(att))
 		{
@@ -219,6 +231,7 @@ public class Parse {
 				
 				catch(Exception e)
 				{	
+					e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [number]";
 					return msg;
 				}
@@ -234,7 +247,7 @@ public class Parse {
 					String name = collapse(att, 1, att.length - 1);
 					int hp = Integer.parseInt(att[att.length - 1]);
 					
-					if (actor.addToInventory(new Entity(name, hp, hp)))
+					if (actor.addToInventory(new Entity(name, ACTOR_OBJECT, hp, hp, actor)))
 					{
 						msg[0] = "Gave " + name + " to " + actor.toString();
 						return msg;
@@ -248,6 +261,7 @@ public class Parse {
 				
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [itemName] [maxHp]";
 					return msg;
 				}
@@ -267,7 +281,6 @@ public class Parse {
 					}
 					else
 					{
-						
 						msg[0] = "Couldn't delete " + name + " from " + actor.toString();
 						return msg;
 					}
@@ -291,6 +304,7 @@ public class Parse {
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [true/false]";
 					return msg;
 				}
@@ -308,6 +322,7 @@ public class Parse {
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [value]";
 					return msg;
 				}
@@ -325,6 +340,7 @@ public class Parse {
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [value]";
 					return msg;
 				}
@@ -344,23 +360,30 @@ public class Parse {
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					new Actor(actor.getX(), actor.getY(), actor.getZ(), "test" + i, 30, 30);
+					new Actor(actor.getX(), actor.getY(), actor.getZ(), "test" + i, ACTOR_ALIVE, 30, 30);
 				}
 				msg[0] = "created some dummy npcs at " + actor.getXYZ();
 				return msg;
 			}
 			else if (m_admin.getMeaning(att[0]).equals("stress"))
 			{
-				for (int i = 0; i < 999; i++)
+				Logger.start();
+				for (int i = 0; i < 9999; i++)
 				{
 					if (i % 100 == 0)
+					{
 						System.out.println(i);
+						Logger.stop(true);
+						Logger.start();
+					}
 					new Actor(actor.getX(),
 							actor.getY(),
 							actor.getZ(),
 							"npc_" + i,
+							ACTOR_ALIVE,
 							30,
 							30);
+					
 				}
 				return msg;
 			}

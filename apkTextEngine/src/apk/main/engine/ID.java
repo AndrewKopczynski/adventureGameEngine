@@ -2,6 +2,7 @@ package apk.main.engine;
 
 import java.util.ArrayList;
 import java.util.List;
+import apk.parser.reference.IDConflictException;
 
 public class ID
 {
@@ -29,7 +30,7 @@ public class ID
 	protected static boolean add(int id) throws IDConflictException
 	{
 		if (m_id.contains(id))
-			throw new IDConflictException();
+			throw new IDConflictException("Conflicting IDs! " + m_id);
 		else
 			return m_id.add(id);
 	}
@@ -78,20 +79,3 @@ public class ID
 		return i;*/
 	}
 }
-
-/** Thrown when there are conflicting IDs.
- * Used to prevent entities and actors from being created
- * if they try to use an ID that's already taken.
- */
-class IDConflictException extends Exception
-{
-	private static final long serialVersionUID = 1L;
-
-      public IDConflictException() {}
-
-      public IDConflictException(String message)
-      {
-         super(message);
-      }
- }
-

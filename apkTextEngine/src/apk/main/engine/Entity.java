@@ -1,18 +1,22 @@
 package apk.main.engine;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import apk.parser.reference.EntityIntializationException;
+import apk.parser.reference.IDConflictException;
 
 /** Represents an entity.
  * <p>
  * An entity has:
  * <ul>
  * <li>A generated unique ID
- * <li>Maximum hitpoints
- * <li>Current hitpoints
+ * <li>Maximum hit points
+ * <li>Current hit points
  * <li>An inventory (list of entities it contains)
  * </ul>
  * 
@@ -46,18 +50,54 @@ public class Entity
 	protected int m_hp;
 	protected boolean m_ignoresCollision = false;
 	
+	protected Entity m_parent;
+	protected int m_type;
+	
+	//TODO does this even make sense lol
+	//TODO is this needed?
+	/* changed to Entity for now, because having Actor extend
+	 * entity but also have Entity have a parent of a class that
+	 * extends itself was super nuts */
+	
 	public Entity() {}
 	
-	public Entity(String name, int hpMax, int hp)
+	// entities can only be created in inventories of actors
+	public Entity(String name, int type, int hpMax, int hp, Actor parent) throws EntityIntializationException
+	{		
+		m_id = ID.add();
+		m_entites.put(m_id, this);
+		
+		m_name = name;
+		m_type = type;
+		
+		m_hpMax = hpMax;
+		m_hp = hp;
+		
+		if (m_parent != null)
+			m_parent = parent;
+		else
+			throw new EntityIntializationException();
+		
+		Logger.log("Created new ent '" + getName() +  "' @ " + m_parent.getName() + "'s inventory.");
+		
+		writeSave();
+	}
+	
+	// entities can only be created in inventories of actors
+	public Entity(String name, int type, int hpMax, int hp, Entity parent)
 	{
 		m_id = ID.add();
 		m_entites.put(m_id, this);
 		
 		m_name = name;
-		m_hpMax = hpMax;
-		m_hp = hpMax;
+		m_type = type;
 		
-		Logger.log("Created new ent '" + toString() +  "' @ " + "inventory?");
+		m_hpMax = hpMax;
+		m_hp = hp;
+		
+		m_parent = parent;
+		
+		Logger.log("Created new entity '" + getName() + "' @ " + m_parent.getName() + "'s inventory.");
 		
 		writeSave();
 	}
@@ -69,19 +109,29 @@ public class Entity
 	 * 
 	 * @param filePath exampleEntity[id]
 	 */
-	public Entity(String filePath)
+	public Entity(String filePath) throws FileNotFoundException
 	{	
 		try
 		{
-			String[] entElements = {"entity", "health", "inventory"};
+			String[] entElements = {"entity", "health", "inInventoryOf"};
 			XMLReader invXML = new XMLReader(filePath, entElements);
 			
-			m_id = Integer.parseInt(invXML.getAttribute(entElements[0], 0, "id"));
+			m_id = Integer.parseInt(invXML.getAttribute("entity", 0, "id"));
 			ID.add(m_id);
 			
 			m_entites.put(m_id, this);
 			
 			m_name = invXML.getAttribute("entity", 0, "name");
+			m_type = Integer.parseInt(invXML.getAttribute("entity", 0, "type"));
+			
+			//inv
+			String t2 = invXML.getAttribute("entity", 0, "inInventoryOf");
+			System.out.println("WS: " + t2);
+			System.out.println("WS: " + Actor.stripID(t2));
+			System.out.println("WS: " + Actor.getByName(t2));
+			
+			m_parent = Actor.getByName(invXML.getAttribute("entity", 0, "inInventoryOf"));
+			
 			Logger.log("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
 			
 			m_hpMax = Integer.parseInt(invXML.getAttribute("health", 0, "hpMax"));
@@ -112,14 +162,16 @@ public class Entity
 	}
 	
 	/** Write to save file. */
-	public void writeSave()
+	public void writeSave() //TODO merge actor and entity saving~
 	{
+		Logger.start();
+		
 		//create file (eg. ent/player[0].xml)
 		XMLWriter w = new XMLWriter(getFilePath());
 		
 		//fetch id, name, and coords
-		String[] a = {"id", "name", "coords"};
-		String[] b = {"" + getId(), getName(), "inInventory"};
+		String[] a = {"id", "name", "type", "inInventoryOf"};
+		String[] b = {"" + getId(), getName(), "" + getType(), m_parent.toString()};
 		
 		//open root
 		w.writeOpenTag("entity", a, b);
@@ -146,6 +198,9 @@ public class Entity
 		//close file writer
 		w.close();
 		Logger.log("Wrote " + toString() +"'s inventory to " + getFilePath());
+		
+		System.out.print("[ENTITY] Save write time: ");
+		Logger.stop(true);
 	}
 	
 	public int getId()
@@ -176,6 +231,12 @@ public class Entity
 	{
 		return m_hp;
 	}
+	
+	public int getType()
+	{
+		return m_type;
+	}
+	
 	/** Damage this entity.
 	 * <p>
 	 * TODO: flags
@@ -340,32 +401,107 @@ public class Entity
 		return str;
 	}
 
+	
+	public String[] getInventory()
+	{
+		int header = 1;
+		int footer = 1;
+		
+		String[] msg = new String[header + m_inv.size() + footer];
+		
+		if (m_inv.size() == 0)
+		{
+			msg[0] = "You're not carrying anything.";
+			return msg;
+		}
+		else
+		{
+			msg[0] = "---- Inventory ----";
+			for (int i = 0; i < m_inv.size(); i++)
+			{
+				msg[i+header] = m_inv.get(i).toString();
+			}
+			msg[msg.length - 1] =  "-------------------";
+			return msg;
+		}
+	}
+	
 	public boolean addToInventory(Entity entity)
 	{
-		return m_inv.add(entity);
+		System.out.println("tried to add " + entity.toString() + " to " +  m_parent.toString() + "'s inventory.");
+		if (m_inv.add(entity))
+		{
+			System.out.println("did!");
+			return true;
+		}
+		else
+		{
+			System.out.println("failed!");
+			return false;
+		}
+	}
+	
+	public boolean hasInInventory(Entity entity)
+	{
+		return m_inv.contains(entity);
+	}
+	public boolean hasInInventory(String string)
+	{
+		for (int i = 0; i < m_inv.size(); i++)
+		{
+			if (m_inv.get(i).getName().equalsIgnoreCase(string))
+				return true;
+		}
+		return false;
+	}
+	
+	public String dropFromInventory(int x, int y, int z, Entity entity)
+	{
+		if (delFromInventory(entity))
+		{
+			m_entites.remove(entity);
+			new Actor(x, y, z, entity);
+			
+			return "Dropped '" + entity.getName() + "'.";
+			//return "%DROP_DEFAULT";
+		}
+		else
+			return "%DROP_ERR";
+	}
+	public String dropFromInventory(int x, int y, int z, String name)
+	{
+		Entity entity = getByName(name); //extra step!
+		
+		if (entity != null && delFromInventory(entity))
+		{
+			m_entites.remove(entity);
+			new Actor(x, y, z, entity);
+			
+			return "Dropped '" + entity.getName() + "'.";
+			//return "%DROP_DEFAULT";
+		}
+		else
+			return "%DROP_ERR";
 	}
 	
 	public boolean delFromInventory(Entity entity)
 	{
-		return m_inv.remove(entity);
+		boolean did = m_inv.remove(entity);
+		if (m_parent != null)
+		{
+			System.out.println("removing from inventory of " + m_parent.toString() + " " + did);
+		}
+		else
+		{
+			System.out.println("parent was null");
+		}
+		
+		return did;
 	}
 	
-	public boolean delFromInventory(String entityName)
+	public boolean delFromInventory(String name)
 	{
-		//System.out.println("doing entity removal from inventory by name for '" + entityName + "'");
-		for (int i = 0; i < m_inv.size(); i++)
-		{
-			if (m_inv.get(i).getName().equals(entityName))
-			{
-				//System.out.println("found item!");
-				m_inv.get(i).kill();
-				m_inv.remove(i);
-				return true;
-			}	
-			//System.out.println("checked " + m_inv.get(i).getName());
-		}
-		//System.out.println("removal failed");
-		return false;
+		return m_inv.remove(getByName(name));
 	}
 	
 	
@@ -388,13 +524,21 @@ public class Entity
 	
 	public static Entity getByName(String name)
 	{
-		for (int i = 0; i < m_entites.size(); i++)
+		for (int i = 0; i < ID.size(); i++)
 		{
-			System.out.println("checking " + name + " against " + m_entites.get(i).getName() + " (" + m_entites.get(i).toString() + ")");
-			if (m_entites.get(i).getName().equalsIgnoreCase(name))
+			if (m_entites.get(ID.get(i)) != null)
 			{
-				return m_entites.get(i);
+				//System.out.println("checking " + name + " against " + m_entites.get(i).getName() + " (" + m_entites.get(i).toString() + ")");
+				if (m_entites.get(ID.get(i)).getName().equalsIgnoreCase(name))
+				{
+					System.out.println("found '" + name + "' !");
+					return m_entites.get(ID.get(i));
+				}
 			}
+			/*else
+			{
+				System.out.println("checked an entity that doesn't exist. weird.");
+			}*/
 		}
 		return null;
 	}
@@ -412,9 +556,12 @@ public class Entity
 	/** debug list print */
 	public static void debug()
 	{
-		for (int i = 0; i < m_entites.size(); i++)
+		for (int i = 0; i < ID.size(); i++)
 		{
-			System.out.println(m_entites.get(i));
+			if (m_entites.get(i) != null)
+				System.out.println(m_entites.get(i).toString());
+			//else
+				//System.out.println(m_entites.get(i));
 		}
 	}
 	

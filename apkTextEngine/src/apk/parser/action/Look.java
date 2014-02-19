@@ -46,6 +46,8 @@ public class Look extends WordList
 		 * actor (given that you know they're there).
 		 */
 		
+		if (actors == null)
+			return "You feel dizzy and utterly lost amongst the waves of people in the crowd here.";
 		if (actors.length <= 0)
 			return "";
 		else if (actors.length >= 25 && actors.length < 50) //TODO client-side language files
@@ -53,11 +55,9 @@ public class Look extends WordList
 		else if (actors.length >= 50 && actors.length < 100)
 			return "You see a large crowd of people here.";
 		else if (actors.length >= 100 && actors.length < 200)
-			return "You see a huge crowd of people here.";
-		else if (actors.length >= 200)
 			return "You see an absolutely massive crowd of people here.";
 		
-		String actorsInRoom = "You see ";
+		String actorsInRoom = "You see: ";
 		
 		for (int i = 0; i < actors.length; i++)
 		{
@@ -71,7 +71,8 @@ public class Look extends WordList
 				System.out.println("4");
 		}
 		
-		actorsInRoom += " standing here.";
+		//TODO more advanced parsing~
+		//actorsInRoom += " standing here.";
 		
 		return actorsInRoom;
 	}

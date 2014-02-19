@@ -1,8 +1,12 @@
 package apk.main.engine;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
+
+import apk.parser.reference.ActorIntializationException;
+import apk.parser.reference.IDConflictException;
 
 /** Represents an entity in the world (a world entity).
  * <p>
@@ -26,16 +30,16 @@ public class Actor extends Entity
 	private int m_y;
 	private int m_z;
 	
-	/** Creates an entity, and sets their max/current HP.
+	/** Creates an actor, and sets their max/current HP.
 	 * 
 	 * @param x X (W(-)  <->  (+)E) coordinate
 	 * @param y Y (N(-)  <->  (+)S) coordinate
 	 * @param z Z (D(-)  <->  (+)U) coordinates
 	 * @param name Name of entity
-	 * @param hpMax Value the entity has at maxmimum health
-	 * @param hp Current HP, always less than maxmium HP
+	 * @param hpMax Value the entity has at maximum health
+	 * @param hp Current HP, always less than maximum HP
 	 */
-	public Actor(int x, int y, int z, String name, int hpMax, int hp)
+	public Actor(int x, int y, int z, String name, int type, int hpMax, int hp)
 	{
 		m_id = ID.add();
 		m_actors.put(m_id, this);
@@ -45,34 +49,53 @@ public class Actor extends Entity
 		m_z = z;
 		
 		m_name = name;
+		m_type = type;
+		
 		m_hpMax = hpMax;
 		m_hp = hp;
 		
-		writeSave();
-		
-		//System.out.println("created" + getName() + "@" + getXYZ());
+		//writeSave();
 	}
 	
-	public Actor(String filePath)
+	public Actor(int x, int y, int z, Entity entity)
+	{
+		//TODO can i just cast this stuff or no
+		m_id = entity.getId();
+		m_actors.put(m_id, this);
+		
+		m_x = x;
+		m_y = y;
+		m_z = z;
+		
+		m_name = entity.getName();
+		m_type = entity.getType();
+		
+		m_hpMax = entity.getHPMax();
+		m_hp = entity.getHP();
+		
+		//writeSave();
+	}
+	
+	public Actor(String filePath) throws IDConflictException, FileNotFoundException, ActorIntializationException
 	{	
-		try
-		{
 			Logger.log("Creating new entity from '" + filePath + "'...");
 			String[] entElements = {"entity", "health", "inventory"};
 			XMLReader invXML = new XMLReader(filePath, entElements);
 			
-			m_id = Integer.parseInt(invXML.getAttribute(entElements[0], 0, "id"));
+			m_id = Integer.parseInt(invXML.getAttribute("entity", 0, "id"));
 			ID.add(m_id);
 			
+			m_actors.put(m_id, this); //stop forgetting to do this aaaaaa
+			
 			m_name = invXML.getAttribute("entity", 0, "name");
+			m_type = Integer.parseInt(invXML.getAttribute("entity", 0, "type"));
 			
 			System.out.println("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
-			
 			
 			String temp = invXML.getAttribute("entity", 0, "coords");
 			String split[] = temp.split(",");
 			
-			if (!split[0].equals("inInventory"))
+			if (!split[0].equals("inInventoryOf"))
 			{
 				m_x = Integer.parseInt(split[0]);
 				m_y = Integer.parseInt(split[1]);
@@ -80,10 +103,11 @@ public class Actor extends Entity
 			}
 			else
 			{
-				String err = "CRTICAL! ENTITY " + toString() + "TRIED TO LOAD"
-						+ " AN ENTITY WITH NO COORDINATES AS A WORLDENTITY!";
+				String err = "CRTICAL! ENTITY " + toString() + "TRIED TO LOAD" + " AN ACTOR WITH NO COORDINATES AS A WORLDENTITY!";
 				System.out.println(err);
 				Logger.log(err);
+				
+				throw new ActorIntializationException();
 			}
 			
 			m_hpMax = Integer.parseInt(invXML.getAttribute("health", 0, "hpMax"));
@@ -96,33 +120,41 @@ public class Actor extends Entity
 				System.out.println("found ent: " + ents[a]);
 				if (!ents[a].equals(toString()))
 				{
-					addToInventory(new Entity("ent/" + ents[a] + ".xml"));
+					System.out.println("added to inventory: " + addToInventory(new Entity("ent/" + ents[a] + ".xml")));
 				}
 				else
 				{
-					String err = "!CRTICAL! ENTITY " + toString() + "TRIED TO LOAD ITSELF!"
-							+ " CHECK ENTITY FILE " + getFilePath() + "!";
+					String err = "!CRTICAL! ENTITY " + toString() + "TRIED TO LOAD ITSELF!" + " CHECK ENTITY FILE " + getFilePath() + "!";
 					System.out.println(err);
 					Logger.log(err);
+					
+					throw new ActorIntializationException();
 				}
 			}
-			writeSave();
-		}
-		catch(IDConflictException e)
-		{
-			System.out.println(e.getMessage());
-		}
+			//writeSave();
 	}
 	
 	@Override
-	public void writeSave()
+	public String getFilePath() //temp
 	{
+		return "ent/" + getName();
+	}
+	
+	@Override
+	public void writeSave() 
+	//INSANELY SLOOOOOOOOW TODO cry
+	//100 actors w/ writeSave 	-> 1.5 seconds
+	//100 actors w/o writeSave 	-> 2ms
+	//750x slower!
+	{
+		Logger.start();
+		
 		//create file (eg. ent/player[0].xml)
 		XMLWriter w = new XMLWriter(getFilePath());
 		
-		//fetch id, name, and coords
-		String[] a = {"id", "name", "coords"};
-		String[] b = {"" + getId(), getName(), getXYZ()};
+		//fetch id, name, type, and coords
+		String[] a = {"id", "name", "type", "coords"};
+		String[] b = {"" + getId(), getName(), "" + getType(), getXYZ()};
 		
 		//open root
 		w.writeOpenTag("entity", a, b);
@@ -149,6 +181,9 @@ public class Actor extends Entity
 		//close file writer
 		w.close();
 		//System.out.println("Wrote " + toString() +"'s inventory to " + getFilePath());
+		
+		System.out.print("[ACTOR] Save write time: ");
+		Logger.stop(true);
 	}
 	
 	/** Refactoring from move because it just did too much in one method. */
@@ -174,8 +209,8 @@ public class Actor extends Entity
 		isInBounds = boundryCheck(x, y, z);
 		isConnected = (m_ignoresCollision || exitCheck(x, y, z));
 		
-		System.out.println("Bound check: " + isInBounds);
-		System.out.println("Connected check: " + isConnected);
+		//System.out.println("Bound check: " + isInBounds);
+		//System.out.println("Connected check: " + isConnected);
 		
 		if (isInBounds && isConnected)
 		{
@@ -259,40 +294,26 @@ public class Actor extends Entity
 		m_z += z;
 	}
 	
-	
-	/** Returns a list of actors at specific coordinates.
+	/** Get all actors BESIDES the one specified.
 	 * 
 	 * @param x X coordinate
 	 * @param y Y coordinate
 	 * @param z Z coordinate
 	 * @return List of actors at those coordinates
-	 */	
-	public static Actor[] getActors(int x, int y, int z)
-	{
-		int index = 0;
-		Actor[] temp = new Actor[m_actors.size()];
-		
-		for (int i = 0; i < ID.size(); i++)
-		{
-			if (m_actors.get(ID.get(i)) != null
-				&& m_actors.get(ID.get(i)).getX() == x
-				&& m_actors.get(ID.get(i)).getY() == y
-				&& m_actors.get(ID.get(i)).getZ() == z)
-			{
-				temp[index] = m_actors.get(i);
-				index++;
-			}
-		}
-		return temp;
-	}
-	
-	/** Get all actors BESIDES the one specified. */
+	 */
 	public static Actor[] getActors(Actor actor, int x, int y, int z)
 	{
 		Actor[] actors = new Actor[0];
 		
 		for (int i = 0; i < ID.size(); i++)
 		{
+			if (i > 200)
+			{
+				/** If there's an ungodly amount of actors here
+				 * then forget fetching the list.
+				 */
+				return null;
+			}
 			if (m_actors.get(ID.get(i)) != null
 				&& m_actors.get(ID.get(i)) != actor
 				&& m_actors.get(ID.get(i)).getX() == x
@@ -304,12 +325,8 @@ public class Actor extends Entity
 				temp[temp.length - 1] = m_actors.get(ID.get(i));
 				
 				actors = temp;
-				
-				//System.out.println(m_actors.get(ID.get(i)));
 			}
 		}
-		//System.out.println("arr: " + actors.length);
-		
 		return actors;
 	}
 	
@@ -329,21 +346,55 @@ public class Actor extends Entity
 			return false;
 	}
 	
-	public static Actor getByName(String name)
+	public static Actor getByName(String name) throws NullPointerException
 	{
 		for (int i = 0; i < ID.size(); i++)
 		{
+			System.out.println("ID:" + ID.get(i));
 			if(m_actors.get(ID.get(i)) != null)
 			{
-				System.out.println("checking " + name + " against " + m_actors.get(i).getName() + " (" + m_actors.get(i).toString() + ")");
-				if (m_actors.get(i).getName().equalsIgnoreCase(name))
+				System.out.println("checking " + name + " against " 
+						+ stripID(m_actors.get(ID.get(i)).toString())
+						+ " (" + m_actors.get(ID.get(i)).toString() + ")");
+				
+				if (m_actors.get(ID.get(i)).getName().equalsIgnoreCase(stripID(name))
+						//|| m_actors.get(ID.get(i)).toString().equalsIgnoreCase(name)
+						) 
 				{
-					return m_actors.get(i);
+					//why compare toString against something that strips toString()???
+					return m_actors.get(ID.get(i));
 				}
 			}
 		}
 		return null;
+		//throw new NullPointerException();
 	}
+	
+	public static String stripID(String name)
+	{
+		if (name.contains("["))
+			return name.substring(0, name.lastIndexOf("["));
+		else
+			return name;
+	}
+	
+	/*public static Actor getByFullName(String fullname)
+	{
+		for (int i = 0; i < ID.size(); i++)
+		{
+			if (m_actors.get(ID.get(i)) != null)
+			{
+				System.out.println("checking " + fullname + " against "
+						+ m_actors.get(ID.get(i)).toString());
+				
+				if (m_actors.get(ID.get(i)).toString().equalsIgnoreCase(fullname))
+				{
+					return m_actors.get(ID.get(i));
+				}
+			}
+		}
+		return null;
+	}*/
 	
 	public static boolean existsByName(String name)
 	{
@@ -361,7 +412,10 @@ public class Actor extends Entity
 	{
 		for (int i = 0; i < ID.size(); i++)
 		{
-			System.out.println(m_actors.get(i));
+			if (m_actors.get(i) != null)
+				System.out.println(m_actors.get(ID.get(i)).toString());
+			//else
+				//System.out.println(m_actors.get(ID.get(i)));
 		}
 	}
 	

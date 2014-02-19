@@ -4,8 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import javax.swing.Timer;
+//import java.util.Date;
 
 /** Class for logging absolutely everything that happens,
  * will be super useful later on.
@@ -15,10 +14,12 @@ import javax.swing.Timer;
 public class Logger 
 {
 	/** Filename of output log file. */
+	//private static Date date = new Date();
+	//private static final String m_filename =  date.toString() + ".log";
 	private static final String m_filename = "log.log";
 	
-	//private static Timer m_timer = new Timer(0, ); TODO timer stuff for testing
-	
+	private static long m_start;
+	private static long m_stop;
 	
 	/** Clears the log.txt file. */
 	public static void clear() 
@@ -42,8 +43,10 @@ public class Logger
 	 */
 	public static void log(String entry) 
 	{
-		try 
+		try //disgustingly slow, seriously, like 20ms a write
 		{
+			start();
+			
 		    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(m_filename, true)));
 		    StackTraceElement[] st = Thread.currentThread().getStackTrace();
 		    
@@ -58,6 +61,8 @@ public class Logger
 		    
 		    out.println(prefix + entry);
 		    out.close();
+		    
+		    stop(true);
 		//} catch (IOException e)
 		} catch (Exception e)
 		{
@@ -65,8 +70,21 @@ public class Logger
 		}
 	}
 	
-	//public static void start()
-	//{
-	//	
-	//}
+	public static void start()
+	{
+		m_start = System.nanoTime();
+	}
+	
+	public static void stop(boolean shouldPrint)
+	{
+		m_stop = System.nanoTime();
+		
+		if (shouldPrint)
+		{
+			if ((m_stop - m_start) / 1000000000 > 1)
+				System.out.println(((m_stop - m_start) / 1000000000) + "s");
+			else
+				System.out.println(((m_stop - m_start) / 1000000) + "ms");
+		}
+	}
 }

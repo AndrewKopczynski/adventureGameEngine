@@ -1,6 +1,7 @@
 package apk.main.engine;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class XMLReader {
 	 * @param filePath Path of XML File to load
 	 * @param elements Elements to be fetched/read from file
 	 */
-	public XMLReader(String filePath, String[] elements) 
+	public XMLReader(String filePath, String[] elements) throws FileNotFoundException
 	{
 		m_filePath = filePath;
 		m_elements = elements;
@@ -60,8 +61,7 @@ public class XMLReader {
 			String err = m_filePath + " failed to load!";
 			System.out.println(err);
 			Logger.log(err);
-			
-			return;
+			throw new FileNotFoundException(m_filePath + " failed to load!"); //TODO rewrite this whole class fadasd
 		}
 	}
 	
