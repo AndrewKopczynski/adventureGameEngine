@@ -1,11 +1,15 @@
 package apk.main.client;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.PrintStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import javax.swing.Timer;
 
 public class Client implements Runnable
 {
@@ -24,6 +28,43 @@ public class Client implements Runnable
 
 	private static BufferedReader inputLine = null;
 	private static boolean closed = false;
+	
+	private static String buffer; //z
+	private static final int TIMER_SPEED = 2;
+	private static ActionListener taskPerformer = new ActionListener() //z
+	{
+		@Override
+		public void actionPerformed(ActionEvent evt)
+		{
+			try
+			{
+				//System.out.println("tick");
+				if (buffer.length() > 0)
+				{
+					String t = buffer.substring(0, 1);
+					
+					if (t.equals("#"))
+						System.out.println();
+					else
+						System.out.print(t);
+					buffer = buffer.substring(1, buffer.length());
+				}
+				else
+				{
+					System.out.println();
+					timer.stop();
+				}
+			}
+			catch (NullPointerException e)
+			{
+				System.err.println("Timer stopped abrubtly: " + e);
+				timer.stop();
+				return;
+			}
+		}
+	};
+	
+	private static Timer timer = new Timer(TIMER_SPEED, taskPerformer);
 
 	public static void main(String[] args)
 	{
@@ -68,7 +109,6 @@ public class Client implements Runnable
 		{
 			try
 			{
-	
 				/* Create a thread to read from the server. */
 				new Thread(new Client()).start();
 				while (!closed)
@@ -93,22 +133,34 @@ public class Client implements Runnable
 	* 
 	* @see java.lang.Runnable#run()
 	*/
+	
+	
+	
 	public void run()
 	{
 		/*
 		* Keep on reading from the socket till we receive "Bye" from the
 		* server. Once we received that then we want to break.
 		*/
-		String responseLine;
 		try
 		{
-		while ((responseLine = m_in.readLine()) != null) //z
-		{
-			System.out.println(responseLine);
-			if (responseLine.indexOf("*** Bye") != -1)
-			break;
-		}
-		closed = true;
+			while ((buffer = m_in.readLine()) != null) //z
+			{
+				if (buffer.indexOf("Logging off...") != -1)
+				{
+					System.out.println("Disconnected.");
+					break;
+				}
+				else
+				{
+					System.out.println(buffer.length());
+					//buffer = responseLine;
+					timer.start();
+				}
+				
+				//System.out.println(responseLine);
+			}
+			closed = true;
 		}
 		catch (IOException e)
 		{
@@ -116,79 +168,3 @@ public class Client implements Runnable
 		}
 	}
 }
-
-
-/** old client */
-/*public class Client
-{
-	public static void main(String[] args) throws IOException
-	{
-		if (args.length != 2)
-		{
-			System.err.println(
-					"Usage: java EchoClient <host name> <port number>");
-			System.exit(1);
-		}
-		
-		Socket clientSocket = null;
-		PrintWriter out = null;
-		BufferedReader in = null;
-		BufferedReader stdIn = null;
-		
-		//get hostname and port from commandLine args
-		String hostName = args[0];
-		int portNumber = Integer.parseInt(args[1]);
-		
-		try
-		{
-			//attempt to connect to server
-			clientSocket = new Socket(hostName, portNumber);
-			
-			out = new PrintWriter(clientSocket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			
-			stdIn = new BufferedReader(new InputStreamReader(System.in));
-			
-			String[] fromServer;
-			String fromUser;
-				
-			while ((fromServer = in.readLine().split("#")) != null)
-			{
-				//print stuff recieved from server
-				for (int i = 0; i < fromServer.length; i++)
-				{
-					System.out.println("Server: " + fromServer[i]);
-				}
-				
-				if (fromServer[0].equals("@quit"))
-					break;
-				
-				fromUser = stdIn.readLine();
-				if (fromUser != null)
-				{
-					System.out.println("Client: " + fromUser);
-					out.println(fromUser);
-				}
-			}
-		}
-		catch (UnknownHostException e)
-		{
-			System.err.println("Cannot find the host: " + hostName);
-			System.exit(1);
-			
-		}
-		catch (IOException e)
-		{
-			System.err.println("Couldn't get I/O for the connection to "
-					+ hostName);
-			System.exit(1);
-		}
-		finally
-		{
-			out.close();
-			in.close();
-			stdIn.close();
-			clientSocket.close();
-		}
-	}
-}*/

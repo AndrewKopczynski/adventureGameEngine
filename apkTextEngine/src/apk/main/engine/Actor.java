@@ -391,7 +391,8 @@ public class Actor extends Entity
 			return false;
 	}
 	
-	public static Actor getByName(String name) throws NullPointerException
+	
+	public static Actor getActorsByName(String name) throws NullPointerException
 	{
 		for (int i = 0; i < ID.size(); i++)
 		{

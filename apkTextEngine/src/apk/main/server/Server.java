@@ -180,7 +180,7 @@ class clientThread extends Thread
 					{
 						clientName = "player_" + name;
 						//protocol = new ServerProtocol(clientName); //z
-						if ((m_player = Actor.getByName(clientName)) == null)
+						if ((m_player = Actor.getActorsByName(clientName)) == null)
 						{
 							try
 							{
@@ -237,7 +237,7 @@ class clientThread extends Thread
 					msgFormatted += msgRecieved[i];
 					if (i < msgRecieved.length - 1)
 					{
-						msgFormatted += "\n";
+						msgFormatted += "#";
 					}
 				}
 				

@@ -146,7 +146,7 @@ public class Entity
 			String t2 = invXML.getAttribute("entity", 0, "inInventoryOf");
 			System.out.println("WS: " + t2);
 			System.out.println("WS: " + Actor.stripID(t2));
-			System.out.println("WS: " + Actor.getByName(t2));
+			System.out.println("WS: " + Actor.getActorsByName(t2));
 			
 			//m_parent = Actor.getByName(invXML.getAttribute("entity", 0, "inInventoryOf"));
 			m_parent = invXML.getAttribute("entity", 0, "inInventoryOf");
@@ -493,18 +493,33 @@ public class Entity
 	}
 	public String dropFromInventory(int x, int y, int z, String name)
 	{
-		Entity entity = getByName(name); //extra step!
-		
-		if (entity != null && delFromInventory(entity))
+		for (int i = 0; i < m_inv.size(); i++)
 		{
-			m_entites.remove(entity);
-			new Actor(x, y, z, entity);
+			Entity[] list = getByName(name); //extra step!
+			//whoops forgot to remove it from the game also
 			
-			return "Dropped '" + entity.getName() + "'.";
-			//return "%DROP_DEFAULT";
+			if (hasInInventory(list[i])
+				&& delFromInventory(list[i]))
+			{
+				new Actor(x, y, z, list[i]);
+				list[i].kill();
+				
+				return "Dropped '" + list[i].toString() + "'.";
+			}
+			
+			
+			/*if (entity != null && delFromInventory(entity))
+			{
+				//m_entites.remove(entity);
+				new Actor(x, y, z, entity);
+				
+				entity.kill();
+				
+				return "Dropped '" + entity.getName() + "'.";
+				//return "%DROP_DEFAULT";
+			}*/
 		}
-		else
-			return "%DROP_ERR";
+		return "%DROP_ERR";
 	}
 	
 	public boolean delFromInventory(Entity entity)
@@ -545,25 +560,24 @@ public class Entity
 			return false;
 	}
 	
-	public static Entity getByName(String name)
+	public static Entity[] getByName(String name)
 	{
+		Entity[] list = new Entity[0];
+		
 		for (int i = 0; i < ID.size(); i++)
 		{
-			if (m_entites.get(ID.get(i)) != null)
+			if (m_entites.get(ID.get(i)) != null 
+				&& m_entites.get(ID.get(i)).getName().equalsIgnoreCase(name))
 			{
-				//System.out.println("checking " + name + " against " + m_entites.get(i).getName() + " (" + m_entites.get(i).toString() + ")");
-				if (m_entites.get(ID.get(i)).getName().equalsIgnoreCase(name))
-				{
-					System.out.println("found '" + name + "' !");
-					return m_entites.get(ID.get(i));
-				}
+				System.out.println("found '" + name + "' !");
+				Entity[] temp = new Entity[list.length + 1];
+				System.arraycopy(list, 0, temp, 0, list.length);
+				temp[temp.length - 1] = m_entites.get(ID.get(i));
+				
+				list = temp;
 			}
-			/*else
-			{
-				System.out.println("checked an entity that doesn't exist. weird.");
-			}*/
 		}
-		return null;
+		return list;
 	}
 	
 	public static boolean existsByName(String name)
@@ -611,6 +625,14 @@ public class Entity
 		m_entites.remove(m_id); //no references, should clean up
 		m_name = null;
 		m_inv = null;
+		try
+		{
+			this.finalize();
+		} catch (Throwable e)
+		{
+			System.err.println("Couldn't clean up entity!");
+			e.printStackTrace();
+		}
 	}
 	
 	public String toString()

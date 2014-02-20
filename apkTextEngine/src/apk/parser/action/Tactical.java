@@ -22,8 +22,8 @@ public class Tactical extends WordList
 		
 		Actor[] actors = Actor.getActors(x, y, z);
 		
-		if (actors.length > 10)
-			msg[0] = "There's just too many people here to tactically appraise properly.";
+		if (actors == null || actors.length > 10)
+			msg[0] = "You don't think you can tactically appraise all these people.";
 		else
 		{
 			msg = new String[actors.length];
