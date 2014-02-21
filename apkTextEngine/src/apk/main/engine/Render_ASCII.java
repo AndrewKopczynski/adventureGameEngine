@@ -51,25 +51,25 @@ public class Render_ASCII
 	 * Avoid exceeding ranges above 4 or 9x9 - the longer the sight range,
 	 * the longer it takes to print the 'map' view.
 	 */
-	private static int m_visionRange = 3;
+	//private static int visibilityRange = 3;
 
 	// for [range] lines above current y 
 	// to [range] lines below current y
 	// then get x lines
-	public static String[] renderMap(int entX, int entY, int entZ)
+	public static String[] renderMap(int entX, int entY, int entZ, int visibilityRange)
 	{
-		if(m_visionRange < 1)
+		if(visibilityRange < 1)
 		{
 			String[] map = {Graphic.getGraphic("lost"), "You can't see much of anything."};
 			return map;
 		}
 		
 		int i = 0;
-		String[] map = new String[Math.max(0, (m_visionRange * 2))];
+		String[] map = new String[Math.max(0, (visibilityRange * 2))];
 		
-		for (int y = (entY + 1 - m_visionRange); y < (entY + m_visionRange); y++)
+		for (int line = (entY + 1 - visibilityRange); line < (entY + visibilityRange); line++)
 		{
-			map[i] = renderMapLine(entX, entY, entZ, y);
+			map[i] = renderMapLine(entX, entY, entZ, line, visibilityRange);
 			i++;
 		}
 		
@@ -86,28 +86,28 @@ public class Render_ASCII
 	
 	/** Renders one horizontal line of the map in the X direction.
 	 * 
-	 * @param y Y level (vertical)
+	 * @param line Y level (vertical)
 	 * @param z Z level (depth)
 	 * @return A line of rooms in ASCII (eg. [_]---[_][^][v])
 	 */
-	private static String renderMapLine(int entX, int entY, int entZ, int y)
+	private static String renderMapLine(int entX, int entY, int entZ, int line, int visibilityRange)
 	{
-		String line = "";
-		for (int x = entX + 1 - m_visionRange; x < entX + m_visionRange; x++)
+		String str = "";
+		for (int x = entX + 1 - visibilityRange; x < entX + visibilityRange; x++)
 		{
-			if (World.isMapRoom(World.roomArray, x, y, entZ))
+			if (World.isMapRoom(World.roomArray, x, line, entZ))
 			{
 				//ignore offset for player drawing
-				if (x == entX && y == entY)
+				if (x == entX && line == entY)
 				{
-					line += insertIntoGraphic(Graphic.getGraphic("plyr"),
-							World.roomArray[x][y][entZ].getRoomGraphic(),
-							x, y, entZ);
+					str += insertIntoGraphic(Graphic.getGraphic("plyr"),
+							World.roomArray[x][line][entZ].getRoomGraphic(),
+							x, line, entZ, visibilityRange);
 				} 
 				
 				else
 				{
-					line += World.roomArray[x][y][entZ].getRoomGraphic();
+					str += World.roomArray[x][line][entZ].getRoomGraphic();
 				}
 			} 
 			
@@ -115,19 +115,19 @@ public class Render_ASCII
 			{
 				//ignore offset for play drawing
 				//TODO: figure out what the above comment even means
-				if (x == entX && y == entY)
+				if (x == entX && line == entY)
 				{
 					String player = " " + Graphic.getGraphic("plyr") + " ";
-					line += player;
+					str += player;
 				}
 				
 				else
 				{
-					line += Graphic.getGraphic("blnk");
+					str += Graphic.getGraphic("blnk");
 				}
 			}
 		}
-		return line;
+		return str;
 	}
 	
 	/** Inserts a given graphic into the tile.
@@ -143,13 +143,13 @@ public class Render_ASCII
 	 * <li>eg. '()' into '[]' = '()'
 	 * </ul>
 	 */
-	private static String insertIntoGraphic(String graphic, String tile, int x, int y, int entZ)
+	private static String insertIntoGraphic(String graphic, String tile, int x, int y, int entZ, int visibilityRange)
 	{
 		String temp;
 		String r = tile;
 		String p = graphic;
 		
-		if (m_visionRange > 0)
+		if (visibilityRange > 0)
 		{
 			if (p.length() % 2 == 0) // graphic is even length
 			{
@@ -174,15 +174,15 @@ public class Render_ASCII
 		}
 	}
 	
-	public static Integer getVisionRange()
+	/*public static Integer getVisionRange()
 	{
-		return m_visionRange;
+		return visibilityRange;
 	}
 	
 	public static void setVisionRange(int i)
 	{
-		m_visionRange = i;
-	}
+		visibilityRange = i;
+	}*/
 	
 	/*public static void setxOffset(int x)
 	{

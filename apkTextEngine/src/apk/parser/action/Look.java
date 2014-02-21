@@ -67,8 +67,8 @@ public class Look extends WordList
 				actorsInRoom += " and ";
 			else if (actors.length - 1 - i > 1)
 				actorsInRoom += ", ";
-			else if (actors.length - 1 - i == 0)
-				System.out.println("4");
+			//else if (actors.length - 1 - i == 0)
+				//System.out.println("4");
 		}
 		
 		//TODO more advanced parsing~

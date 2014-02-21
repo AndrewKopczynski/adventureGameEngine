@@ -75,7 +75,6 @@ public class Server
 		{
 			try
 			{
-				
 				clientSocket = serverSocket.accept();
 				//z
 				System.out.print("Client connecting... ");
@@ -94,7 +93,11 @@ public class Server
 				if (i == maxClientsCount)
 				{
 					PrintStream os = new PrintStream(clientSocket.getOutputStream());
-					os.println("Server is full (" + maxClientsCount + " maximum clients)."); //z
+					os.println("Server is full (" 
+						+ maxClientsCount 
+						+ "/"
+						+ maxClientsCount
+						+ " maximum clients)."); //z
 					os.close();
 					clientSocket.close();
 				}
@@ -192,7 +195,7 @@ class clientThread extends Thread
 								e.printStackTrace();
 								
 								System.out.println("DID NOT LOAD FROM FILE");
-								m_player = new Actor(0, 0, 0, clientName, ACTOR_ALIVE, 30, 30);
+								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
 							}
 							catch (IDConflictException e)
 							{
@@ -200,7 +203,7 @@ class clientThread extends Thread
 								e.printStackTrace();
 								
 								System.out.println("DID NOT LOAD FROM FILE");
-								m_player = new Actor(0, 0, 0, clientName, ACTOR_ALIVE, 30, 30);
+								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
 							}
 							catch (FileNotFoundException e)
 							{
@@ -208,7 +211,7 @@ class clientThread extends Thread
 								e.printStackTrace();
 								
 								System.out.println("DID NOT LOAD FROM FILE");
-								m_player = new Actor(0, 0, 0, clientName, ACTOR_ALIVE, 30, 30);
+								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
 							}
 						}
 						break;
@@ -315,7 +318,7 @@ class clientThread extends Thread
 				{
 					if (threads[i] == this)
 					{
-						m_player.writeSave();
+						//m_player.writeSave();
 						threads[i] = null;
 					}
 				}

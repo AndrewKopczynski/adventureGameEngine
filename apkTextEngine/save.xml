@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<save map="test_map" path="maps/test_map.xml">
+	<load>
+		<actor>zesty</actor>
+		<actor>testGuy</actor>
+		<actor>otherPerson</actor>
+	</load>
+</save>

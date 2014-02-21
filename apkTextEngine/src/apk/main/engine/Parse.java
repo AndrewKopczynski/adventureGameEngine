@@ -225,7 +225,7 @@ public class Parse {
 			{
 				try
 				{
-					Render_ASCII.setVisionRange(Integer.parseInt(att[1]));
+					actor.setVisionRange(Integer.parseInt(att[1]));
 					msg[0] = "Set visibility range to " + att[1];
 					return msg;
 				}
@@ -248,7 +248,7 @@ public class Parse {
 					String name = collapse(att, 1, att.length - 1);
 					int hp = Integer.parseInt(att[att.length - 1]);
 					
-					Entity entity = new Entity(name, ACTOR_OBJECT, hp, hp, actor);
+					Entity entity = new Entity(name, TYPE_OBJECT, hp, hp, actor);
 					
 					if (actor.addToInventory(entity))
 					{
@@ -363,7 +363,7 @@ public class Parse {
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					new Actor(actor.getX(), actor.getY(), actor.getZ(), "test" + i, ACTOR_ALIVE, 30, 30);
+					new Actor(actor.getX(), actor.getY(), actor.getZ(), "test" + i, TYPE_ALIVE, 30, 30);
 				}
 				msg[0] = "created some dummy npcs at " + actor.getXYZ();
 				return msg;
@@ -383,7 +383,7 @@ public class Parse {
 							actor.getY(),
 							actor.getZ(),
 							"npc_" + i,
-							ACTOR_ALIVE,
+							TYPE_ALIVE,
 							30,
 							30);
 					

@@ -459,10 +459,21 @@ public class Actor extends Entity
 	{
 		for (int i = 0; i < ID.size(); i++)
 		{
-			if (m_actors.get(i) != null)
+			if (m_actors.get(ID.get(i)) != null)
 				System.out.println(m_actors.get(ID.get(i)).toString());
 			//else
 				//System.out.println(m_actors.get(ID.get(i)));
+		}
+	}
+	
+	public static final void saveAll()
+	{
+		for (int i = 0; i < ID.size(); i++)
+		{
+			if (m_actors.get(ID.get(i)) != null)
+			{
+				m_actors.get(ID.get(i)).writeSave();
+			}
 		}
 	}
 	

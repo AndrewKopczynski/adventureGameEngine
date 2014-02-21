@@ -41,7 +41,8 @@ import apk.parser.reference.IDConflictException;
  * */
 public class Entity
 {	
-	private static Map<Integer, Entity> m_entites = new HashMap<Integer, Entity>();
+	private static Map<Integer, Entity> m_ents = new HashMap<Integer, Entity>();
+	private static final int DEFAULT_VISIBILITY = 2; //how far an actor/entity can see
 	
 	protected List<Entity> m_inv = new ArrayList<Entity>();
 	protected int m_id;
@@ -52,6 +53,8 @@ public class Entity
 	
 	private String m_parent;
 	protected int m_type;
+	
+	protected int m_visionRange = DEFAULT_VISIBILITY;
 	
 	//TODO does this even make sense lol
 	//TODO is this needed?
@@ -69,7 +72,7 @@ public class Entity
 		System.out.println("---------------------------------");
 		
 		m_id = ID.add();
-		m_entites.put(m_id, this);
+		m_ents.put(m_id, this);
 		
 		m_name = name;
 		m_type = type;
@@ -90,7 +93,7 @@ public class Entity
 		
 		Logger.log("Created new ent '" + getName() +  "' @ " + m_parent + "'s inventory.");
 		
-		writeSave();
+		//writeSave();
 	}
 	
 	// entities can only be created in inventories of actors
@@ -101,7 +104,7 @@ public class Entity
 		System.out.println("----------------------------------");
 		
 		m_id = ID.add();
-		m_entites.put(m_id, this);
+		m_ents.put(m_id, this);
 		
 		m_name = name;
 		m_type = type;
@@ -137,7 +140,7 @@ public class Entity
 			m_id = Integer.parseInt(invXML.getAttribute("entity", 0, "id"));
 			ID.add(m_id);
 			
-			m_entites.put(m_id, this);
+			m_ents.put(m_id, this);
 			
 			m_name = invXML.getAttribute("entity", 0, "name");
 			m_type = Integer.parseInt(invXML.getAttribute("entity", 0, "type"));
@@ -254,6 +257,16 @@ public class Entity
 	public int getType()
 	{
 		return m_type;
+	}
+	
+	public int getVisionRange()
+	{
+		return m_visionRange;
+	}
+	
+	public void setVisionRange(int visionRange)
+	{
+		m_visionRange = visionRange;
 	}
 	
 	/** Damage this entity.
@@ -431,7 +444,6 @@ public class Entity
 		if (m_inv.size() == 0)
 		{
 			msg[0] = "You're not carrying anything.";
-			return msg;
 		}
 		else
 		{
@@ -440,9 +452,9 @@ public class Entity
 			{
 				msg[i+header] = m_inv.get(i).toString();
 			}
-			msg[msg.length - 1] =  "-------------------";
-			return msg;
 		}
+		msg[msg.length - 1] =  "-------------------";
+		return msg;
 	}
 	
 	public boolean addToInventory(Entity entity)
@@ -482,7 +494,7 @@ public class Entity
 	{
 		if (delFromInventory(entity))
 		{
-			m_entites.remove(entity);
+			m_ents.remove(entity);
 			new Actor(x, y, z, entity);
 			
 			return "Dropped '" + entity.getName() + "'.";
@@ -498,7 +510,8 @@ public class Entity
 			Entity[] list = getByName(name); //extra step!
 			//whoops forgot to remove it from the game also
 			
-			if (hasInInventory(list[i])
+			if (list.length > 0
+				&& hasInInventory(list[i])
 				&& delFromInventory(list[i]))
 			{
 				new Actor(x, y, z, list[i]);
@@ -536,25 +549,22 @@ public class Entity
 		
 		return did;
 	}
-	
 	public boolean delFromInventory(String name)
 	{
 		return m_inv.remove(getByName(name));
 	}
 	
-	
 	public static Entity getById(int id)
 	{
-		if (m_entites.containsKey(id))
-			return m_entites.get(id);
+		if (m_ents.containsKey(id))
+			return m_ents.get(id);
 		else
 			return null;
 	}
 	
-	
 	public static boolean existsById(int id)
 	{
-		if (m_entites.containsKey(id))
+		if (m_ents.containsKey(id))
 			return true;
 		else
 			return false;
@@ -566,13 +576,13 @@ public class Entity
 		
 		for (int i = 0; i < ID.size(); i++)
 		{
-			if (m_entites.get(ID.get(i)) != null 
-				&& m_entites.get(ID.get(i)).getName().equalsIgnoreCase(name))
+			if (m_ents.get(ID.get(i)) != null 
+				&& m_ents.get(ID.get(i)).getName().equalsIgnoreCase(name))
 			{
 				System.out.println("found '" + name + "' !");
 				Entity[] temp = new Entity[list.length + 1];
 				System.arraycopy(list, 0, temp, 0, list.length);
-				temp[temp.length - 1] = m_entites.get(ID.get(i));
+				temp[temp.length - 1] = m_ents.get(ID.get(i));
 				
 				list = temp;
 			}
@@ -582,9 +592,9 @@ public class Entity
 	
 	public static boolean existsByName(String name)
 	{
-		for (int i = 0; i < m_entites.size(); i++)
+		for (int i = 0; i < m_ents.size(); i++)
 		{
-			if (m_entites.get(i).toString().equalsIgnoreCase(name))
+			if (m_ents.get(i).toString().equalsIgnoreCase(name))
 				return true;
 		}
 		return false;
@@ -595,10 +605,21 @@ public class Entity
 	{
 		for (int i = 0; i < ID.size(); i++)
 		{
-			if (m_entites.get(i) != null)
-				System.out.println(m_entites.get(i).toString());
+			if (m_ents.get(ID.get(i)) != null)
+				System.out.println(m_ents.get(ID.get(i)).toString());
 			//else
 				//System.out.println(m_entites.get(i));
+		}
+	}
+	
+	public static void saveAll()
+	{
+		for (int i = 0; i < ID.size(); i++)
+		{
+			if (m_ents.get(ID.get(i)) != null)
+			{
+				m_ents.get(ID.get(i)).writeSave();
+			}
 		}
 	}
 	
@@ -622,7 +643,7 @@ public class Entity
 		{
 			System.out.println(e);
 		}
-		m_entites.remove(m_id); //no references, should clean up
+		m_ents.remove(m_id); //no references, should clean up
 		m_name = null;
 		m_inv = null;
 		try
