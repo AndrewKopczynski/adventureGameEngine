@@ -1,9 +1,14 @@
 package apk.main.engine;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
 
 import apk.parser.reference.ActorIntializationException;
 import apk.parser.reference.IDConflictException;
@@ -84,69 +89,68 @@ public class Actor extends Entity
 		//writeSave();
 	}
 	
-	public Actor(String filePath) throws IDConflictException, FileNotFoundException, ActorIntializationException
+	public Actor(URL actorURL) throws IDConflictException, ActorIntializationException, DocumentException
 	{	
 		System.out.println("-----------------------");
 		System.out.println("LOADING ACTOR FROM FILE");
 		System.out.println("-----------------------");
 		
-			Logger.log("Creating new entity from '" + filePath + "'...");
-			String[] entElements = {"entity", "health", "inventory"};
-			XMLReader invXML = new XMLReader(filePath, entElements);
+		int id;
+		int type;
+		int hpMax = -1;
+		int hp = -1;
+		
+		String name;
+		String coords;
+		String[] split;
+		
+		Document actorD = XMLReader.parse(actorURL);
+		Element root = actorD.getRootElement();
+		
+		id = Integer.parseInt(root.attributeValue("id"));
+		type = Integer.parseInt(root.attributeValue("type"));
+		
+		name = root.attributeValue("name");
+		coords = root.attributeValue("coords");
+		
+		for (Iterator<Element> i = root.elementIterator("health"); i.hasNext();)
+		{
+			Element element = (Element) i.next();
 			
-			m_id = Integer.parseInt(invXML.getAttribute("entity", 0, "id"));
-			ID.add(m_id);
-			
-			m_actors.put(m_id, this); //stop forgetting to do this aaaaaa
-			
-			m_name = invXML.getAttribute("entity", 0, "name");
-			m_type = Integer.parseInt(invXML.getAttribute("entity", 0, "type"));
-			
-			System.out.println("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
-			
-			String temp = invXML.getAttribute("entity", 0, "coords");
-			String split[] = temp.split(",");
-			
-			if (!split[0].equals("inInventoryOf"))
+			hpMax = Integer.parseInt(element.attributeValue("hpMax"));
+			hp = Integer.parseInt(element.attributeValue("hp"));
+		}
+		
+		for (Iterator<Element> i = root.elementIterator("inventory"); i.hasNext();)
+		{
+			Element element = (Element) i.next();
+			for (Iterator<Element> j = element.elementIterator(); j.hasNext();)
 			{
-				m_x = Integer.parseInt(split[0]);
-				m_y = Integer.parseInt(split[1]);
-				m_z = Integer.parseInt(split[2]);
+				Element children = (Element) j.next();
+				System.out.println(children.getText()); //TODO add stuff to inventory
 			}
-			else
-			{
-				String err = "CRTICAL! ENTITY " + toString() + "TRIED TO LOAD" + " AN ACTOR WITH NO COORDINATES AS A WORLDENTITY!";
-				System.out.println(err);
-				Logger.log(err);
-				
-				throw new ActorIntializationException();
-			}
-			
-			m_hpMax = Integer.parseInt(invXML.getAttribute("health", 0, "hpMax"));
-			m_hp = Integer.parseInt(invXML.getAttribute("health", 0, "hp"));
-			
-			System.out.println("printing inventory...");
-			String ents[] = invXML.getChildren("inventory", 0);
-			for (int a = 1; a < ents.length; a += 2)
-			{
-				System.out.println("found ent: " + ents[a]);
-				if (!ents[a].equals(toString()))
-				{
-					System.out.println("added to inventory: " + addToInventory(new Entity("ent/" + ents[a] + ".xml")));
-				}
-				else
-				{
-					String err = "!CRTICAL! ENTITY " + toString() + "TRIED TO LOAD ITSELF!" + " CHECK ENTITY FILE " + getFilePath() + "!";
-					System.out.println(err);
-					Logger.log(err);
-					
-					throw new ActorIntializationException();
-				}
-			}
-			System.out.println("--------------------------------");
-			System.out.println("FINISHED LOADING ACTOR FROM FILE");
-			System.out.println("--------------------------------");
-			//writeSave();
+		}
+		
+		m_id = id;
+		ID.add(m_id);
+		
+		m_type = type;
+		m_name = name;
+		m_hpMax = hpMax;
+		m_hp = hp;
+		
+		split = coords.split(",");
+		m_x = Integer.parseInt(split[0]);
+		m_y = Integer.parseInt(split[1]);
+		m_z = Integer.parseInt(split[2]);
+		
+		/* put into list of actors */
+		m_actors.put(m_id, this);
+		
+		System.out.println("--------------------------------");
+		System.out.println("FINISHED LOADING ACTOR FROM FILE");
+		System.out.println("--------------------------------");
+		//writeSave();
 	}
 	
 	@Override
@@ -229,7 +233,7 @@ public class Actor extends Entity
 		
 		if (isInBounds && isConnected)
 		{
-			msg = Render_ASCII.renderMap(x, y, z);
+			msg = Render_ASCII.renderMap(x, y, z, m_visionRange);
 			
 			if(moveToLocation)
 				move(vel);
@@ -252,10 +256,10 @@ public class Actor extends Entity
 		System.out.println(World.isMapRoom(World.roomArray, x, y, z));*/
 		
 		return (x >= 0 && y >= 0 && z >= 0
-				&& x < World.mapSize - 1
-				&& y < World.mapSize - 1
+				&& x < World.getMapSize() - 1
+				&& y < World.getMapSize() - 1
 				&& z < World.HEIGHT_LIMIT - 1
-				&& (World.isMapRoom(World.roomArray, x, y, z) || m_ignoresCollision));
+				&& (World.isMapRoom(World.getWorld(), x, y, z) || m_ignoresCollision));
 	}
 	
 	private boolean exitCheck(int x, int y, int z)

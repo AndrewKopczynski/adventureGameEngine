@@ -9,12 +9,16 @@ import apk.main.engine.Parse;
 import apk.main.engine.Actor;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.ServerSocket;
+import java.net.URL;
+
+import org.dom4j.DocumentException;
 
 /*
 * A chat server that delivers public and private messages.
@@ -36,7 +40,22 @@ public class Server
 		/**all modified lines are marked with //z for the sake of clarity*/
 		
 		Logger.clear(); //z
-		new World("maps/test_map.xml", "gfx/standard_tileset.xml"); //z
+		//new World("maps/test_map.xml", "gfx/standard_tileset.xml"); //z
+		try
+		{	
+			URL worldURL = new File("maps/test_map.xml").toURI().toURL();
+			URL tilesetURL = new File("gfx/standard_tileset.xml").toURI().toURL();
+			
+			new World(worldURL, tilesetURL);
+		}
+		catch (MalformedURLException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		System.out.println("Starting server..."); //z
 		
@@ -187,7 +206,8 @@ class clientThread extends Thread
 						{
 							try
 							{
-								m_player = new Actor("ent/" + clientName + ".xml");
+								URL playerURL = new File("ent/" + clientName + ".xml").toURI().toURL();
+								m_player = new Actor(playerURL);
 							}
 							catch (ActorIntializationException e)
 							{
@@ -205,7 +225,15 @@ class clientThread extends Thread
 								System.out.println("DID NOT LOAD FROM FILE");
 								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
 							}
-							catch (FileNotFoundException e)
+							catch (MalformedURLException e)
+							{
+								System.out.println("ent/" + clientName + " not found!");
+								e.printStackTrace();
+								
+								System.out.println("DID NOT LOAD FROM FILE");
+								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
+							}
+							catch (DocumentException e)
 							{
 								System.out.println("ent/" + clientName + " not found!");
 								e.printStackTrace();

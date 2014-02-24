@@ -132,7 +132,7 @@ public class Entity
 		System.out.println("LOADING ENTITY FROM FILE");
 		System.out.println("------------------------");
 		
-		try
+		/*try
 		{
 			String[] entElements = {"entity", "health", "inInventoryOf"};
 			XMLReader invXML = new XMLReader(filePath, entElements);
@@ -180,7 +180,7 @@ public class Entity
 		catch (IDConflictException e)
 		{
 			kill();
-		}
+		}*/
 	}
 	
 	/** Write to save file. */

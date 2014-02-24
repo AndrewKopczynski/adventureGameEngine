@@ -1,115 +1,112 @@
 package apk.main.engine;
 
+import java.net.URL;
+import java.util.Iterator;
+
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+
 public class World 
 {
 	//TODO: overhaul map system, make it a point map instead of exit-based
 	//TODO: level editor, should not be writing any maps by hand anymore
 	
-	/** Total size of map */
-	public static int mapSize;
-	
-	/** Arbitrary limit, need to figure out a better way to handle later. */
 	public static final int HEIGHT_LIMIT = 512;
+	private static int m_mapSize;
+	private static Room[][][] m_world;
 	
-	/** Map is loaded into this 3D array */
-	public static Room[][][] roomArray;
+	public World(URL worldURL) throws DocumentException
+	{
+		loadWorld(worldURL);
+	}
 	
-	/** Loads a map using a given map file and tileset.
-	 * 
-	 * @param mapFilePath Filepath to the map.xml
-	 * @param tileFilePath Filepath to the tileset.xml
-	 */
-	public World(String mapFilePath, String tileFilePath)
-	{	
-		/** Tileset */
-		try 
-		{
-			Logger.log("Loading tileset...");
-			
-			String[] tElements = {"tile"};
-			XMLReader tileXML = new XMLReader(tileFilePath, tElements);
-			
-			for (int i = 0; i < tileXML.getNumOfElements(tElements[0]); i++)
-			{
-				String name = tileXML.getAttribute(tElements[0], i, "name");
-				String g = tileXML.getAttribute(tElements[0], i, "g");
-				String e = tileXML.getAttribute(tElements[0], i, "e");
-				System.out.println(g);
-				new Graphic(name, g, e);
-			}	
-		}
-		catch (Exception e)
-		{
-			Logger.log("Tileset ("+ tileFilePath + ") failed to load! " + e);
-			e.printStackTrace();
-		}
-		Logger.log("Tileset (" + tileFilePath + ") was loaded sucessfully.");
+	public World(URL worldURL, URL tileURL) throws DocumentException
+	{
+		loadWorld(worldURL);
+		loadTileset(tileURL);
+	}
+	
+	private void loadWorld(URL worldURL) throws DocumentException
+	{
+		Document worldD = XMLReader.parse(worldURL);
 		
-		/** Map ------------------------------------------------------------------ */
-		try
-		{	
-			Logger.log("Loading map...");
-			
-			String[] mElements = {"room"};
-			XMLReader mapXML = new XMLReader(mapFilePath, mElements);
-			
-			String mapName = mapXML.getRootAttribute("name");
-			mapSize = Integer.parseInt(mapXML.getRootAttribute("size"));
-			roomArray = new Room[mapSize][mapSize][HEIGHT_LIMIT];
-			
-			for (int i = 0; i < mapXML.getNumOfElements(mElements[0]); i++)
-			{
-				String name = mapXML.getAttribute(mElements[0], i, "name");
-				String type = mapXML.getAttribute(mElements[0], i, "type");
-				String coord = mapXML.getAttribute(mElements[0], i, "coord");
-				Room room = new Room(mapName, name, type, coord);
-				roomArray[room.getX()][room.getY()][room.getZ()] = room;
-				System.out.println(roomArray[room.getX()][room.getY()][room.getZ()]);
-			}		
-		} 
-		catch (Exception e)
+		Element root = worldD.getRootElement();
+		String worldName = root.attributeValue("name");
+		
+		m_mapSize = Integer.parseInt(root.attributeValue("size"));
+		m_world = new Room[m_mapSize][m_mapSize][HEIGHT_LIMIT];
+		
+		/* Iterates through all elements with name "room". */
+		for (Iterator<Element> i = root.elementIterator("room"); i.hasNext();)
 		{
-			Logger.log("Tileset OR Map (" + mapFilePath + ") failed to load! " + e);
-			e.printStackTrace();
+            Element element = (Element) i.next();
+            
+            String name = element.attributeValue("name");
+            String type = element.attributeValue("type");
+            String coord = element.attributeValue("coord");
+            
+            Room room = new Room(worldName, name, type, coord);
+            m_world[room.getX()][room.getY()][room.getZ()] = room;
+            
+            System.out.println("[ROOM] " + m_world[room.getX()][room.getY()][room.getZ()]);
+        }
+	}
+	
+	public void loadTileset(URL tileURL) throws DocumentException
+	{
+		Document tileD = XMLReader.parse(tileURL);
+		
+		Element root = tileD.getRootElement();
+		
+		/* Iterates through all elements with name "tile" */
+		for (Iterator<Element> i = root.elementIterator("tile"); i.hasNext();)
+		{
+			Element element = (Element) i.next();
+			
+			String name = element.attributeValue("name");
+			String graphic = element.attributeValue("g");
+			String exits = element.attributeValue("e");
+			
+			new Graphic(name, graphic, exits);
+			
+			System.out.println("[TILE] " + graphic);
 		}
-		Logger.log("Map (" + mapFilePath + ") was loaded sucessfully.");
 	}
 	
 	/** Check for Room[][] Arrays to see if they're empty.
 	 *
 	 * @return True if not empty, false if empty. */
 	public static boolean isMapRoom(Room[][][] array, int x, int y, int z) 
-	{
-		/** For debugging TODO: Remove in later builds.
-		 */
-		
-		try {
+	{	
+		try
+		{
 			// ignore negatives, avoids out of bounds index
 			if (x < 0 || y < 0 || z < 0)
-			{
 				return false;
-			}
 			
 			// ignore values outside of array, avoids out of bounds index
-			if (x > mapSize - 1 || y > mapSize - 1 || z > mapSize - 1)
-			{
+			if (x > m_mapSize - 1 || y > m_mapSize - 1 || z > m_mapSize - 1)
 				return false;
-			}
-			
 			else if (array[x][y][z] != null) 
-			{
 				return true;
-			} 
-			
 			else 
-			{
 				return false;
-			}
 		}
 		catch(Exception e)
 		{
-			System.out.println("Checked for a room out of bounds! Ignoring room(s)...");
+			System.err.println("Checked for a room out of bounds! Ignoring room(s)...");
 			return false;
 		}
+	}
+	
+	public static int getMapSize()
+	{
+		return m_mapSize;
+	}
+	
+	public static Room[][][] getWorld()
+	{
+		return m_world;
 	}
 }
