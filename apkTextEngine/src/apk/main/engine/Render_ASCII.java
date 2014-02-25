@@ -73,8 +73,8 @@ public class Render_ASCII
 			i++;
 		}
 		
-		if (World.isMapRoom(World.roomArray, entX, entY, entZ))
-			map[i] = ("Exits: " + World.roomArray[entX][entY][entZ].getRoomExits());
+		if (World.isMapRoom(World.getWorld(), entX, entY, entZ))
+			map[i] = ("Exits: " + World.getWorld()[entX][entY][entZ].getRoomExits());
 		else
 			map[i] = ("Exits: ?");
 		
@@ -95,26 +95,24 @@ public class Render_ASCII
 		String str = "";
 		for (int x = entX + 1 - visibilityRange; x < entX + visibilityRange; x++)
 		{
-			if (World.isMapRoom(World.roomArray, x, line, entZ))
+			if (World.isMapRoom(World.getWorld(), x, line, entZ))
 			{
 				//ignore offset for player drawing
 				if (x == entX && line == entY)
 				{
 					str += insertIntoGraphic(Graphic.getGraphic("plyr"),
-							World.roomArray[x][line][entZ].getRoomGraphic(),
+							World.getWorld()[x][line][entZ].getRoomGraphic(),
 							x, line, entZ, visibilityRange);
 				} 
 				
 				else
 				{
-					str += World.roomArray[x][line][entZ].getRoomGraphic();
+					str += World.getWorld()[x][line][entZ].getRoomGraphic();
 				}
 			} 
 			
 			else
 			{
-				//ignore offset for play drawing
-				//TODO: figure out what the above comment even means
 				if (x == entX && line == entY)
 				{
 					String player = " " + Graphic.getGraphic("plyr") + " ";
@@ -173,29 +171,4 @@ public class Render_ASCII
 			return Graphic.getGraphic("lost");
 		}
 	}
-	
-	/*public static Integer getVisionRange()
-	{
-		return visibilityRange;
-	}
-	
-	public static void setVisionRange(int i)
-	{
-		visibilityRange = i;
-	}*/
-	
-	/*public static void setxOffset(int x)
-	{
-		m_xOffset = Math.min(M_OFFSET_CAP, x);
-	}
-	
-	public static void setyOffset(int y)
-	{
-		m_yOffset = Math.min(M_OFFSET_CAP, y);
-	}
-	
-	public static void setzOffset(int z)
-	{
-		m_zOffset = Math.min(M_OFFSET_CAP, z);
-	}*/
 }

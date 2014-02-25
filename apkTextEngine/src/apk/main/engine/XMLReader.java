@@ -1,45 +1,48 @@
 package apk.main.engine;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URL;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+public class XMLReader
+{
 
-public class XMLReader {
-
-	/** File to read XML from. */
+	/** File to read XML from. *//*
 	private File m_fileXML;
 	
-	/** Seems to intialize docBuilderXML TODO: Temporary? */
+	*//** Seems to intialize docBuilderXML TODO: Temporary? *//*
 	private DocumentBuilderFactory m_docFactoryXML;
-	/** Parses the document for docXML TODO: Temporary? */
+	*//** Parses the document for docXML TODO: Temporary? *//*
 	private DocumentBuilder m_docBuilderXML;
-	/** The document, once parsed. */
+	*//** The document, once parsed. *//*
 	private Document m_docXML;
-	/** List of nodes for that map AND THAT MAP ONLY
+	*//** List of nodes for that map AND THAT MAP ONLY
 	 * <p>
-	 * READ: DO NOT MAKE STATIC AGAIN. It was a dumb idea. */
+	 * READ: DO NOT MAKE STATIC AGAIN. It was a dumb idea. *//*
 	private List<NodeList> m_docNodeList = new ArrayList<NodeList>();
 	
-	/** File path. TODO: Temporary? Do we still need this after loading an XML? */
+	*//** File path. TODO: Temporary? Do we still need this after loading an XML? *//*
 	private String m_filePath;
-	/** Elements to be read from file. */
-	private String[] m_elements;
+	*//** Elements to be read from file. *//*
+	private String[] m_elements;*/
+	
+	public static Document parse(URL url) throws DocumentException
+	{
+		SAXReader reader = new SAXReader();
+		Document document = reader.read(url);
+		
+		return document;
+	}
+	
 	
 	/** Loads an XML File.
 	 * 
 	 * @param filePath Path of XML File to load
 	 * @param elements Elements to be fetched/read from file
 	 */
-	public XMLReader(String filePath, String[] elements) throws FileNotFoundException
+	/*public XMLReader(String filePath, String[] elements) throws FileNotFoundException
 	{
 		m_filePath = filePath;
 		m_elements = elements;
@@ -65,11 +68,11 @@ public class XMLReader {
 		}
 	}
 	
-	/** Creates a NodeList used later.
+	*//** Creates a NodeList used later.
 	 * <p>
 	 * **The index of the element in m_elements will be the
 	 * same as the index in m_docNodeList.
-	 */
+	 *//*
 	private void setupNodeList()
 	{	
 		for (int i = 0; i < m_elements.length; i++) {
@@ -78,9 +81,9 @@ public class XMLReader {
 		}
 	}
 	
-	/** Gets the root.
+	*//** Gets the root.
 	 * @return Root element's name
-	 */
+	 *//*
 	public String getRootName()
 	{
 		return m_docXML.getDocumentElement().getNodeName();
@@ -104,7 +107,7 @@ public class XMLReader {
 		return m_docNodeList.get(index).getLength();
 	}
 
-	/** Gets an attribute from a specific element.
+	*//** Gets an attribute from a specific element.
 	 * 
 	 * @param element Element name (eg. <room>)
 	 * @param n Nth Element to get attribute from
@@ -113,7 +116,7 @@ public class XMLReader {
 	 * 
 	 * @param attribute
 	 * @return
-	 */
+	 *//*
 	public String getAttribute(String element, int n, String attribute)
 	{
 		String temp = null; // returner
@@ -192,5 +195,5 @@ public class XMLReader {
 			}
 		}	
 		return temp;	
-	}
+	}*/
 }
