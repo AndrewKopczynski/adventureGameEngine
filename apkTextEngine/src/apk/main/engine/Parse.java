@@ -2,6 +2,7 @@ package apk.main.engine;
 
 import static apk.parser.reference.ActorType.*;
 import apk.parser.action.*;
+import apk.parser.reference.MessageType;
 import apk.parser.target.*;
 
 public class Parse {
@@ -98,12 +99,19 @@ public class Parse {
 		/** MOVEMENT - SHORT MOVE MERGED WITH MOVE ------------------------	|*/
 		if (m_direction.check(att) || m_move.check(att)) //check should stop bad movements
 		{
+			String target;
 			int[] vel; // requested direction to move actor
 			
 			if (att.length == 1)
+			{
 				vel = m_direction.parse(att[0]);
+				target = att[0];
+			}
 			else if (att.length == 2)
+			{
 				vel = m_direction.parse(att[1]);
+				target = att[1];
+			}
 			else
 				return m_move.getError();
 			
@@ -111,7 +119,9 @@ public class Parse {
 			{
 				msg = actor.requestMap(vel, true);
 				msg[msg.length - 1] = m_look.getActorsInRoom(actor, null);
-				return msg;
+				
+				//done!
+				return MessageType.personal(actor, "MOVE", target, msg);
 			}
 			return m_move.getError();
 		}
@@ -130,7 +140,8 @@ public class Parse {
 			msg = actor.requestMap(vel, false);
 			msg[msg.length - 1] = m_look.getActorsInRoom(actor, vel);
 			
-			return msg;
+			//done!
+			return MessageType.personal(actor, "LOOK", att[0], msg);
 		}
 		
 		/** SAY -----------------------------------------------------------	|*/
@@ -140,7 +151,8 @@ public class Parse {
 					+ " says, \"" + collapse(att, 1, att.length) 
 					+ "\"").trim();
 			
-			return msg;
+			//done!
+			return MessageType.roomwide(actor, "SAY", actor.getXYZ(), "WORLD", msg);
 		}
 		
 		/** TAKE ----------------------------------------------------------	|*/
@@ -351,11 +363,14 @@ public class Parse {
 			/** debug */
 			else if (m_admin.getMeaning(att[0]).equals("debug"))
 			{
-				System.out.println("ENTITY:");
-				Entity.debug();
-				System.out.println("ACTOR:");
-				Actor.debug();
-				msg[0] = "Printed debug.";
+				String[] t1 = Entity.debug();
+				String[] t2 = Actor.debug();
+				
+				msg = new String[t1.length + t2.length + 1];
+				System.arraycopy(t1, 0, msg, 0, t1.length);
+				System.arraycopy(t2, 0, msg, t1.length, t2.length);
+				
+				msg[msg.length - 1] = "----------------";
 				return msg;
 			}
 			/** test - spawns four actors at the caller's coordinates */
@@ -363,7 +378,7 @@ public class Parse {
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					new Actor(actor.getX(), actor.getY(), actor.getZ(), "test" + i, TYPE_ALIVE, 30, 30);
+					new Actor(actor.getX(), actor.getY(), actor.getZ(), "npc_test_" + i, TYPE_ALIVE, 30, 30);
 				}
 				msg[0] = "created some dummy npcs at " + actor.getXYZ();
 				return msg;
@@ -382,7 +397,7 @@ public class Parse {
 					new Actor(actor.getX(),
 							actor.getY(),
 							actor.getZ(),
-							"npc_" + i,
+							"npc_test_" + i,
 							TYPE_ALIVE,
 							30,
 							30);

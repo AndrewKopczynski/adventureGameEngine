@@ -42,7 +42,7 @@ import apk.parser.reference.IDConflictException;
 public class Entity
 {	
 	private static Map<Integer, Entity> m_ents = new HashMap<Integer, Entity>();
-	private static final int DEFAULT_VISIBILITY = 2; //how far an actor/entity can see
+	private static final int DEFAULT_VISIBILITY = 3; //how far an actor/entity can see
 	
 	protected List<Entity> m_inv = new ArrayList<Entity>();
 	protected int m_id;
@@ -492,12 +492,15 @@ public class Entity
 	
 	public String dropFromInventory(int x, int y, int z, Entity entity)
 	{
+		
 		if (delFromInventory(entity))
 		{
+			String t = entity.getName();
+			
 			m_ents.remove(entity);
 			new Actor(x, y, z, entity);
 			
-			return "Dropped '" + entity.getName() + "'.";
+			return "Dropped '" + t + "'.";
 			//return "%DROP_DEFAULT";
 		}
 		else
@@ -514,10 +517,12 @@ public class Entity
 				&& hasInInventory(list[i])
 				&& delFromInventory(list[i]))
 			{
+				String t = list[i].getName();
+				
 				new Actor(x, y, z, list[i]);
 				list[i].kill();
 				
-				return "Dropped '" + list[i].toString() + "'.";
+				return "Dropped '" + t + "'.";
 			}
 			
 			
@@ -601,15 +606,22 @@ public class Entity
 	}
 	
 	/** debug list print */
-	public static void debug()
+	public static String[] debug()
 	{
+		String[] list = new String[m_ents.size()];
+		int a = 0;
+		
 		for (int i = 0; i < ID.size(); i++)
 		{
 			if (m_ents.get(ID.get(i)) != null)
-				System.out.println(m_ents.get(ID.get(i)).toString());
+			{
+				list[a] = "[ENTITY]" + m_ents.get(ID.get(i)).toString();
+				a++;
+			}
 			//else
 				//System.out.println(m_entites.get(i));
 		}
+		return list;
 	}
 	
 	public static void saveAll()

@@ -1,6 +1,7 @@
 package apk.main.server;
 
 import static apk.parser.reference.ActorType.*;
+import static apk.parser.reference.MessageType.*;
 import apk.parser.reference.ActorIntializationException;
 import apk.parser.reference.IDConflictException;
 import apk.main.engine.Logger;
@@ -28,7 +29,7 @@ public class Server
 	private static Socket clientSocket = null;
 	
 	// This chat server can accept up to maxClientsCount clients' connections.
-	private static final int maxClientsCount = 3; //z lowered for testing
+	private static final int maxClientsCount = 4; //z lowered for testing
 	private static final clientThread[] threads = new clientThread[maxClientsCount];
 	
 	public static void main(String args[])
@@ -230,13 +231,49 @@ class clientThread extends Thread
 			while (m_connected)
 			{
 				String line = m_in.readLine();
+				int formatLines = 0; //z
+				int messageType = 0; //z
 				
 				/** collapse input first */
 				String[] msgRecieved  = m_p.parse(m_player, line);
 				String msgFormatted = "";
 				
-				for (int i = 0; i < msgRecieved.length; i++)
+				try
 				{
+					int m = Integer.parseInt(msgRecieved[0]);
+					/**message type stuff here*/
+					if (m == MSG_PERSONAL)
+					{
+						messageType = MSG_PERSONAL;
+						formatLines = MSG_PERSONAL_LENGTH;
+					}
+					else if (m == MSG_ROOMWIDE)
+					{
+						messageType = MSG_ROOMWIDE;
+						formatLines = MSG_ROOMWIDE_LENGTH;
+					}
+					else if (m == MSG_AREAWIDE)
+					{
+						messageType = MSG_AREAWIDE;
+						formatLines = MSG_AREAWIDE_LENGTH;
+					}
+					else
+					{
+						System.out.println("no message type!");
+					}
+				}
+				catch(Exception e)
+				{
+					System.out.println("bad message type");
+					//e.printStackTrace();
+				}
+				
+				System.out.println("Message length: " + msgRecieved.length);
+				System.out.println("FormatLines: " + formatLines);
+				
+				for (int i = formatLines; i < msgRecieved.length; i++)
+				{
+					System.out.println("formatting!");
 					msgFormatted += msgRecieved[i];
 					if (i < msgRecieved.length - 1)
 					{
@@ -254,10 +291,11 @@ class clientThread extends Thread
 						for (int i = 0; i < threads.length; i++) //max clients -> threads
 						{
 							/** MESSAGE_TYPE_SELF */
-							if (threads[i] != null
-									&& threads[i] == this
-									&& threads[i].clientName != null
-									&& msgRecieved[0].equals(m_player.getName()))
+							if (messageType == MSG_PERSONAL
+								&& threads[i] != null
+								&& threads[i] == this
+								&& threads[i].clientName != null
+								)
 							{
 								System.out.println("did self message for " + m_player.getName());
 								//this.os.println(get);
@@ -266,9 +304,10 @@ class clientThread extends Thread
 							}
 							
 							/** MESSAGE_TYPE_ROOM */
-							if (threads[i] != null 
-									&& threads[i].clientName != null
-									&& threads[i].m_player.getXYZ().equals(m_player.getXYZ()))
+							if (messageType == MSG_ROOMWIDE
+								&& threads[i] != null 
+								&& threads[i].clientName != null
+								&& threads[i].m_player.getXYZ().equals(m_player.getXYZ()))
 							{
 								//System.out.println("did room message for " + m_ent.getXYZ());
 								threads[i].os.println(msgFormatted);

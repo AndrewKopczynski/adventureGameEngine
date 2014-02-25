@@ -229,7 +229,7 @@ public class Actor extends Entity
 		
 		if (isInBounds && isConnected)
 		{
-			msg = Render_ASCII.renderMap(x, y, z);
+			msg = Render_ASCII.renderMap(x, y, z, m_visionRange);
 			
 			if(moveToLocation)
 				move(vel);
@@ -455,15 +455,22 @@ public class Actor extends Entity
 	}
 	
 	/** debug list print */
-	public static void debug()
+	public static String[] debug()
 	{
+		String[] list = new String[m_actors.size()];
+		int a = 0;
+		
 		for (int i = 0; i < ID.size(); i++)
 		{
 			if (m_actors.get(ID.get(i)) != null)
-				System.out.println(m_actors.get(ID.get(i)).toString());
+			{
+				list[a] = "[ACTOR]" + m_actors.get(ID.get(i)).toString();
+				a++;
+			}
 			//else
-				//System.out.println(m_actors.get(ID.get(i)));
+				//System.out.println(m_entites.get(i));
 		}
+		return list;
 	}
 	
 	public static final void saveAll()

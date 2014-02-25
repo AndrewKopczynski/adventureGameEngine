@@ -1,7 +1,9 @@
 package apk.parser.reference;
 
+import apk.main.engine.Actor;
+
 /** MessageType.java
- * - Describes messages sent to clients so that they recieve the right messages.
+ * - Describes messages sent to clients so that they receive the right messages.
  * <p>
  * <ul>Messages:
  * 
@@ -38,9 +40,9 @@ package apk.parser.reference;
  * </ul>
  * 
  * <ul>Notes
- * <li>MSG_PERSONAL takes four arguments - [MSG_PERSONAL] [%SOURCE] [%ACTION] [%TARGET]
- * <li>MSG_ROOMWIDE takes five arguments - [MSG_ROOMWIDE] [%ACTOR]  [%SOURCE] [%TARGET] [%TARGET2]
- * <li>MSG_AREAWIDE takes five arguments - [MSG_AREAWIDE] [%SIZE]   [%SOURCE] [%ACTION] [%TARGET]
+ * <li>MSG_PERSONAL takes five arguments - [MSG_PERSONAL] [%ACTOR] [%ACTION] [%TARGET]            {CONTENTS OF MESSAGE}
+ * <li>MSG_ROOMWIDE takes six arguments -  [MSG_ROOMWIDE] [%ACTOR] [%ACTION] [%TARGET] [%TARGET2] {CONTENTS OF MESSAGE}
+ * <li>MSG_AREAWIDE takes six arguments -  [MSG_AREAWIDE] [%SIZE]  [%ACTOR]  [%ACTION] [%TARGET]  {CONTENTS OF MESSAGE}
  * </ul>
  * 
  * @author Andrew Kopczynski
@@ -48,7 +50,7 @@ package apk.parser.reference;
  */
 public class MessageType
 {
-	/** A message that should only be recieved by the person
+	/** A message that should only be received by the person
 	 * performing the action.
 	 * <p>
 	 * <ul><i><b>Examples:</b></i>
@@ -58,8 +60,9 @@ public class MessageType
 	 * </ul>
 	 */
 	public static final int MSG_PERSONAL = 0;
+	public static final int MSG_PERSONAL_LENGTH = 4; //how long the message stuff is before the contents
 	
-	/** A message that should be recieved by everyone in the same
+	/** A message that should be received by everyone in the same
 	 * room (X/Y/Z coordinates)
 	 * <p>
 	 * <ul><i><b>Examples:</b></i>
@@ -68,8 +71,9 @@ public class MessageType
 	 * <li>Generally any action involving two actors
 	 */
 	public static final int MSG_ROOMWIDE = 1;
+	public static final int MSG_ROOMWIDE_LENGTH = 5; //how long the message stuff is before the contents
 	
-	/** A message that should be recieved by people in a given area.
+	/** A message that should be received by people in a given area.
 	 * <p>
 	 * <ul><i><b>Examples:</b></i>
 	 * <li>A loud noise like an explosion
@@ -77,4 +81,40 @@ public class MessageType
 	 * <li>Generally any other loud, noise based event.
 	 */
 	public static final int MSG_AREAWIDE = 2;
+	public static final int MSG_AREAWIDE_LENGTH = 5; //how long the message stuff is before the contents
+	
+	public static String[] personal(Actor actor, String action, String target, String[] contents)
+	{
+		//simply put, this message means the following:
+		//this is a PERSONAL MESSAGE to the ACTOR (followed by extra stuff describing what they did)
+		String[] msg = {"" + MSG_PERSONAL, actor.toString(), action, target};
+		String[] compiled = new String[msg.length + contents.length];
+		
+		System.arraycopy(msg, 0, compiled, 0, msg.length);
+		System.arraycopy(contents, 0, compiled, msg.length, contents.length);
+		
+		return compiled;
+	}
+	
+	public static String[] roomwide(Actor actor, String action, String target, String target2, String[] contents)
+	{
+		String[] msg = {"" + MSG_ROOMWIDE, actor.toString(), action, target, target2};
+		String[] compiled = new String[msg.length + contents.length];
+		
+		System.arraycopy(msg, 0, compiled, 0, msg.length);
+		System.arraycopy(contents, 0, compiled, msg.length, contents.length);
+		
+		return compiled;
+	}
+	
+	public static String[] areawide(int size, Actor actor, String action, String target, String[] contents)
+	{
+		String[] msg = {"" + MSG_AREAWIDE, "" + size, actor.toString(), action, target};
+		String[] compiled = new String[msg.length + contents.length];
+		
+		System.arraycopy(msg, 0, compiled, 0, msg.length);
+		System.arraycopy(contents, 0, compiled, msg.length, contents.length);
+		
+		return compiled;
+	}
 }

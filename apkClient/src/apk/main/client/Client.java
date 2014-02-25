@@ -57,7 +57,7 @@ public class Client implements Runnable
 			}
 			catch (NullPointerException e)
 			{
-				System.err.println("Timer stopped abrubtly: " + e);
+				System.err.println("Connection dropped.");
 				timer.stop();
 				return;
 			}
@@ -153,7 +153,7 @@ public class Client implements Runnable
 				}
 				else
 				{
-					System.out.println(buffer.length());
+					System.out.println("[debug: " + buffer.length() + "]");
 					//buffer = responseLine;
 					timer.start();
 				}
