@@ -2,11 +2,19 @@ package apk.main.engine;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+
+import static apk.main.engine.Logger.printDebug;
 import apk.parser.reference.EntityIntializationException;
 import apk.parser.reference.IDConflictException;
 
@@ -67,9 +75,7 @@ public class Entity
 	// entities can only be created in inventories of actors
 	public Entity(String name, int type, int hpMax, int hp, Actor parent) throws EntityIntializationException //actor
 	{		
-		System.out.println("---------------------------------");
-		System.out.println("CREATING ENTITY WITH ACTOR PARENT");
-		System.out.println("---------------------------------");
+		printDebug("CREATING ENTITY WITH ACTOR PARENT");
 		
 		m_id = ID.add();
 		m_ents.put(m_id, this);
@@ -91,17 +97,15 @@ public class Entity
 		else
 			throw new EntityIntializationException();
 		
-		Logger.log("Created new ent '" + getName() +  "' @ " + m_parent + "'s inventory.");
 		
-		//writeSave();
+		Logger.log("Created new ent '" + getName() +  "' @ " + m_parent + "'s inventory.");
+		printDebug("DONE!");
 	}
 	
 	// entities can only be created in inventories of actors
 	public Entity(String name, int type, int hpMax, int hp, Entity parent) //ent
 	{
-		System.out.println("----------------------------------");
-		System.out.println("CREATING ENTITY WITH ENTITY PARENT");
-		System.out.println("----------------------------------");
+		printDebug("CREATING ENTITY WITH ENTITY PARENT");
 		
 		m_id = ID.add();
 		m_ents.put(m_id, this);
@@ -116,7 +120,7 @@ public class Entity
 		
 		Logger.log("Created new entity '" + getName() + "' @ " + m_parent + "'s inventory.");
 		
-		writeSave();
+		printDebug("DONE!");
 	}
 	
 	/** Creates a new entity from a file.
@@ -125,12 +129,82 @@ public class Entity
 	 * but can also be used for template entities.
 	 * 
 	 * @param filePath exampleEntity[id]
+	 * @throws IDConflictException 
+	 * @throws DocumentException 
 	 */
-	public Entity(String filePath) throws FileNotFoundException
+	public Entity(String filePath) throws FileNotFoundException, IDConflictException, DocumentException
 	{	
-		System.out.println("------------------------");
-		System.out.println("LOADING ENTITY FROM FILE");
-		System.out.println("------------------------");
+		printDebug("LOADING ENTITY FROM FILE");
+		
+		try
+		{
+			URL entURL = new File(filePath).toURI().toURL();
+			
+			int id;
+			int type;
+			int hpMax = -1;
+			int hp = -1;
+			
+			String name;
+			String parent;
+			//String[] split;
+			
+			Document actorD = XMLReader.parse(entURL);
+			Element root = actorD.getRootElement();
+			
+			id = Integer.parseInt(root.attributeValue("id"));
+			type = Integer.parseInt(root.attributeValue("type"));
+			
+			name = root.attributeValue("name");
+			parent = root.attributeValue("inInventoryOf");
+			
+			for (Iterator<Element> i = root.elementIterator("health"); i.hasNext();)
+			{
+				Element element = (Element) i.next();
+				
+				hpMax = Integer.parseInt(element.attributeValue("hpMax"));
+				hp = Integer.parseInt(element.attributeValue("hp"));
+			}
+			
+			for (Iterator<Element> i = root.elementIterator("inventory"); i.hasNext();)
+			{
+				Element element = (Element) i.next();
+				for (Iterator<Element> j = element.elementIterator(); j.hasNext();)
+				{
+					Element children = (Element) j.next();
+					System.out.println(children.getText()); //TODO add stuff to inventory
+				}
+			}
+			
+			m_id = id;
+			m_parent = parent;
+			ID.add(m_id);
+			
+			m_type = type;
+			m_name = name;
+			m_hpMax = hpMax;
+			m_hp = hp;
+			
+			/*split = coords.split(",");
+			m_x = Integer.parseInt(split[0]);
+			m_y = Integer.parseInt(split[1]);
+			m_z = Integer.parseInt(split[2]);*/
+			
+			/* put into list of actors */
+			m_ents.put(m_id, this);
+			
+			printDebug("DONE!");
+		}
+		catch (MalformedURLException e)
+		{
+			printDebug("FAILED TO LOAD ACTOR FROM FILE");
+			e.printStackTrace();
+		}
+		finally
+		{
+			printDebug("FINISHED LOADING ACTOR FROM FILE");
+		}
+		
 		
 		/*try
 		{
@@ -181,6 +255,7 @@ public class Entity
 		{
 			kill();
 		}*/
+		printDebug("DONE!");
 	}
 	
 	/** Write to save file. */

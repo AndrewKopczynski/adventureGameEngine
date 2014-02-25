@@ -87,4 +87,16 @@ public class Logger
 				System.out.println(((m_stop - m_start) / 1000000) + "ms");
 		}
 	}
+	
+	public static void printDebug(String s)
+	{
+		for (int i = 0; i < s.length() && !s.substring(i, i+1).equalsIgnoreCase("\n"); i++)
+			System.err.print("-");
+		System.err.println();
+		System.err.println(s.toUpperCase());
+		
+		for (int i = 0; i < s.length() && !s.substring(i, i+1).equalsIgnoreCase("\n"); i++)
+			System.err.print("-");
+		System.err.println();
+	}
 }

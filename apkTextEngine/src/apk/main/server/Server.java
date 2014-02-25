@@ -1,7 +1,9 @@
 package apk.main.server;
 
+import static apk.main.engine.Logger.printDebug;
 import static apk.parser.reference.ActorType.*;
 import static apk.parser.reference.MessageType.*;
+
 import apk.parser.reference.ActorIntializationException;
 import apk.parser.reference.IDConflictException;
 import apk.main.engine.Logger;
@@ -10,14 +12,15 @@ import apk.main.engine.Parse;
 import apk.main.engine.Actor;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.ServerSocket;
-import java.net.URL;
+
+/*import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;*/
 
 import org.dom4j.DocumentException;
 
@@ -26,7 +29,6 @@ import org.dom4j.DocumentException;
 */
 public class Server
 {
-	
 	// The server socket.
 	private static ServerSocket serverSocket = null;
 	// The client socket.
@@ -40,32 +42,24 @@ public class Server
 	{
 		/**all modified lines are marked with //z for the sake of clarity*/
 		
+		printDebug("SERVER IS STARTING UP!"); //z
 		Logger.clear(); //z
-		//new World("maps/test_map.xml", "gfx/standard_tileset.xml"); //z
+		
 		try
 		{	
-			URL worldURL = new File("maps/test_map.xml").toURI().toURL();
-			URL tilesetURL = new File("gfx/standard_tileset.xml").toURI().toURL();
-			
-			new World(worldURL, tilesetURL);
+			new World("maps/test_map.xml", "gfx/standard_tileset.xml");
 		}
-		catch (MalformedURLException e)
+		catch (DocumentException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
+			printDebug("FAILED TO LOAD MAP OR TILESET!");
 			e.printStackTrace();
 		}
-		
-		System.out.println("Starting server..."); //z
 		
 		// The default port number.
 		int portNumber = 2222;
 		if (args.length < 1)
 		{
-			System.out.println("Usage: java MultiThreadChatServerSync <portNumber>\n"
-				+ "Now using port number: " + portNumber);
+			printDebug("USAGE: java server [portNumber]\n" + "NOW USING PORT NUMBER: " + portNumber); //z
 		}
 		else
 		{
@@ -78,13 +72,13 @@ public class Server
 		*/
 		try 
 		{
-			//z
-			System.out.println("Opening connection...");
+			printDebug("OPENING CONNECTION ON PORT " +  portNumber); //z
 			serverSocket = new ServerSocket(portNumber);
 		}
 		catch (IOException e)
 		{
-			System.out.println(e);
+			printDebug("FAILED TO START SERVER! PORT NUMBER IS PROBABLY ALREADY IN USE!");
+			e.printStackTrace();
 		}
 	
 		/*
@@ -96,9 +90,9 @@ public class Server
 			try
 			{
 				clientSocket = serverSocket.accept();
-				//z
-				System.out.print("Client connecting... ");
-				System.out.println(clientSocket.toString());
+				
+				printDebug("CLIENT CONNECTING"); //z
+				printDebug(clientSocket.toString());
 				
 				int i = 0;
 				for (i = 0; i < maxClientsCount; i++)
@@ -130,7 +124,7 @@ public class Server
 	}
 }
 
-/*
+/**
 * The chat client thread. This client thread opens the input and the output
 * streams for a particular client, ask the client's name, informs all the
 * clients connected to the server about the fact that a new client has joined
@@ -207,39 +201,39 @@ class clientThread extends Thread
 						{
 							try
 							{
-								URL playerURL = new File("ent/" + clientName + ".xml").toURI().toURL();
-								m_player = new Actor(playerURL);
+								//URL playerURL = new File("ent/" + clientName + ".xml").toURI().toURL();
+								m_player = new Actor("ent/" + clientName + ".xml");
 							}
 							catch (ActorIntializationException e)
 							{
 								System.out.println("Actor failed to intialize!");
 								e.printStackTrace();
 								
-								System.out.println("DID NOT LOAD FROM FILE");
+								printDebug("DID NOT LOAD FROM FILE");
 								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
 							}
 							catch (IDConflictException e)
 							{
-								System.out.println("Conflicting IDs!");
+								printDebug("Conflicting IDs!");
 								e.printStackTrace();
 								
-								System.out.println("DID NOT LOAD FROM FILE");
+								printDebug("DID NOT LOAD FROM FILE");
 								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
 							}
-							catch (MalformedURLException e)
+							/*catch (MalformedURLException e)
 							{
 								System.out.println("ent/" + clientName + " not found!");
 								e.printStackTrace();
 								
 								System.out.println("DID NOT LOAD FROM FILE");
 								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
-							}
+							}*/
 							catch (DocumentException e)
 							{
-								System.out.println("ent/" + clientName + " not found!");
-								e.printStackTrace();
+								printDebug("ent/" + clientName + " not found!");
+								//e.printStackTrace(); //its really long and spammy okay
 								
-								System.out.println("DID NOT LOAD FROM FILE");
+								printDebug("DID NOT LOAD FROM FILE");
 								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
 							}
 						}
@@ -292,16 +286,15 @@ class clientThread extends Thread
 				}
 				catch(Exception e)
 				{
-					System.out.println("bad message type");
+					System.out.println("Bad message type!");
 					//e.printStackTrace();
 				}
 				
-				System.out.println("Message length: " + msgRecieved.length);
-				System.out.println("FormatLines: " + formatLines);
+				//System.out.println("Message length: " + msgRecieved.length);
+				//System.out.println("FormatLines: " + formatLines);
 				
 				for (int i = formatLines; i < msgRecieved.length; i++)
 				{
-					System.out.println("formatting!");
 					msgFormatted += msgRecieved[i];
 					if (i < msgRecieved.length - 1)
 					{
@@ -311,9 +304,6 @@ class clientThread extends Thread
 				
 				if(msgRecieved.length > 0 && msgRecieved[0] != null)
 				{
-					//System.out.println("recieved is GREATER THAN 0 THINGS");
-					//System.out.println(msgRecieved[0]);
-					
 					synchronized (this)
 					{
 						for (int i = 0; i < threads.length; i++) //max clients -> threads
@@ -325,7 +315,7 @@ class clientThread extends Thread
 								&& threads[i].clientName != null
 								)
 							{
-								System.out.println("did self message for " + m_player.getName());
+								//System.out.println("did self message for " + m_player.getName());
 								//this.os.println(get);
 								threads[i].os.println(msgFormatted);
 								//threads[i].os.println(protocol.processInput(line));

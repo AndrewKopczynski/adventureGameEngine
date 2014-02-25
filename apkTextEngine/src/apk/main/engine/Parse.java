@@ -1,5 +1,6 @@
 package apk.main.engine;
 
+import static apk.main.engine.Logger.printDebug;
 import static apk.parser.reference.ActorType.*;
 import apk.parser.action.*;
 import apk.parser.reference.MessageType;
@@ -31,7 +32,7 @@ public class Parse {
 	public Parse()
 	{
 		Logger.log("Loading parsers and wordlists...");
-		System.out.println("Loading parser...");
+		printDebug("Loading parser...");
 	}
 	
 	/** Collapses a string array from a to b in a String array. */
@@ -173,8 +174,8 @@ public class Parse {
 					return msg;
 				}
 			}
-			return m_take.getError(att[0]);
 			
+			return m_take.getError(att[0]);
 		}
 		
 		/** PUT -----------------------------------------------------------	|*/
@@ -212,21 +213,22 @@ public class Parse {
 		else if (m_status.check(att))
 		{
 			msg[0] = actor.printMeter(actor.getHP(), actor.getHP(), actor.getHPMax(), 30);
-			return msg;
+			
+			return MessageType.personal(actor, "STATUS", actor.toString(), msg);
 		}
 		
 		/** TAC*TICAL -----------------------------------------------------	|*/
 		else if (m_tactical.check(att))
 		{
 			msg = m_tactical.getActorsTacticalInRoom(actor);
-			//msg[0] = actor.printNamedHealthBar();
-			return msg;
+			
+			return MessageType.personal(actor, "TACTICAL", actor.getXYZ(), msg);
 		}
 		
 		/** I*NVENTORY ----------------------------------------------------	|*/
 		else if (m_inventory.check(att))
 		{
-			return actor.getInventory();
+			return MessageType.personal(actor, "INVENTORY", actor.toString(), msg);
 		}
 		
 		/** ADMIN STUFF ---------------------------------------------------	|*/
@@ -239,14 +241,15 @@ public class Parse {
 				{
 					actor.setVisionRange(Integer.parseInt(att[1]));
 					msg[0] = "Set visibility range to " + att[1];
-					return msg;
+					
+					return MessageType.personal(actor, "@SETVIS", actor.toString(), msg);
 				}
 				
 				catch(Exception e)
 				{	
 					e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [number]";
-					return msg;
+					return MessageType.personal(actor, "@SETVIS", actor.toString(), msg);
 				}
 			}
 			
@@ -265,12 +268,12 @@ public class Parse {
 					if (actor.addToInventory(entity))
 					{
 						msg[0] = "Gave " + name + " to " + actor.toString();
-						return msg;
+						return MessageType.personal(actor, "@GIVE", actor.toString(), msg);
 					}
 					else
 					{
 						msg[0] = "Couldn't give " + name + " to " + actor.toString();
-						return msg;
+						return MessageType.personal(actor, "@GIVE", actor.toString(), msg);
 					}
 				}
 				
@@ -278,7 +281,7 @@ public class Parse {
 				{
 					e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [itemName] [maxHp]";
-					return msg;
+					return MessageType.personal(actor, "@GIVE", actor.toString(), msg);
 				}
 			}
 			/** deleteItem */
@@ -290,21 +293,20 @@ public class Parse {
 					
 					if (actor.delFromInventory(name))
 					{
-						
 						msg[0] = "Deleted " + name + " from " + actor.toString();
-						return msg;
+						return MessageType.personal(actor, "@DEL", actor.toString(), msg);
 					}
 					else
 					{
 						msg[0] = "Couldn't delete " + name + " from " + actor.toString();
-						return msg;
+						return MessageType.personal(actor, "@DEL", actor.toString(), msg);
 					}
 				}
 				catch(Exception e)
 				{
 					
 					msg[0] = "Usage: " + att[0] + " [itemName]";
-					return msg;
+					return MessageType.personal(actor, "@DEL", actor.toString(), msg);
 				}
 			}
 			/** noclip */
@@ -315,13 +317,13 @@ public class Parse {
 					actor.ignoresCollision(Boolean.parseBoolean(att[1]));
 
 					msg[0] = "noclip = " + att[1];
-					return msg;
+					return MessageType.personal(actor, "@NOCLIP", actor.toString(), msg);
 				}
 				catch(Exception e)
 				{
 					e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [true/false]";
-					return msg;
+					return MessageType.personal(actor, "@NOCLIP", actor.toString(), msg);
 				}
 			}
 			/** hurt */
@@ -333,13 +335,13 @@ public class Parse {
 					
 					msg[0] = "Inflicted " + att[1] + " point(s) of damage to '" 
 						+ actor.toString() + "'.";
-					return msg;
+					return MessageType.personal(actor, "@HURT", actor.toString(), msg);
 				}
 				catch(Exception e)
 				{
 					e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [value]";
-					return msg;
+					return MessageType.personal(actor, "@HURT", actor.toString(), msg);
 				}
 			}
 			/** heal */
@@ -351,13 +353,13 @@ public class Parse {
 					
 					msg[0] = "Healed " + att[1] + " point(s) of damage from '" 
 							+ actor.toString() + "'.";
-					return msg;
+					return MessageType.personal(actor, "@HEAL", actor.toString(), msg);
 				}
 				catch(Exception e)
 				{
 					e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [value]";
-					return msg;
+					return MessageType.personal(actor, "@HEAL", actor.toString(), msg);
 				}
 			}
 			/** debug */
@@ -371,7 +373,7 @@ public class Parse {
 				System.arraycopy(t2, 0, msg, t1.length, t2.length);
 				
 				msg[msg.length - 1] = "----------------";
-				return msg;
+				return MessageType.personal(actor, "@DEBUG", actor.toString(), msg);
 			}
 			/** test - spawns four actors at the caller's coordinates */
 			else if (m_admin.getMeaning(att[0]).equals("test"))
@@ -381,7 +383,7 @@ public class Parse {
 					new Actor(actor.getX(), actor.getY(), actor.getZ(), "npc_test_" + i, TYPE_ALIVE, 30, 30);
 				}
 				msg[0] = "created some dummy npcs at " + actor.getXYZ();
-				return msg;
+				return MessageType.personal(actor, "@TEST", actor.toString(), msg);
 			}
 			else if (m_admin.getMeaning(att[0]).equals("stress"))
 			{
@@ -403,13 +405,13 @@ public class Parse {
 							30);
 					
 				}
-				return msg;
+				return MessageType.personal(actor, "@STRESSTEST", actor.toString(), msg);
 			}
 			/** if invalid */
 			else
 			{
 				msg[0] = "'" + att[0] + "' doesn't seem to be a valid command.";
-				return msg;
+				return MessageType.personal(actor, "@STRESSTEST", actor.toString(), msg);
 			}
 		}
 		
@@ -419,7 +421,7 @@ public class Parse {
 		else if (m_quit.check(att))
 		{
 			msg[0] = "Logging out...";
-			return msg;
+			return MessageType.personal(actor, "@QUIT", actor.toString(), msg);
 		}
 		
 		/** NO MATCH ------------------------------------------------------	|
@@ -427,7 +429,7 @@ public class Parse {
 		else
 		{
 			msg[0] = input + " for entity " + actor + " isn't a valid command.";
-			return msg;
+			return MessageType.personal(actor, "ERROR", collapse(att, 1, att.length), msg);
 		}
 	}
 }

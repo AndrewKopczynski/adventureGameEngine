@@ -1,5 +1,7 @@
 package apk.main.engine;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 
@@ -16,15 +18,26 @@ public class World
 	private static int m_mapSize;
 	private static Room[][][] m_world;
 	
-	public World(URL worldURL) throws DocumentException
-	{
-		loadWorld(worldURL);
-	}
-	
 	public World(URL worldURL, URL tileURL) throws DocumentException
 	{
 		loadWorld(worldURL);
 		loadTileset(tileURL);
+	}
+	
+	public World(String worldFilePath, String tileFilePath) throws DocumentException
+	{
+		try
+		{
+			URL worldURL = new File(worldFilePath).toURI().toURL();
+			URL tileURL = new File(tileFilePath).toURI().toURL();
+			
+			new World(worldURL, tileURL);
+		}
+		catch (MalformedURLException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void loadWorld(URL worldURL) throws DocumentException
