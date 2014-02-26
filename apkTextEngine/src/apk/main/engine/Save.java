@@ -25,7 +25,7 @@ public class Save
 
 	public static final void state()
 	{
-		XMLWriter w = new XMLWriter("save");
+		XML w = new XML("save");
 
 		String[] a = {"worldPath"				, "tilePath"};
 		String[] b = {World.getWorldFilePath()	, World.getTileFilePath()};
@@ -45,7 +45,7 @@ public class Save
 	{
 		URL saveURL = new File(saveFilePath).toURI().toURL();
 		
-		Document saveD = XMLReader.parse(saveURL);
+		Document saveD = XML.parse(saveURL);
 		Element root = saveD.getRootElement();
 		
 		String world = root.attributeValue("worldPath");

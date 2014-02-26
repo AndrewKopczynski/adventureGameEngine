@@ -91,19 +91,23 @@ public class Logger
 	
 	public static void printDebug(String s)
 	{
-		System.out.println(getLine(s));
-		System.out.println(s.toUpperCase());
-		System.out.println(getLine(s));
+		//System.out.println(getLine(s));
+		//System.out.println(s.toUpperCase());
+		//System.out.println(getLine(s));
+		
+		log(getLine(s));
+		log(s.toUpperCase());
+		log(getLine(s));
 	}
 	
-	public static void printDebug(boolean headerFooter, String s)
+	/*public static void printDebug(boolean headerFooter, String s)
 	{
 		if (headerFooter)
 			System.out.println(getLine(s));
 		System.out.println(s);
 		if (!headerFooter)
 			System.out.println(getLine(s));
-	}
+	}*/
 	
 	private static String getLine(String s)
 	{

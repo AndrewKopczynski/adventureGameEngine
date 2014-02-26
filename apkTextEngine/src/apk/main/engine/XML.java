@@ -1,15 +1,27 @@
 package apk.main.engine;
 
 import java.io.*;
+import java.net.URL;
 
-public class XMLWriter
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
+
+public class XML //TODO: maybe change writing to dom4j? It works pretty well right now tho
 {
-	
 	private String m_filePath;
 	private PrintWriter m_out = null;
 	private int m_tab = 0;
 	
-	public XMLWriter(String filePath)
+	public static Document parse(URL url) throws DocumentException
+	{
+		SAXReader reader = new SAXReader();
+		Document document = reader.read(url);
+		
+		return document;
+	}
+	
+	public XML(String filePath)
 	{
 		m_filePath = filePath;
 		

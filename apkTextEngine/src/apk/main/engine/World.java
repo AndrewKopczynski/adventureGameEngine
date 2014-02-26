@@ -48,7 +48,7 @@ public class World
 	
 	private void loadWorld(URL worldURL) throws DocumentException
 	{
-		Document worldD = XMLReader.parse(worldURL);
+		Document worldD = XML.parse(worldURL);
 		
 		Element root = worldD.getRootElement();
 		String worldName = root.attributeValue("name");
@@ -74,7 +74,7 @@ public class World
 	
 	public void loadTileset(URL tileURL) throws DocumentException
 	{
-		Document tileD = XMLReader.parse(tileURL);
+		Document tileD = XML.parse(tileURL);
 		
 		Element root = tileD.getRootElement();
 		

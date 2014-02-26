@@ -132,7 +132,7 @@ public class Actor extends Entity
 			String coords;
 			String[] split;
 			
-			Document actorD = XMLReader.parse(actorURL);
+			Document actorD = XML.parse(actorURL);
 			Element root = actorD.getRootElement();
 			
 			id = Integer.parseInt(root.attributeValue("id"));
@@ -244,7 +244,7 @@ public class Actor extends Entity
 		System.out.println("HP  : " + m_hp);
 		
 		//create file (eg. ent/player[0].xml)
-		XMLWriter w = new XMLWriter(getFilePath());
+		XML w = new XML(getFilePath());
 		
 		//fetch id, name, type, and coords
 		String[] a = {"id", "name", "type", "coords"};
