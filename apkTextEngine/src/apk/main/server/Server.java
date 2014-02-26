@@ -3,24 +3,28 @@ package apk.main.server;
 import static apk.main.engine.Logger.printDebug;
 import static apk.parser.reference.ActorType.*;
 import static apk.parser.reference.MessageType.*;
-
 import apk.parser.reference.ActorIntializationException;
 import apk.parser.reference.IDConflictException;
 import apk.main.engine.Logger;
-import apk.main.engine.World;
+import apk.main.engine.Save;
+//import apk.main.engine.World;
 import apk.main.engine.Parse;
 import apk.main.engine.Actor;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.ServerSocket;
 
 /*import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;*/
+
+
 
 import org.dom4j.DocumentException;
 
@@ -47,11 +51,24 @@ public class Server
 		
 		try
 		{	
-			new World("maps/test_map.xml", "gfx/standard_tileset.xml");
+			Save.load("save.xml");
+			//new World("maps/test_map.xml", "gfx/standard_tileset.xml");
 		}
 		catch (DocumentException e)
 		{
 			printDebug("FAILED TO LOAD MAP OR TILESET!");
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IDConflictException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ActorIntializationException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

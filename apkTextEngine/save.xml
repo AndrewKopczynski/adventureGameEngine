@@ -1,8 +1,9 @@
 <?xml version="1.0" ?>
-<save map="test_map" path="maps/test_map.xml">
-	<load>
-		<actor>zesty</actor>
-		<actor>testGuy</actor>
-		<actor>otherPerson</actor>
-	</load>
+<save worldPath="maps/test_map.xml" tilePath="gfx/standard_tileset.xml">
+	<actor>player_zesty[32]</actor>
+	<actor>npc_test_0[36]</actor>
+	<actor>npc_test_1[37]</actor>
+	<actor>npc_test_2[38]</actor>
+	<actor>npc_test_3[39]</actor>
+	<actor>player_npc_test_0[40]</actor>
 </save>

@@ -49,17 +49,17 @@ import apk.parser.reference.IDConflictException;
  * */
 public class Entity
 {	
-	private static Map<Integer, Entity> m_ents = new HashMap<Integer, Entity>();
 	private static final int DEFAULT_VISIBILITY = 3; //how far an actor/entity can see
-	
+	private static Map<Integer, Entity> m_ents = new HashMap<Integer, Entity>();
 	protected List<Entity> m_inv = new ArrayList<Entity>();
+	
 	protected int m_id;
 	protected String m_name;
 	protected int m_hpMax;
 	protected int m_hp;
 	protected boolean m_ignoresCollision = false;
 	
-	private String m_parent;
+	private Actor m_parent; //todo: entity parents later
 	protected int m_type;
 	
 	protected int m_visionRange = DEFAULT_VISIBILITY;
@@ -86,24 +86,22 @@ public class Entity
 		m_hpMax = hpMax;
 		m_hp = hp;
 		
-		if (parent != null)
-		{
-			m_parent = parent.toString();
-		/*	
-			System.out.println(m_parent.getName());
-			System.out.println(m_parent.getId());
-			System.out.println(m_parent.toString());*/
-		}
-		else
-			throw new EntityIntializationException();
+		setParent(parent);
 		
+		System.out.println("CREATED ENTITY WITH FOLLOWING:");
+		System.out.println("LIST: " + m_ents.get(m_id));
+		System.out.println("ID  : " + m_id);
+		System.out.println("PAR : " + m_parent);
+		System.out.println("NAME: " + m_name);
+		System.out.println("TYPE: " + m_type);
+		System.out.println("MXHP: " + m_hpMax);
+		System.out.println("HP  : " + m_hp);
 		
-		Logger.log("Created new ent '" + getName() +  "' @ " + m_parent + "'s inventory.");
-		printDebug("DONE!");
+		printDebug("DONE CREATING ENTITY WITH ACTOR PARENT");
 	}
 	
 	// entities can only be created in inventories of actors
-	public Entity(String name, int type, int hpMax, int hp, Entity parent) //ent
+	/*public Entity(String name, int type, int hpMax, int hp, Entity parent) //ent
 	{
 		printDebug("CREATING ENTITY WITH ENTITY PARENT");
 		
@@ -116,12 +114,12 @@ public class Entity
 		m_hpMax = hpMax;
 		m_hp = hp;
 		
-		m_parent = parent.toString();
+		m_parent = parent;
 		
 		Logger.log("Created new entity '" + getName() + "' @ " + m_parent + "'s inventory.");
 		
 		printDebug("DONE!");
-	}
+	}*/
 	
 	/** Creates a new entity from a file.
 	 * <p>
@@ -131,8 +129,11 @@ public class Entity
 	 * @param filePath exampleEntity[id]
 	 * @throws IDConflictException 
 	 * @throws DocumentException 
+	 * @throws EntityIntializationException 
 	 */
-	public Entity(String filePath) throws FileNotFoundException, IDConflictException, DocumentException
+	public Entity(String filePath, Actor parent)
+			throws FileNotFoundException,IDConflictException,
+			DocumentException, EntityIntializationException
 	{	
 		printDebug("LOADING ENTITY FROM FILE");
 		
@@ -146,7 +147,7 @@ public class Entity
 			int hp = -1;
 			
 			String name;
-			String parent;
+			//String parent;
 			//String[] split;
 			
 			Document actorD = XMLReader.parse(entURL);
@@ -156,7 +157,7 @@ public class Entity
 			type = Integer.parseInt(root.attributeValue("type"));
 			
 			name = root.attributeValue("name");
-			parent = root.attributeValue("inInventoryOf");
+			//parent = root.attributeValue("inInventoryOf");
 			
 			for (Iterator<Element> i = root.elementIterator("health"); i.hasNext();)
 			{
@@ -176,92 +177,62 @@ public class Entity
 				}
 			}
 			
+			/* print out everything before assignment*/
+			System.out.println("LOADED THE FOLLOWING:");
+			System.out.println("LIST: " + m_ents.get(m_id));
+			System.out.println("ID  : " + id);
+			System.out.println("PAR : " + parent);
+			System.out.println("NAME: " + name);
+			System.out.println("TYPE: " + type);
+			System.out.println("MXHP: " + hpMax);
+			System.out.println("HP  : " + hp);
+			
 			m_id = id;
-			m_parent = parent;
 			ID.add(m_id);
 			
+			//m_parent = Actor.getActorsByNameAndID(parent);
+			setParent(parent);
 			m_type = type;
 			m_name = name;
 			m_hpMax = hpMax;
 			m_hp = hp;
 			
-			/*split = coords.split(",");
-			m_x = Integer.parseInt(split[0]);
-			m_y = Integer.parseInt(split[1]);
-			m_z = Integer.parseInt(split[2]);*/
-			
-			/* put into list of actors */
+			/* put into list of entities */
 			m_ents.put(m_id, this);
 			
-			printDebug("DONE!");
+			System.out.println("\nCREATED ENTITY WITH FOLLOWING:");
+			System.out.println("LIST: " + m_ents.get(m_id));
+			System.out.println("ID  : " + m_id);
+			System.out.println("PAR : " + m_parent);
+			System.out.println("NAME: " + m_name);
+			System.out.println("TYPE: " + m_type);
+			System.out.println("MXHP: " + m_hpMax);
+			System.out.println("HP  : " + m_hp);
 		}
 		catch (MalformedURLException e)
 		{
-			printDebug("FAILED TO LOAD ACTOR FROM FILE");
+			printDebug("FAILED TO LOAD ENTITY FROM FILE");
 			e.printStackTrace();
 		}
 		finally
 		{
-			printDebug("FINISHED LOADING ACTOR FROM FILE");
+			printDebug("FINISHED LOADING ENTITY FROM FILE");
 		}
-		
-		
-		/*try
-		{
-			String[] entElements = {"entity", "health", "inInventoryOf"};
-			XMLReader invXML = new XMLReader(filePath, entElements);
-			
-			m_id = Integer.parseInt(invXML.getAttribute("entity", 0, "id"));
-			ID.add(m_id);
-			
-			m_ents.put(m_id, this);
-			
-			m_name = invXML.getAttribute("entity", 0, "name");
-			m_type = Integer.parseInt(invXML.getAttribute("entity", 0, "type"));
-			
-			//inv
-			String t2 = invXML.getAttribute("entity", 0, "inInventoryOf");
-			System.out.println("WS: " + t2);
-			System.out.println("WS: " + Actor.stripID(t2));
-			System.out.println("WS: " + Actor.getActorsByName(t2));
-			
-			//m_parent = Actor.getByName(invXML.getAttribute("entity", 0, "inInventoryOf"));
-			m_parent = invXML.getAttribute("entity", 0, "inInventoryOf");
-			
-			Logger.log("Adding '" + m_name + "' to list with ID '" + m_id + "'...");
-			
-			m_hpMax = Integer.parseInt(invXML.getAttribute("health", 0, "hpMax"));
-			m_hp = Integer.parseInt(invXML.getAttribute("health", 0, "hp"));
-			
-			String ents[] = invXML.getChildren("inventory", 0);
-			for (int a = 1; a < ents.length; a += 2)
-			{
-				//System.out.println("found ent: " + ents[a]);
-				if (!ents[a].equals(toString()))
-				{
-					addToInventory(new Entity("ent/" + ents[a] + ".xml"));
-				}
-				else
-				{
-					String err = "!CRTICAL! ENTITY " + toString() + "TRIED TO LOAD ITSELF!"
-							+ " CHECK ENTITY FILE " + getFilePath() + "!";
-					System.out.println(err);
-					Logger.log(err);
-				}
-			}
-			writeSave();
-		}
-		catch (IDConflictException e)
-		{
-			kill();
-		}*/
-		printDebug("DONE!");
 	}
 	
 	/** Write to save file. */
 	public void writeSave() //TODO merge actor and entity saving~
 	{
 		Logger.start();
+		printDebug("WRITING SAVE FOR ENTITY");
+		System.out.println("SAVED ENTITY WITH FOLLOWING:");
+		System.out.println("LIST: " + m_ents.get(m_id));
+		System.out.println("ID  : " + m_id);
+		System.out.println("PAR : " + m_parent);
+		System.out.println("NAME: " + m_name);
+		System.out.println("TYPE: " + m_type);
+		System.out.println("MXHP: " + m_hpMax);
+		System.out.println("HP  : " + m_hp);
 		
 		//create file (eg. ent/player[0].xml)
 		XMLWriter w = new XMLWriter(getFilePath());
@@ -296,8 +267,8 @@ public class Entity
 		w.close();
 		Logger.log("Wrote " + toString() +"'s inventory to " + getFilePath());
 		
-		System.out.print("[ENTITY] Save write time: ");
 		Logger.stop(true);
+		printDebug("FINISHED WRITING SAVE FOR ENTITY");
 	}
 	
 	public int getId()
@@ -342,6 +313,18 @@ public class Entity
 	public void setVisionRange(int visionRange)
 	{
 		m_visionRange = visionRange;
+	}
+	
+	public Actor getParent()
+	{
+		return m_parent;
+	}
+	public void setParent(Actor parent) throws EntityIntializationException
+	{
+		if (parent != null)
+			m_parent = parent;
+		else
+			throw new EntityIntializationException();
 	}
 	
 	/** Damage this entity.
@@ -518,7 +501,8 @@ public class Entity
 		
 		if (m_inv.size() == 0)
 		{
-			msg[0] = "You're not carrying anything.";
+			String[] t = {"You're not carrying anything."};
+			return t;
 		}
 		else
 		{
@@ -534,46 +518,26 @@ public class Entity
 	
 	public boolean addToInventory(Entity entity)
 	{
-		System.out.println("tried to add " 
-				+ entity.toString() 
-				+ " to " 
-				//+ ((Entity) m_parent).toString()
-				+ "'s inventory.");
 		if (m_inv.add(entity))
-		{
-			System.out.println("did!");
 			return true;
-		}
 		else
-		{
-			System.out.println("failed!");
 			return false;
-		}
 	}
 	
-	public boolean hasInInventory(Entity entity)
+	public boolean hasInInv(Entity entity)
 	{
 		return m_inv.contains(entity);
 	}
-	public boolean hasInInventory(String string)
-	{
-		for (int i = 0; i < m_inv.size(); i++)
-		{
-			if (m_inv.get(i).getName().equalsIgnoreCase(string))
-				return true;
-		}
-		return false;
-	}
 	
-	public String dropFromInventory(int x, int y, int z, Entity entity)
+	public String dropFromInv(Entity entity)
 	{
 		
-		if (delFromInventory(entity))
+		if (m_inv.remove(entity))
 		{
 			String t = entity.getName();
 			
 			m_ents.remove(entity);
-			new Actor(x, y, z, entity);
+			new Actor(m_parent.getX(), m_parent.getY(), m_parent.getZ(), entity);
 			
 			return "Dropped '" + t + "'.";
 			//return "%DROP_DEFAULT";
@@ -581,7 +545,7 @@ public class Entity
 		else
 			return "%DROP_ERR";
 	}
-	public String dropFromInventory(int x, int y, int z, String name)
+	public String dropFromInv(String name)
 	{
 		for (int i = 0; i < m_inv.size(); i++)
 		{
@@ -589,49 +553,16 @@ public class Entity
 			//whoops forgot to remove it from the game also
 			
 			if (list.length > 0
-				&& hasInInventory(list[i])
-				&& delFromInventory(list[i]))
+				&& hasInInv(list[i])
+				&& m_inv.remove(list[i]))
 			{
 				String t = list[i].getName();
 				
-				new Actor(x, y, z, list[i]);
-				list[i].kill();
-				
+				new Actor(m_parent.getX(), m_parent.getY(), m_parent.getZ(), list[i]);
 				return "Dropped '" + t + "'.";
 			}
-			
-			
-			/*if (entity != null && delFromInventory(entity))
-			{
-				//m_entites.remove(entity);
-				new Actor(x, y, z, entity);
-				
-				entity.kill();
-				
-				return "Dropped '" + entity.getName() + "'.";
-				//return "%DROP_DEFAULT";
-			}*/
 		}
 		return "%DROP_ERR";
-	}
-	
-	public boolean delFromInventory(Entity entity)
-	{
-		boolean did = m_inv.remove(entity);
-		if (m_parent != null)
-		{
-			System.out.println("removing from inventory of " + m_parent.toString() + " " + did);
-		}
-		else
-		{
-			System.out.println("parent was null");
-		}
-		
-		return did;
-	}
-	public boolean delFromInventory(String name)
-	{
-		return m_inv.remove(getByName(name));
 	}
 	
 	public static Entity getById(int id)
@@ -730,13 +661,18 @@ public class Entity
 		{
 			System.out.println(e);
 		}
+		
+		ID.remove(m_id);
 		m_ents.remove(m_id); //no references, should clean up
 		m_name = null;
+		m_parent = null;
 		m_inv = null;
+		
 		try
 		{
 			this.finalize();
-		} catch (Throwable e)
+		}
+		catch (Throwable e)
 		{
 			System.err.println("Couldn't clean up entity!");
 			e.printStackTrace();

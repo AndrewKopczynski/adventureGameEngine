@@ -15,7 +15,10 @@ public class World
 	//TODO: level editor, should not be writing any maps by hand anymore
 	
 	public static final int HEIGHT_LIMIT = 512;
+	
 	private static int m_mapSize;
+	private static String m_worldFilePath;
+	private static String m_tileFilePath;
 	private static Room[][][] m_world;
 	
 	public World(URL worldURL, URL tileURL) throws DocumentException
@@ -28,6 +31,9 @@ public class World
 	{
 		try
 		{
+			m_worldFilePath = worldFilePath;
+			m_tileFilePath = tileFilePath;
+			
 			URL worldURL = new File(worldFilePath).toURI().toURL();
 			URL tileURL = new File(tileFilePath).toURI().toURL();
 			
@@ -121,5 +127,14 @@ public class World
 	public static Room[][][] getWorld()
 	{
 		return m_world;
+	}
+	
+	public static String getWorldFilePath()
+	{
+		return m_worldFilePath;
+	}
+	public static String getTileFilePath()
+	{
+		return m_tileFilePath;
 	}
 }

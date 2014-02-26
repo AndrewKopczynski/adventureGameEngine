@@ -81,6 +81,7 @@ public class Logger
 		
 		if (shouldPrint)
 		{
+			System.out.print("[EXECUTION TIME]");
 			if ((m_stop - m_start) / 1000000000 > 1)
 				System.out.println(((m_stop - m_start) / 1000000000) + "s");
 			else
@@ -90,13 +91,26 @@ public class Logger
 	
 	public static void printDebug(String s)
 	{
+		System.out.println(getLine(s));
+		System.out.println(s.toUpperCase());
+		System.out.println(getLine(s));
+	}
+	
+	public static void printDebug(boolean headerFooter, String s)
+	{
+		if (headerFooter)
+			System.out.println(getLine(s));
+		System.out.println(s);
+		if (!headerFooter)
+			System.out.println(getLine(s));
+	}
+	
+	private static String getLine(String s)
+	{
+		String t = "";
 		for (int i = 0; i < s.length() && !s.substring(i, i+1).equalsIgnoreCase("\n"); i++)
-			System.err.print("-");
-		System.err.println();
-		System.err.println(s.toUpperCase());
+			t += "-";
 		
-		for (int i = 0; i < s.length() && !s.substring(i, i+1).equalsIgnoreCase("\n"); i++)
-			System.err.print("-");
-		System.err.println();
+		return t;
 	}
 }

@@ -7,7 +7,7 @@ import apk.parser.reference.IDConflictException;
 public class ID
 {
 	private static List<Integer> m_id = new ArrayList<Integer>();
-	private static int m_lastID = 0;
+	private static List<Integer> m_recycle = new ArrayList<Integer>();
 	
 	/** Adds to the ID list and returns the ID that was added.
 	 * 
@@ -17,6 +17,7 @@ public class ID
 	{
 		int id = getNext();
 		m_id.add(id);
+		Logger.printDebug("added ID: " + id);
 		return id;
 	}
 	
@@ -53,7 +54,10 @@ public class ID
 	protected static boolean remove(int id)
 	{
 		if (m_id.contains(id))
+		{
 			m_id.remove(id);
+			m_recycle.add(id);
+		}
 		else
 			return false;
 		return true;
@@ -67,15 +71,17 @@ public class ID
 	
 	private static int getNext()
 	{
-		//temporary faster id fetch doesn't recycle any IDs
-		int i = m_lastID;
-		m_lastID++;
+		int i = 0;
 		
-		return i;
-		/*int i = 0;
-		//while(m_idList.contains(i))
+		if (m_recycle.size() > 0) //'cache'
+		{
+			//if has, get first and remove it from recycle
+			m_recycle.get(0);
+			m_recycle.remove(0);
+		}
+		
 		while(m_id.contains(i))
 			i++;
-		return i;*/
+		return i;
 	}
 }

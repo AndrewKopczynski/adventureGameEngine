@@ -200,7 +200,7 @@ public class Parse {
 			if (att.length >= 2)
 			{
 				String t = collapse(att, 1, att.length);
-				msg[0] = actor.dropFromInventory(actor.getX(), actor.getY(), actor.getZ(), t);
+				msg[0] = actor.dropFromInv(t);
 				
 				
 				//msg[0] = "detected 'drop [" + collapse(att, 1, att.length) + "]'.";
@@ -221,13 +221,13 @@ public class Parse {
 		else if (m_tactical.check(att))
 		{
 			msg = m_tactical.getActorsTacticalInRoom(actor);
-			
 			return MessageType.personal(actor, "TACTICAL", actor.getXYZ(), msg);
 		}
 		
 		/** I*NVENTORY ----------------------------------------------------	|*/
 		else if (m_inventory.check(att))
 		{
+			msg = actor.getInventory();
 			return MessageType.personal(actor, "INVENTORY", actor.toString(), msg);
 		}
 		
@@ -247,7 +247,7 @@ public class Parse {
 				
 				catch(Exception e)
 				{	
-					e.printStackTrace();
+					//e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [number]";
 					return MessageType.personal(actor, "@SETVIS", actor.toString(), msg);
 				}
@@ -279,13 +279,13 @@ public class Parse {
 				
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					//e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [itemName] [maxHp]";
 					return MessageType.personal(actor, "@GIVE", actor.toString(), msg);
 				}
 			}
 			/** deleteItem */
-			else if (m_admin.getMeaning(att[0]).equals("del"))
+			/*else if (m_admin.getMeaning(att[0]).equals("del"))
 			{
 				try
 				{
@@ -308,7 +308,7 @@ public class Parse {
 					msg[0] = "Usage: " + att[0] + " [itemName]";
 					return MessageType.personal(actor, "@DEL", actor.toString(), msg);
 				}
-			}
+			}*/
 			/** noclip */
 			else if (m_admin.getMeaning(att[0]).equals("noclip"))
 			{
@@ -406,6 +406,13 @@ public class Parse {
 					
 				}
 				return MessageType.personal(actor, "@STRESSTEST", actor.toString(), msg);
+			}
+			else if (m_admin.getMeaning(att[0]).equals("saveAll"))
+			{
+				Save.all();
+				Save.state();
+				msg[0] = "Saved!";
+				return MessageType.personal(actor, "@SAVEALL", "WORLD", msg);
 			}
 			/** if invalid */
 			else

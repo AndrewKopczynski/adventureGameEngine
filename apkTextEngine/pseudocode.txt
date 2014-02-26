@@ -1,0 +1,144 @@
+PROBLEM:
+
+I get this output:
+
+---------------------
+CREATING A NEW ANIMAL
+DONE CREATING A NEW ANIMAL
+--------------------------
+ID  : 32
+X   : 0
+Y   : 0
+Z   : 0
+NAME: animal_newAnimal
+TYPE: 0
+MXHP: 30
+HP  : 30
+
+Instead of the desired output:
+
+---------------------
+CREATING A NEW ANIMAL
+ID  : 32
+X   : 0
+Y   : 0
+Z   : 0
+NAME: animal_newAnimal
+TYPE: 0
+MXHP: 30
+HP  : 30
+DONE CREATING A NEW ANIMAL
+--------------------------
+
+==========================================================================
+
+public Debug
+{
+	public static void printDebug(String s)
+	{
+		System.err.println(getLine(s));
+		System.err.println(s.toUpperCase());
+		System.err.println(getLine(s));
+	}
+	
+	public static void printDebug(boolean headerFooter, String s)
+	{
+		if (headerFooter)
+			System.err.println(getLine(s));
+		System.err.println(s);
+		if (!headerFooter)
+			System.err.println(getLine(s));
+	}
+	
+	private static String getLine(String s)
+	{
+		String line = "";
+		for (int i = 0; i < s.length() && !s.substring(i, i+1).equalsIgnoreCase("\n"); i++)
+			line += "-";
+		
+		return line;
+	}
+}
+
+* * *
+
+import static psuedoPackage.Debug.printDebug;
+
+public class Animal
+{
+	public Animal()
+	{
+		printDebug(true, "CREATING A NEW ANIMAL");
+
+		//intialize all the member variables here
+		
+		System.out.println("ID  : " + m_id);
+		System.out.println("X   : " + m_x);
+		System.out.println("Y   : " + m_y);
+		System.out.println("Z   : " + m_z);
+		System.out.println("NAME: " + m_name);
+		System.out.println("TYPE: " + m_type);
+		System.out.println("MXHP: " + m_hpMax);
+		System.out.println("HP  : " + m_hp);
+		
+		printDebug(false, "DONE CREATING A NEW ANIMAL");
+	}
+}
+
+Outputs the following:
+
+---------------------
+CREATING A NEW ANIMAL
+DONE CREATING A NEW ANIMAL
+--------------------------
+ID  : 32
+X   : 0
+Y   : 0
+Z   : 0
+NAME: animal_newAnimal
+TYPE: 0
+MXHP: 30
+HP  : 30
+
+==========================================================================
+
+import static psuedoPackage.Debug.printDebug;
+
+public class Animal
+{
+	public Animal()
+	{
+		printDebug("CREATING A NEW ANIMAL");
+
+		//intialize all the member variables here
+		
+		System.out.println("ID  : " + m_id);
+		System.out.println("X   : " + m_x);
+		System.out.println("Y   : " + m_y);
+		System.out.println("Z   : " + m_z);
+		System.out.println("NAME: " + m_name);
+		System.out.println("TYPE: " + m_type);
+		System.out.println("MXHP: " + m_hpMax);
+		System.out.println("HP  : " + m_hp);
+		
+		printDebug("DONE CREATING A NEW ANIMAL");
+	}
+}
+
+Outputs the following:
+
+---------------------
+CREATING A NEW ANIMAL
+---------------------
+ID  : 32
+X   : 0
+Y   : 0
+Z   : 0
+NAME: animal_newAnimal
+TYPE: 0
+MXHP: 30
+HP  : 30
+--------------------------
+DONE CREATING A NEW ANIMAL
+--------------------------
+
