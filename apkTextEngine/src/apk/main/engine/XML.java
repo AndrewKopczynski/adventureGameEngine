@@ -13,10 +13,18 @@ public class XML //TODO: maybe change writing to dom4j? It works pretty well rig
 	private PrintWriter m_out = null;
 	private int m_tab = 0;
 	
-	public static Document parse(URL url) throws DocumentException
+	public static Document parse(URL url) throws FileNotFoundException
 	{
 		SAXReader reader = new SAXReader();
-		Document document = reader.read(url);
+		Document document;
+		try
+		{
+			document = reader.read(url);
+		}
+		catch (DocumentException e)
+		{
+			throw new FileNotFoundException();
+		}
 		
 		return document;
 	}

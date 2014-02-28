@@ -1,8 +1,6 @@
 package apk.main.engine;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,42 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 
-import static apk.main.engine.Logger.printDebug;
+import static apk.main.engine.Logger.logDebug;
 import apk.parser.reference.EntityIntializationException;
-import apk.parser.reference.IDConflictException;
 
-/** Represents an entity.
- * <p>
- * An entity has:
- * <ul>
- * <li>A generated unique ID
- * <li>Maximum hit points
- * <li>Current hit points
- * <li>An inventory (list of entities it contains)
- * </ul>
- * 
- * <p>
- * 
- * NOTE:
- * <br>
- * Entities just exist and chill. They can't move around,
- * or be moved around. 
- * <br>
- * WorldEntity extends Entity, and lets Entities
- * move around and junk.
- * 
- * <p>
- * 
- * Use:
- * <ul>
- * <li>Entity for items in inventories and things not in the game world
- * <li>WorldEntity for players, NPCs, and generally anything that can
- * move or be moved.
- * </ul>
- * */
 public class Entity
 {	
 	private static final int DEFAULT_VISIBILITY = 3; //how far an actor/entity can see
@@ -64,21 +31,14 @@ public class Entity
 	
 	protected int m_visionRange = DEFAULT_VISIBILITY;
 	
-	//TODO does this even make sense lol
-	//TODO is this needed?
-	/* changed to Entity for now, because having Actor extend
-	 * entity but also have Entity have a parent of a class that
-	 * extends itself was super nuts */
-	
 	public Entity() {}
 	
 	// entities can only be created in inventories of actors
 	public Entity(String name, int type, int hpMax, int hp, Actor parent) throws EntityIntializationException //actor
 	{		
-		printDebug("CREATING ENTITY WITH ACTOR PARENT");
+		logDebug("-", "CREATING ENTITY WITH ACTOR PARENT");
 		
 		m_id = ID.add();
-		m_ents.put(m_id, this);
 		
 		m_name = name;
 		m_type = type;
@@ -87,6 +47,7 @@ public class Entity
 		m_hp = hp;
 		
 		setParent(parent);
+		m_ents.put(m_id, this);
 		
 		System.out.println("CREATED ENTITY WITH FOLLOWING:");
 		System.out.println("LIST: " + m_ents.get(m_id));
@@ -97,45 +58,12 @@ public class Entity
 		System.out.println("MXHP: " + m_hpMax);
 		System.out.println("HP  : " + m_hp);
 		
-		printDebug("DONE CREATING ENTITY WITH ACTOR PARENT");
+		logDebug("-", "DONE CREATING ENTITY WITH ACTOR PARENT");
 	}
 	
-	// entities can only be created in inventories of actors
-	/*public Entity(String name, int type, int hpMax, int hp, Entity parent) //ent
-	{
-		printDebug("CREATING ENTITY WITH ENTITY PARENT");
-		
-		m_id = ID.add();
-		m_ents.put(m_id, this);
-		
-		m_name = name;
-		m_type = type;
-		
-		m_hpMax = hpMax;
-		m_hp = hp;
-		
-		m_parent = parent;
-		
-		Logger.log("Created new entity '" + getName() + "' @ " + m_parent + "'s inventory.");
-		
-		printDebug("DONE!");
-	}*/
-	
-	/** Creates a new entity from a file.
-	 * <p>
-	 * Usually used in loading entities from a save,
-	 * but can also be used for template entities.
-	 * 
-	 * @param filePath exampleEntity[id]
-	 * @throws IDConflictException 
-	 * @throws DocumentException 
-	 * @throws EntityIntializationException 
-	 */
-	public Entity(String filePath, Actor parent)
-			throws FileNotFoundException,IDConflictException,
-			DocumentException, EntityIntializationException
+	public Entity(String filePath, Actor parent) throws EntityIntializationException
 	{	
-		printDebug("LOADING ENTITY FROM FILE");
+		logDebug("-", "LOADING ENTITY FROM FILE");
 		
 		try
 		{
@@ -200,7 +128,7 @@ public class Entity
 			/* put into list of entities */
 			m_ents.put(m_id, this);
 			
-			System.out.println("\nCREATED ENTITY WITH FOLLOWING:");
+			System.out.println("CREATED ENTITY WITH FOLLOWING:");
 			System.out.println("LIST: " + m_ents.get(m_id));
 			System.out.println("ID  : " + m_id);
 			System.out.println("PAR : " + m_parent);
@@ -209,30 +137,29 @@ public class Entity
 			System.out.println("MXHP: " + m_hpMax);
 			System.out.println("HP  : " + m_hp);
 		}
-		catch (MalformedURLException e)
+		catch (Exception e) //if for any reason an exception is thrown, DON'T load entity
 		{
-			printDebug("FAILED TO LOAD ENTITY FROM FILE");
-			e.printStackTrace();
+			throw new EntityIntializationException("Failed to load an entity! " + e);
 		}
 		finally
 		{
-			printDebug("FINISHED LOADING ENTITY FROM FILE");
+			logDebug("-", "FINISHED LOADING ENTITY FROM FILE");
 		}
 	}
 	
 	/** Write to save file. */
 	public void writeSave() //TODO merge actor and entity saving~
 	{
-		Logger.start();
-		printDebug("WRITING SAVE FOR ENTITY");
-		System.out.println("SAVED ENTITY WITH FOLLOWING:");
-		System.out.println("LIST: " + m_ents.get(m_id));
-		System.out.println("ID  : " + m_id);
-		System.out.println("PAR : " + m_parent);
-		System.out.println("NAME: " + m_name);
-		System.out.println("TYPE: " + m_type);
-		System.out.println("MXHP: " + m_hpMax);
-		System.out.println("HP  : " + m_hp);
+		logDebug("-", "WRITING SAVE FOR ENTITY");
+		
+		logDebug("SAVED ENTITY WITH FOLLOWING:");
+		logDebug("LIST: " + m_ents.get(m_id));
+		logDebug("ID  : " + m_id);
+		logDebug("PAR : " + m_parent);
+		logDebug("NAME: " + m_name);
+		logDebug("TYPE: " + m_type);
+		logDebug("MXHP: " + m_hpMax);
+		logDebug("HP  : " + m_hp);
 		
 		//create file (eg. ent/player[0].xml)
 		XML w = new XML(getFilePath());
@@ -267,8 +194,7 @@ public class Entity
 		w.close();
 		Logger.log("Wrote " + toString() +"'s inventory to " + getFilePath());
 		
-		Logger.stop(true);
-		printDebug("FINISHED WRITING SAVE FOR ENTITY");
+		logDebug("-", "FINISHED WRITING SAVE FOR ENTITY");
 	}
 	
 	public int getId()
@@ -526,7 +452,12 @@ public class Entity
 	
 	public boolean hasInInv(Entity entity)
 	{
-		return m_inv.contains(entity);
+		if (m_inv.contains(entity))
+		{
+			System.out.println(toString() + " has " + entity.toString() + "!");
+			return true;
+		}
+		return false;
 	}
 	
 	public String dropFromInv(Entity entity)
@@ -534,10 +465,15 @@ public class Entity
 		
 		if (m_inv.remove(entity))
 		{
+			System.out.println(entity);
 			String t = entity.getName();
 			
 			m_ents.remove(entity);
-			new Actor(m_parent.getX(), m_parent.getY(), m_parent.getZ(), entity);
+			new Actor(
+					m_parent.getX(),
+					m_parent.getY(),
+					m_parent.getZ(),
+					entity);
 			
 			return "Dropped '" + t + "'.";
 			//return "%DROP_DEFAULT";
@@ -547,22 +483,31 @@ public class Entity
 	}
 	public String dropFromInv(String name)
 	{
-		for (int i = 0; i < m_inv.size(); i++)
+		Entity[] list = getByName(name); //extra step!
+		
+		if (list.length > 0)
 		{
-			Entity[] list = getByName(name); //extra step!
+			return dropFromInv(list[0]);
+		}
+		return "%DROP_ERR";
+		
+		/*for (int i = 0; i < m_inv.size(); i++)
+		{
 			//whoops forgot to remove it from the game also
 			
 			if (list.length > 0
 				&& hasInInv(list[i])
 				&& m_inv.remove(list[i]))
 			{
-				String t = list[i].getName();
-				
-				new Actor(m_parent.getX(), m_parent.getY(), m_parent.getZ(), list[i]);
-				return "Dropped '" + t + "'.";
+				new Actor(
+						m_parent.getX(),
+						m_parent.getY(),
+						m_parent.getZ(),
+						list[i]);
+				return "Dropped '" + name + "'.";
 			}
 		}
-		return "%DROP_ERR";
+		return "%DROP_ERR";*/
 	}
 	
 	public static Entity getById(int id)
@@ -591,6 +536,7 @@ public class Entity
 				&& m_ents.get(ID.get(i)).getName().equalsIgnoreCase(name))
 			{
 				System.out.println("found '" + name + "' !");
+				
 				Entity[] temp = new Entity[list.length + 1];
 				System.arraycopy(list, 0, temp, 0, list.length);
 				temp[temp.length - 1] = m_ents.get(ID.get(i));
@@ -621,7 +567,8 @@ public class Entity
 		{
 			if (m_ents.get(ID.get(i)) != null)
 			{
-				list[a] = "[ENTITY]" + m_ents.get(ID.get(i)).toString();
+				list[a] = "[ENTITY]" + m_ents.get(ID.get(i)).toString()
+					+ " in inventory of " + m_ents.get(ID.get(i)).getParent().getName();
 				a++;
 			}
 			//else

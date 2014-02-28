@@ -11,6 +11,7 @@ import java.io.PrintWriter;
  * 
  * @author Andrew Kopczynski
  * @version 0.1 */
+
 public class Logger 
 {
 	/** Filename of output log file. */
@@ -20,6 +21,11 @@ public class Logger
 	
 	private static long m_start;
 	private static long m_stop;
+	
+	private static boolean m_tab = false;
+	private static boolean m_shouldLog = false;
+	private static long m_time = 0;
+	private static long m_signif = 0;
 	
 	/** Clears the log.txt file. */
 	public static void clear() 
@@ -78,42 +84,59 @@ public class Logger
 	public static void stop(boolean shouldPrint)
 	{
 		m_stop = System.nanoTime();
+		m_time += (m_stop - m_start);
 		
-		if (shouldPrint)
+		if (shouldPrint && m_shouldLog)
 		{
-			System.out.print("[EXECUTION TIME]");
-			if ((m_stop - m_start) / 1000000000 > 1)
-				System.out.println(((m_stop - m_start) / 1000000000) + "s");
-			else
-				System.out.println(((m_stop - m_start) / 1000000) + "ms");
+			//System.out.print("[EXECUTION TIME]");
+			//if ((m_stop - m_start) / 1000000000 > 1)
+				//System.out.(((m_stop - m_start) / 1000000000) + "s");
+			//else
+				//System.out.print(((m_stop - m_start) / 1000000) + "ms");
+			if ((m_signif/1000000000) < (m_time/1000000000))
+			{
+				m_signif = m_time;
+				System.out.println("[Logger_TIMESPENTLOGGING]" + (m_time / 1000000000) + "s");
+			}
 		}
 	}
 	
-	public static void printDebug(String s)
+	public static void logDebug(String chr, String s)
 	{
-		//System.out.println(getLine(s));
-		//System.out.println(s.toUpperCase());
-		//System.out.println(getLine(s));
-		
-		log(getLine(s));
-		log(s.toUpperCase());
-		log(getLine(s));
+		if (m_shouldLog)
+		{
+			//System.out.println(getLine(chr, s));
+			//System.out.println(s.toUpperCase());
+			//System.out.println(getLine(chr, s));
+			
+			log(getLine(chr, s));
+			log(s.toUpperCase());
+			log(getLine(chr, s));
+			
+			m_tab = !m_tab;
+		}
 	}
 	
-	/*public static void printDebug(boolean headerFooter, String s)
+	public static void logDebug(String s)
 	{
-		if (headerFooter)
-			System.out.println(getLine(s));
-		System.out.println(s);
-		if (!headerFooter)
-			System.out.println(getLine(s));
-	}*/
+		if (m_shouldLog)
+		{	
+			String t;
+			if(m_tab)
+				t = "\t>";
+			else
+				t = ">>";
+			
+			log(t + s.toUpperCase());
+		}
+	}
 	
-	private static String getLine(String s)
+	private static String getLine(String chr, String s)
 	{
-		String t = "";
+		String t = ">";
+		
 		for (int i = 0; i < s.length() && !s.substring(i, i+1).equalsIgnoreCase("\n"); i++)
-			t += "-";
+			t += chr;
 		
 		return t;
 	}

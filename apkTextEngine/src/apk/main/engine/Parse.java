@@ -1,6 +1,6 @@
 package apk.main.engine;
 
-import static apk.main.engine.Logger.printDebug;
+import static apk.main.engine.Logger.logDebug;
 import static apk.parser.reference.ActorType.*;
 import apk.parser.action.*;
 import apk.parser.reference.MessageType;
@@ -32,7 +32,7 @@ public class Parse {
 	public Parse()
 	{
 		Logger.log("Loading parsers and wordlists...");
-		printDebug("Loading parser...");
+		logDebug("Loading parser...");
 	}
 	
 	/** Collapses a string array from a to b in a String array. */
@@ -279,7 +279,7 @@ public class Parse {
 				
 				catch(Exception e)
 				{
-					//e.printStackTrace();
+					e.printStackTrace();
 					msg[0] = "Usage: " + att[0] + " [itemName] [maxHp]";
 					return MessageType.personal(actor, "@GIVE", actor.toString(), msg);
 				}
@@ -388,7 +388,7 @@ public class Parse {
 			else if (m_admin.getMeaning(att[0]).equals("stress"))
 			{
 				Logger.start();
-				for (int i = 0; i < 9999; i++)
+				for (int i = 0; i < 999; i++)
 				{
 					if (i % 100 == 0)
 					{

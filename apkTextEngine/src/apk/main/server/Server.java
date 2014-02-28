@@ -1,13 +1,12 @@
 package apk.main.server;
 
-import static apk.main.engine.Logger.printDebug;
+import static apk.main.engine.Logger.logDebug;
 import static apk.parser.reference.ActorType.*;
 import static apk.parser.reference.MessageType.*;
 import apk.parser.reference.ActorIntializationException;
 import apk.parser.reference.IDConflictException;
 import apk.main.engine.Logger;
 import apk.main.engine.Save;
-//import apk.main.engine.World;
 import apk.main.engine.Parse;
 import apk.main.engine.Actor;
 
@@ -16,20 +15,11 @@ import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.ServerSocket;
 
-/*import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;*/
-
-
-
-import org.dom4j.DocumentException;
-
 /*
-* A chat server that delivers public and private messages.
+* A chat server converted for usage in a game engine. Weird, huh?
 */
 public class Server
 {
@@ -46,37 +36,32 @@ public class Server
 	{
 		/**all modified lines are marked with //z for the sake of clarity*/
 		
-		printDebug("SERVER IS STARTING UP!"); //z
+		System.out.println("SERVER IS STARTING UP!"); //z
 		Logger.clear(); //z
 		
 		try
 		{	
+			System.out.println("LOADING SAVE...");
 			Save.load("save.xml");
+			System.out.println("SAVE READ WITHOUT ERRORS!");
 			//new World("maps/test_map.xml", "gfx/standard_tileset.xml");
 		}
-		catch (DocumentException e)
+		catch (FileNotFoundException e)
 		{
-			printDebug("FAILED TO LOAD MAP OR TILESET!");
+			System.out.println("Save couldn't be read! Closing server...");
 			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IDConflictException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ActorIntializationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.exit(1);
+		}
+		catch (ActorIntializationException e)
+		{
+			System.err.println(e.getMessage());
 		}
 		
 		// The default port number.
 		int portNumber = 2222;
 		if (args.length < 1)
 		{
-			printDebug("USAGE: java server [portNumber]\n" + "NOW USING PORT NUMBER: " + portNumber); //z
+			System.out.println("USAGE: java server [portNumber]\n" + "NOW USING PORT NUMBER: " + portNumber); //z
 		}
 		else
 		{
@@ -89,12 +74,12 @@ public class Server
 		*/
 		try 
 		{
-			printDebug("OPENING CONNECTION ON PORT " +  portNumber); //z
+			System.out.println("OPENING CONNECTION ON PORT " +  portNumber); //z
 			serverSocket = new ServerSocket(portNumber);
 		}
 		catch (IOException e)
 		{
-			printDebug("FAILED TO START SERVER! PORT NUMBER IS PROBABLY ALREADY IN USE!");
+			System.out.println("FAILED TO START SERVER! PORT NUMBER IS PROBABLY ALREADY IN USE!");
 			e.printStackTrace();
 		}
 	
@@ -108,8 +93,8 @@ public class Server
 			{
 				clientSocket = serverSocket.accept();
 				
-				printDebug("CLIENT CONNECTING"); //z
-				printDebug(clientSocket.toString());
+				System.out.println("CLIENT CONNECTING"); //z
+				System.out.println(clientSocket.toString());
 				
 				int i = 0;
 				for (i = 0; i < maxClientsCount; i++)
@@ -226,31 +211,15 @@ class clientThread extends Thread
 								System.out.println("Actor failed to intialize!");
 								e.printStackTrace();
 								
-								printDebug("DID NOT LOAD FROM FILE");
+								System.out.println("DID NOT LOAD FROM FILE");
 								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
 							}
 							catch (IDConflictException e)
 							{
-								printDebug("Conflicting IDs!");
-								e.printStackTrace();
-								
-								printDebug("DID NOT LOAD FROM FILE");
-								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
-							}
-							/*catch (MalformedURLException e)
-							{
-								System.out.println("ent/" + clientName + " not found!");
+								System.out.println("Conflicting IDs!");
 								e.printStackTrace();
 								
 								System.out.println("DID NOT LOAD FROM FILE");
-								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
-							}*/
-							catch (DocumentException e)
-							{
-								printDebug("ent/" + clientName + " not found!");
-								//e.printStackTrace(); //its really long and spammy okay
-								
-								printDebug("DID NOT LOAD FROM FILE");
 								m_player = new Actor(0, 0, 0, clientName, TYPE_ALIVE, 30, 30);
 							}
 						}

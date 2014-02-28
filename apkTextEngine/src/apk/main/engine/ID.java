@@ -17,7 +17,7 @@ public class ID
 	{
 		int id = getNext();
 		m_id.add(id);
-		Logger.printDebug("added ID: " + id);
+		Logger.logDebug("added ID: " + id);
 		return id;
 	}
 	

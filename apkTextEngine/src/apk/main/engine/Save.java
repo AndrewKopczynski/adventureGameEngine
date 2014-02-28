@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.Iterator;
 
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 
 import apk.parser.reference.ActorIntializationException;
@@ -41,9 +40,17 @@ public class Save
 		w.close();
 	}
 	
-	public static final void load(String saveFilePath) throws MalformedURLException, DocumentException, FileNotFoundException, IDConflictException, ActorIntializationException
+	public static final void load(String saveFilePath) throws FileNotFoundException, ActorIntializationException
 	{
-		URL saveURL = new File(saveFilePath).toURI().toURL();
+		URL saveURL;
+		try
+		{
+			saveURL = new File(saveFilePath).toURI().toURL();
+		}
+		catch (MalformedURLException e) //assume bad filepath
+		{
+			throw new FileNotFoundException("Coudln't find '" + saveFilePath + "'!");
+		}
 		
 		Document saveD = XML.parse(saveURL);
 		Element root = saveD.getRootElement();
@@ -51,12 +58,22 @@ public class Save
 		String world = root.attributeValue("worldPath");
 		String tileset = root.attributeValue("tilePath");
 		
+		/* For some reason I loaded actors before loading the world.
+		 * This is a reminder to NOT do that. Seriously, wtf.*/
+		new World(world, tileset);
+		
 		for (Iterator<Element> i = root.elementIterator("actor"); i.hasNext();)
 		{
 			Element element = (Element) i.next();
-			new Actor("ent/" + element.getText() + ".xml");
+			try
+			{
+				new Actor("ent/" + element.getText() + ".xml");
+			}
+			catch (IDConflictException e)
+			{
+				System.err.println("Tried to load an actor with conflicting IDs!" + e);
+			}
 		}
-		new World(world, tileset);
 	}
 	
 	public static final void all()

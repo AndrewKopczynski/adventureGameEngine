@@ -1,12 +1,12 @@
 package apk.main.engine;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 
 public class World 
@@ -21,13 +21,13 @@ public class World
 	private static String m_tileFilePath;
 	private static Room[][][] m_world;
 	
-	public World(URL worldURL, URL tileURL) throws DocumentException
+	public World(URL worldURL, URL tileURL) throws FileNotFoundException
 	{
 		loadWorld(worldURL);
 		loadTileset(tileURL);
 	}
 	
-	public World(String worldFilePath, String tileFilePath) throws DocumentException
+	public World(String worldFilePath, String tileFilePath) throws FileNotFoundException
 	{
 		try
 		{
@@ -41,12 +41,11 @@ public class World
 		}
 		catch (MalformedURLException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new FileNotFoundException();
 		}
 	}
 	
-	private void loadWorld(URL worldURL) throws DocumentException
+	private void loadWorld(URL worldURL) throws FileNotFoundException
 	{
 		Document worldD = XML.parse(worldURL);
 		
@@ -72,7 +71,7 @@ public class World
         }
 	}
 	
-	public void loadTileset(URL tileURL) throws DocumentException
+	public void loadTileset(URL tileURL) throws FileNotFoundException
 	{
 		Document tileD = XML.parse(tileURL);
 		
