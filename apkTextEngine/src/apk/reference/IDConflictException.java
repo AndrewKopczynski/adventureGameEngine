@@ -1,4 +1,4 @@
-package apk.parser.reference;
+package apk.reference;
 
 /** Thrown when there are conflicting IDs.
  * Used to prevent entities and actors from being created

@@ -12,7 +12,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 
 import static apk.main.engine.Logger.logDebug;
-import apk.parser.reference.EntityIntializationException;
+import apk.reference.EntityIntializationException;
 
 public class Entity
 {	
@@ -459,11 +459,29 @@ public class Entity
 		}
 		return false;
 	}
-	
-	public String dropFromInv(Entity entity)
+	public List<Entity> getInv()
 	{
-		
-		if (m_inv.remove(entity))
+		return m_inv;
+	}
+	
+	public String dropFromInv()
+	{
+		if (m_parent.getInv().remove(this))
+		{
+			System.out.println("droping " + this + " from " + m_parent);
+			
+			m_ents.remove(this);
+			new Actor(
+					m_parent.getX(),
+					m_parent.getY(),
+					m_parent.getZ(),
+					this);
+			this.kill();
+			return "Dropped!";
+		}
+		else
+			return "%DROP_ERR";
+		/*if (m_inv.remove(this))
 		{
 			System.out.println(entity);
 			String t = entity.getName();
@@ -479,7 +497,7 @@ public class Entity
 			//return "%DROP_DEFAULT";
 		}
 		else
-			return "%DROP_ERR";
+			return "%DROP_ERR";*/
 	}
 	public String dropFromInv(String name)
 	{
@@ -487,7 +505,7 @@ public class Entity
 		
 		if (list.length > 0)
 		{
-			return dropFromInv(list[0]);
+			return list[0].dropFromInv();
 		}
 		return "%DROP_ERR";
 		

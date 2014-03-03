@@ -1,9 +1,9 @@
 package apk.main.engine;
 
 import static apk.main.engine.Logger.logDebug;
-import apk.parser.reference.ActorIntializationException;
-import apk.parser.reference.EntityIntializationException;
-import apk.parser.reference.IDConflictException;
+import apk.reference.ActorIntializationException;
+import apk.reference.EntityIntializationException;
+import apk.reference.IDConflictException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -433,9 +433,15 @@ public class Actor extends Entity
 	public static Actor getById(int id)
 	{
 		if (m_actors.containsKey(id))
+		{
+			System.out.println("fetched something");
 			return m_actors.get(id);
+		}
 		else
+		{
+			System.out.println("didn't fetch something");
 			return null;
+		}
 	}
 	
 	public static boolean existsById(int id)
@@ -500,6 +506,13 @@ public class Actor extends Entity
 				return true;
 		}
 		return false;
+	}
+	
+	public String dropFromInv(Entity entity)
+	{
+		entity.dropFromInv();
+		
+		return "asdfu";
 	}
 	
 	/** debug list print */

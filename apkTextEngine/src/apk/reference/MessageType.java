@@ -1,4 +1,4 @@
-package apk.parser.reference;
+package apk.reference;
 
 import apk.main.engine.Actor;
 

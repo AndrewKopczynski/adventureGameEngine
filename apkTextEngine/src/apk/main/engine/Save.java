@@ -11,8 +11,8 @@ import java.util.Iterator;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
-import apk.parser.reference.ActorIntializationException;
-import apk.parser.reference.IDConflictException;
+import apk.reference.ActorIntializationException;
+import apk.reference.IDConflictException;
 
 /** Responsible for saving and loading the game.
  * 

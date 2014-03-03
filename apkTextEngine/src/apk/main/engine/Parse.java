@@ -1,10 +1,10 @@
 package apk.main.engine;
 
 import static apk.main.engine.Logger.logDebug;
-import static apk.parser.reference.ActorType.*;
+import static apk.reference.EntType.*;
 import apk.parser.action.*;
-import apk.parser.reference.MessageType;
 import apk.parser.target.*;
+import apk.reference.MessageType;
 
 public class Parse {
 	

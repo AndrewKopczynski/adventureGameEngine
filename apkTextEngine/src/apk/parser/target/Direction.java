@@ -1,6 +1,6 @@
 package apk.parser.target;
 
-import apk.parser.reference.WordList;
+import apk.reference.WordList;
 
 public class Direction extends WordList
 {

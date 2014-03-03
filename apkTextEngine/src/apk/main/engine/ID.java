@@ -2,7 +2,8 @@ package apk.main.engine;
 
 import java.util.ArrayList;
 import java.util.List;
-import apk.parser.reference.IDConflictException;
+
+import apk.reference.IDConflictException;
 
 public class ID
 {

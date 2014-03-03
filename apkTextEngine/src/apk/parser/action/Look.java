@@ -1,7 +1,7 @@
 package apk.parser.action;
 
 import apk.main.engine.Actor;
-import apk.parser.reference.WordList;
+import apk.reference.WordList;
 
 public class Look extends WordList
 {

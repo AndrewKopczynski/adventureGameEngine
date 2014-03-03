@@ -1,6 +1,6 @@
 package apk.parser.action;
 
-import apk.parser.reference.WordList;
+import apk.reference.WordList;
 
 public class Steal extends WordList
 {

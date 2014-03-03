@@ -1,10 +1,10 @@
 package apk.main.server;
 
 import static apk.main.engine.Logger.logDebug;
-import static apk.parser.reference.ActorType.*;
-import static apk.parser.reference.MessageType.*;
-import apk.parser.reference.ActorIntializationException;
-import apk.parser.reference.IDConflictException;
+import static apk.reference.EntType.*;
+import static apk.reference.MessageType.*;
+import apk.reference.ActorIntializationException;
+import apk.reference.IDConflictException;
 import apk.main.engine.Logger;
 import apk.main.engine.Save;
 import apk.main.engine.Parse;
