@@ -218,7 +218,7 @@ public class Actor extends Entity
 		}
 		catch (Exception e)
 		{
-			/* Besdies EntityInitializationExceptions, if an exception is thrown,
+			/* Besides EntityInitializationExceptions, if an exception is thrown,
 			 * then DO NOT load the actor. */
 			throw new ActorIntializationException("Failed to load an actor! " + e);
 		}

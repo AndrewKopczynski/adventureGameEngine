@@ -15,7 +15,7 @@ public class Graphic {
 	/** Gets the tile's ASCII Graphic by name of the tile.
 	 * 
 	 * @param name Name attribute of tile
-	 * @return 1 x 3 ASCII graphic (eg. [_])
+	 * @return 1 x 'X' ASCII graphic (eg. [_] or [], dependant on tileset)
 	 */
 	public static String getGraphic(String name)
 	{
