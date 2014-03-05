@@ -23,7 +23,7 @@ public class Logger
 	private static long m_stop;
 	
 	private static boolean m_tab = false;
-	private static boolean m_shouldLog = false;
+	private static boolean m_shouldLog = true;
 	private static long m_time = 0;
 	private static long m_signif = 0;
 	

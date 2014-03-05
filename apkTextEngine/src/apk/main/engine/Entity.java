@@ -13,6 +13,7 @@ import org.dom4j.Element;
 
 import static apk.main.engine.Logger.logDebug;
 import apk.reference.EntityIntializationException;
+import apk.reference.IDConflictException;
 
 public class Entity
 {	
@@ -470,13 +471,21 @@ public class Entity
 		{
 			System.out.println("droping " + this + " from " + m_parent);
 			
+			
+			try
+			{
+				new Actor(
+						m_parent.getX(),
+						m_parent.getY(),
+						m_parent.getZ(),
+						this);
+			}
+			catch (IDConflictException e) //dunno if this will ever be thrown tbh
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			m_ents.remove(this);
-			new Actor(
-					m_parent.getX(),
-					m_parent.getY(),
-					m_parent.getZ(),
-					this);
-			this.kill();
 			return "Dropped!";
 		}
 		else
@@ -618,8 +627,7 @@ public class Entity
 				Logger.log("Deleted: " + getFilePath());
 			else
 			{
-				System.out.println("!CRTICAL! ENTITY FILE NOT DELETED!");
-				throw new IllegalArgumentException("Could not delete entity file " + getFilePath());
+				System.out.println("Didn't find an file to delete!");
 			}
 		}
 		catch (Exception e)

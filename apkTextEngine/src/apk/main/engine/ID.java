@@ -32,7 +32,7 @@ public class ID
 	protected static boolean add(int id) throws IDConflictException
 	{
 		if (m_id.contains(id))
-			throw new IDConflictException("Conflicting IDs! " + m_id);
+			throw new IDConflictException("Conflicting IDs! " + id + " - " + m_id);
 		else
 			return m_id.add(id);
 	}
@@ -54,9 +54,10 @@ public class ID
 	
 	protected static boolean remove(int id)
 	{
+		System.out.println("removing " + id);
 		if (m_id.contains(id))
 		{
-			m_id.remove(id);
+			m_id.remove(m_id.indexOf(id)); //was removing by index before, oops
 			m_recycle.add(id);
 		}
 		else

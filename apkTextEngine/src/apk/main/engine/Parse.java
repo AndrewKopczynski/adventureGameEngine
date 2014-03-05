@@ -206,7 +206,12 @@ public class Parse {
 				//msg[0] = "detected 'drop [" + collapse(att, 1, att.length) + "]'.";
 				return msg;
 			}
-			return m_drop.getError(att[0]);
+			else
+			{
+				msg = m_drop.getError();
+			}
+			
+			return MessageType.roomwide(actor, "DROP", actor.getXYZ(), "WORLD", msg);
 		}
 		
 		/** ST*ATUS -------------------------------------------------------	|*/

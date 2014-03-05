@@ -1,5 +1,3 @@
 <?xml version="1.0" ?>
 <save worldPath="maps/test_map.xml" tilePath="gfx/standard_tileset.xml">
-	<actor>player_zesty[32]</actor>
-	<actor>player_testMan[33]</actor>
 </save>

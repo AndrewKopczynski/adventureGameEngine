@@ -30,6 +30,7 @@ import org.dom4j.Element;
  * <li>An inventory (list of entities)
  * </ul>
  * */
+@SuppressWarnings("unused")
 public class Actor extends Entity
 {
 	/**List of ID/Actors */
@@ -41,7 +42,9 @@ public class Actor extends Entity
 	
 	public Actor(int x, int y, int z, String name, int type, int hpMax, int hp)
 	{
-		logDebug("-", "CREATING NEW ACTOR");
+		System.out.println(
+				//"-", 
+				"CREATING NEW ACTOR");
 		
 		m_id = ID.add();
 		m_actors.put(m_id, this);
@@ -56,23 +59,27 @@ public class Actor extends Entity
 		m_hpMax = hpMax;
 		m_hp = hp;
 		
-		logDebug("CREATED ACTOR WITH FOLLOWING:");
-		logDebug("LIST: " + m_actors.get(m_id));
-		logDebug("ID  : " + m_id);
-		logDebug("X   : " + m_x);
-		logDebug("Y   : " + m_y);
-		logDebug("Z   : " + m_z);
-		logDebug("NAME: " + m_name);
-		logDebug("TYPE: " + m_type);
-		logDebug("MXHP: " + m_hpMax);
-		logDebug("HP  : " + m_hp);
+		System.out.println("CREATED ACTOR WITH FOLLOWING:");
+		System.out.println("LIST: " + m_actors.get(m_id));
+		System.out.println("ID  : " + m_id);
+		System.out.println("X   : " + m_x);
+		System.out.println("Y   : " + m_y);
+		System.out.println("Z   : " + m_z);
+		System.out.println("NAME: " + m_name);
+		System.out.println("TYPE: " + m_type);
+		System.out.println("MXHP: " + m_hpMax);
+		System.out.println("HP  : " + m_hp);
 		
-		logDebug("-", "DONE CREATING NEW ACTOR!");
+		System.out.println(
+				//"-", 
+				"DONE CREATING NEW ACTOR!");
 	}
 	
-	public Actor(int x, int y, int z, Entity entity)
+	public Actor(int x, int y, int z, Entity entity) throws IDConflictException
 	{
-		logDebug("-", "CONVERTING ENTITY TO ACTOR");
+		System.out.println(
+				//"-", 
+				"CONVERTING ENTITY TO ACTOR");
 		
 		//TODO can i just cast this stuff or no
 		m_id = entity.getId();
@@ -87,26 +94,31 @@ public class Actor extends Entity
 		m_hpMax = entity.getHPMax();
 		m_hp = entity.getHP();
 		
-		logDebug("CONVERTED ENTITY TO ACTOR WITH FOLLOWING:");
-		logDebug("LIST: " + m_actors.get(m_id));
-		logDebug("ID  : " + m_id);
-		logDebug("X   : " + m_x);
-		logDebug("Y   : " + m_y);
-		logDebug("Z   : " + m_z);
-		logDebug("NAME: " + m_name);
-		logDebug("TYPE: " + m_type);
-		logDebug("MXHP: " + m_hpMax);
-		logDebug("HP  : " + m_hp);
-		
 		entity.kill();
+		ID.add(m_id); //after entity is killed always remember to accolate ID, duh
 		m_actors.put(m_id, this); //after kill() to make sure id is available
 		
-		logDebug("-", "DONE CONVERTING ENTITY TO ACTOR!");
+		System.out.println("CONVERTED ENTITY TO ACTOR WITH FOLLOWING:");
+		System.out.println("LIST: " + m_actors.get(m_id));
+		System.out.println("ID  : " + m_id);
+		System.out.println("X   : " + m_x);
+		System.out.println("Y   : " + m_y);
+		System.out.println("Z   : " + m_z);
+		System.out.println("NAME: " + m_name);
+		System.out.println("TYPE: " + m_type);
+		System.out.println("MXHP: " + m_hpMax);
+		System.out.println("HP  : " + m_hp);
+		
+		System.out.println(
+				//"-", 
+				"DONE CONVERTING ENTITY TO ACTOR!");
 	}
 	
 	public Actor(String filePath) throws IDConflictException, ActorIntializationException, FileNotFoundException
 	{	
-		logDebug("-", "LOADING ACTOR FROM FILE");
+		System.out.println(
+				//"-", 
+				"LOADING ACTOR FROM FILE");
 		
 		try
 		{
@@ -139,14 +151,14 @@ public class Actor extends Entity
 			}
 			
 			/* print out everything before assignment*/
-			logDebug("LOADED THE FOLLOWING:");
-			logDebug("LIST: " + m_actors.get(m_id));
-			logDebug("ID  : " + id);
-			logDebug("XYZ : " + coords);
-			logDebug("NAME: " + name);
-			logDebug("TYPE: " + type);
-			logDebug("MXHP: " + hpMax);
-			logDebug("HP  : " + hp);
+			System.out.println("LOADED THE FOLLOWING:");
+			System.out.println("LIST: " + m_actors.get(m_id));
+			System.out.println("ID  : " + id);
+			System.out.println("XYZ : " + coords);
+			System.out.println("NAME: " + name);
+			System.out.println("TYPE: " + type);
+			System.out.println("MXHP: " + hpMax);
+			System.out.println("HP  : " + hp);
 			
 			m_id = id;
 			ID.add(m_id);
@@ -164,18 +176,20 @@ public class Actor extends Entity
 			/* put into list of actors */
 			m_actors.put(m_id, this);
 			
-			logDebug("CREATED ACTOR USING ABOVE:");
-			logDebug("LIST: " + m_actors.get(m_id));
-			logDebug("ID  : " + m_id);
-			logDebug("X   : " + m_x);
-			logDebug("Y   : " + m_y);
-			logDebug("Z   : " + m_z);
-			logDebug("NAME: " + m_name);
-			logDebug("TYPE: " + m_type);
-			logDebug("MXHP: " + m_hpMax);
-			logDebug("HP  : " + m_hp);
+			System.out.println("CREATED ACTOR USING ABOVE:");
+			System.out.println("LIST: " + m_actors.get(m_id));
+			System.out.println("ID  : " + m_id);
+			System.out.println("X   : " + m_x);
+			System.out.println("Y   : " + m_y);
+			System.out.println("Z   : " + m_z);
+			System.out.println("NAME: " + m_name);
+			System.out.println("TYPE: " + m_type);
+			System.out.println("MXHP: " + m_hpMax);
+			System.out.println("HP  : " + m_hp);
 			
-			logDebug("-", "LOADING ACTOR'S INVENTORY");
+			System.out.println(
+					//"-", 
+					"LOADING ACTOR'S INVENTORY");
 			
 			for (Iterator<Element> i = root.elementIterator("inventory"); i.hasNext();)
 			{
@@ -197,7 +211,9 @@ public class Actor extends Entity
 				}
 			}
 			
-			logDebug("-", "DONE LOADING ACTOR'S INVENTORY");
+			System.out.println(
+					//"-", 
+					"DONE LOADING ACTOR'S INVENTORY");
 			
 		}
 		catch (Exception e)
@@ -208,7 +224,9 @@ public class Actor extends Entity
 		}
 		finally
 		{
-			logDebug("-", "FINISHED LOADING ACTOR FROM FILE");
+			System.out.println(
+					//"-", 
+					"FINISHED LOADING ACTOR FROM FILE");
 		}
 	}
 	
@@ -221,18 +239,20 @@ public class Actor extends Entity
 	@Override
 	public void writeSave() 
 	{
-		logDebug("-", "WRITING SAVE FOR ACTOR");
+		System.out.println(
+				//"-", 
+				"WRITING SAVE FOR ACTOR");
 		
-		logDebug("SAVING ACTOR USING FOLLOWING:");
-		logDebug("LIST: " + m_actors.get(m_id));
-		logDebug("ID  : " + m_id);
-		logDebug("X   : " + m_x);
-		logDebug("Y   : " + m_y);
-		logDebug("Z   : " + m_z);
-		logDebug("NAME: " + m_name);
-		logDebug("TYPE: " + m_type);
-		logDebug("MXHP: " + m_hpMax);
-		logDebug("HP  : " + m_hp);
+		System.out.println("SAVING ACTOR USING FOLLOWING:");
+		System.out.println("LIST: " + m_actors.get(m_id));
+		System.out.println("ID  : " + m_id);
+		System.out.println("X   : " + m_x);
+		System.out.println("Y   : " + m_y);
+		System.out.println("Z   : " + m_z);
+		System.out.println("NAME: " + m_name);
+		System.out.println("TYPE: " + m_type);
+		System.out.println("MXHP: " + m_hpMax);
+		System.out.println("HP  : " + m_hp);
 		
 		//create file (eg. ent/player[0].xml)
 		XML w = new XML(getFilePath());
@@ -267,7 +287,9 @@ public class Actor extends Entity
 		w.close();
 		//System.out.println("Wrote " + toString() +"'s inventory to " + getFilePath());
 		
-		logDebug("-", "FINISHED WRITING SAVE FOR ACTOR");
+		System.out.println(
+				//"-", 
+				"FINISHED WRITING SAVE FOR ACTOR");
 	}
 	
 	/** Refactoring from move because it just did too much in one method. */
@@ -446,10 +468,7 @@ public class Actor extends Entity
 	
 	public static boolean existsById(int id)
 	{
-		if (m_actors.containsKey(id))
-			return true;
-		else
-			return false;
+		return m_actors.containsKey(id);
 	}
 	
 	public static Actor getActorsByName(String name) throws NullPointerException
@@ -458,8 +477,8 @@ public class Actor extends Entity
 		{
 			if(m_actors.get(ID.get(i)) != null)
 			{
-				logDebug("CHECKING ID " + ID.get(i));
-				logDebug("checking " + name + " against " 
+				System.out.println("CHECKING ID " + ID.get(i));
+				System.out.println("checking " + name + " against " 
 						+ stripID(m_actors.get(ID.get(i)).toString())
 						+ " (" + m_actors.get(ID.get(i)).toString() + ")");
 				
@@ -523,6 +542,7 @@ public class Actor extends Entity
 		
 		for (int i = 0; i < ID.size(); i++)
 		{
+			//System.out.println(i);
 			if (m_actors.get(ID.get(i)) != null)
 			{
 				list[a] = "[ACTOR]" + m_actors.get(ID.get(i)).toString();
