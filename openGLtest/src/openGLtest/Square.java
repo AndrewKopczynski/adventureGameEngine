@@ -25,10 +25,9 @@ public class Square extends Shape
 	public void render()
 	{	
 		glPushMatrix();
-			glScalef(1.0f, -1.0f, 1.0f);
-			//glTranslatef(getX(), getY(), 0);
-			//glRotatef(getRot(), 0f, 0f, 1f);
-			//glTranslatef(-getX(), -getY(), 0);
+			glTranslatef(getX(), getY(), 0);
+			glRotatef(getRot(), 0f, 0f, 1f);
+			glTranslatef(-getX(), -getY(), 0);
 
 			glDisable(GL_TEXTURE_2D);
 			glColor3f(getR(),getG(),getB());
@@ -44,8 +43,8 @@ public class Square extends Shape
 		glPopMatrix();
 		
 		tx.setX(getX());
-		tx.setY(getY());
-		tx.setStr(getX()+ ", " + getY());
+		tx.setY(-getY());
+		tx.setStr(getX()+ ", " + -getY());
 		tx.Render();
 	}
 }

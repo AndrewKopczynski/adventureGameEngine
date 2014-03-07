@@ -50,7 +50,7 @@ public class Shape extends Color
 	
 	public float getY()
 	{
-		return m_y;
+		return -m_y;
 	}
 	public void setY(float y)
 	{

@@ -24,7 +24,6 @@ public class Text extends Shape
 		glEnable(GL_TEXTURE_2D);
 		
 		glPushMatrix();
-		glScalef(1.0f, -1.0f, 1.0f);
 			glTranslatef(getX(), getY(), 0);
 			glRotatef(getRot(), 0f, 0f, 1f);
 			glTranslatef(-getX(), -getY(), 0);

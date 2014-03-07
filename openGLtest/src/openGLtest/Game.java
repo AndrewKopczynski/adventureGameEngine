@@ -25,7 +25,7 @@ public class Game
 	
 	private static TrueTypeFont m_font;
 	private Square sq = new Square("it's a box!", 100, 100, 50, 50);
-	private Text tx = new Text("text1", 0, 0, 50, 50);
+	private Text tx = new Text("text1", 0, 600, 50, 50);
 
 	public static TrueTypeFont getFont()
 	{
@@ -163,14 +163,18 @@ public class Game
 		//float rot = 0.35f * getDelta();
 		
 		//System.out.println(rot);
-		tx.setStr(Mouse.getX() + ", " + Mouse.getY());
-		tx.Render();
-		
-		sq.addRot(0.10f * delta);
-		getFont().drawString(800, 600, "asd");
-		sq.setX(Mouse.getX());
-		sq.setY(-Mouse.getY());
-		sq.render();
+		glPushMatrix();
+			glScalef(1.0f, -1.0f, 1.0f);
+			
+			tx.setStr(Mouse.getX() + ", " + Mouse.getY());
+			tx.Render();
+			
+			sq.addRot(0.10f * delta);
+			getFont().drawString(800, 600, "asd");
+			sq.setX(Mouse.getX());
+			sq.setY(Mouse.getY());
+			sq.render();
+		glPopMatrix();
 	}
 	
 	public static void main(String[] args)
