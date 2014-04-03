@@ -2,10 +2,6 @@ package openGLtest;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import org.lwjgl.input.Mouse;
-import org.newdawn.slick.Color;
-import org.newdawn.slick.opengl.TextureImpl;
-
 public class Square extends Shape
 {
 	private Text tx;

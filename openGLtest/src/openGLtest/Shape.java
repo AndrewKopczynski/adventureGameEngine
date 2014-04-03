@@ -1,9 +1,5 @@
 package openGLtest;
 
-import java.awt.Font;
-
-import org.newdawn.slick.TrueTypeFont;
-
 public class Shape extends Color
 {
 	//private Origin m_origin;

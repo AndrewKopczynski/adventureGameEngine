@@ -1,0 +1,180 @@
+ENGINE REWRITE:
+
+- World should contain rooms
+- Rooms should contain entities (or other rooms maybe?)
+	- Rooms would have exits to other rooms
+	- Taking an exit in Room named "out" would lead to whatever room is attached to "out"
+	- No more coordinate based movement
+	- Rooms would still have coordinates though
+	- Can't stack rooms in other rooms with coordinates though?
+	- Could have rooms with both coordinates and those without maybe
+	- Could also have a four dimensional array for laughs, meaning [0][0][0][0] and
+	[0][0][0][1] are the same in space 3D but on different planes still
+	- probably too hard/costly to implement anyway
+	-> could just hide GPS/coordinates except for outdoor tiles or something, where they'd be pretty correct
+	-> or could leave gaps in more general tiles
+	->> imediate issue with this is that i need to add pick-and-choose-which-tiles-to-render sort of system based on the tile you're on
+	->> alternatively: ditch spatially impossible rooms
+	->>> probably a better idea
+	->>> could also go for a more dwarf fortress style of tilestuff
+	->>> probably way cooler anyway
+	->>>> TODO then: make other entities show up on the map
+	
+- Entities could contain other entities
+	- Entities are contained in tiles meaning they can get XYZ from those,
+	and do not need their own XYZ
+	-> They could "go to western tile" instead of actually incrimenting their coordinates
+
+- m_actors and m_ents are terrible ideas, and looping through them when theres a ton of actors or entities would be sloooooooooooooooooooooooooooooooooooooooooow
+	-> instead, tiles can keep track of where entities are
+	
+	
+PROPERTIES:
+
+WORLD:
+no change, arrayOfRooms.
+
+ROOM:
+X			 	(int)
+Y			 	(int)
+Z			 	(int)
+ID			 	(int)
+NAME		 	(String)
+ROOM_TYPE	 	(String for graphic, properties like isOutdoor)
+ROOM_EXIT	 	(List of Rooms that this room is connected to)
+WORLD 		 	(World)
+
+ENTITY:
+ID			 	(int)
+NAME		 	(generic string, "player", "wildDog", etc)
+MAXHP		 	(int)
+HP			 	(int)
+MAIN_LIMB		(all entities have at least a single physical limb called this)
+INVENTORY	 	(list of entities this entity has)
+ENT_TYPE	 	(ALIVE, OBJECT, ETC)
+ENT_LOCATION 	(room the entity is in)
+ENT_COLLIDES 	(true/false)
+------------------------------------------------------
+LIMB:
+CONNECTED		(list of limbs attached to this limb)
+
+CONNECTED_LIMBS:
+ATTACHED_TO		(list of limbs this limb is connected to)
+
+- All entities have a main limb for physical representation
+- This main limb can be connected to other ones
+- eg: typical person:
+
+MAIN_LIMB: UPPER_TORSO
+
+UPPER_TORSO:	{neck,
+				right_shoulder,
+				left_shoulder,
+				lower_torso}
+							
+NECK:			{upper_torso,
+				head}
+							
+RIGHT_SHOULDER:	{upper_torso,
+				right_upper_arm}
+
+RIGHT_UPPER_ARM:{right_shoulder,
+				right_elbow}
+				
+RIGHT_ELBOW:	{right_upper_arm,
+				right_lower_arm}
+				
+RIGHT_LOWER_ARM:{right_elbow,
+				right_hand}
+				
+RIGHT_HAND:		{right_lower_arm,
+				right_thumb,
+				right_digit_index,
+				right_digit_middle,
+				right_digit_ring,
+				right_digit_pinky}
+				
+RIGHT_THUMB:	{right_hand}
+RIGHT_DIGIT_INDEX: {right_hand}
+RIGHT_DIGIT_MIDDLE: {right_hand}
+RIGHT_DIGIT_RING: {right_hand}
+RIGHT_DIGIT_PINKY: {right_hand}
+				
+LEFT_SHOULDER:	{upper_torso,
+				left_upper_arm}
+
+LEFT_UPPER_ARM:{left_shoulder,
+				left_elbow}
+				
+LEFT_ELBOW:	{left_upper_arm,
+				left_lower_arm}
+				
+LEFT_LOWER_ARM:{left_elbow,
+				left_hand}
+				
+LEFT_HAND:		{left_lower_arm,
+				left_thumb,
+				left_digit_index,
+				left_digit_middle,
+				left_digit_ring,
+				left_digit_pinky}
+
+LEFT_THUMB:	{left_hand}
+LEFT_DIGIT_INDEX: {left_hand}
+LEFT_DIGIT_MIDDLE: {left_hand}
+LEFT_DIGIT_RING: {left_hand}
+LEFT_DIGIT_PINKY: {left_hand}
+				
+LOWER_TORSO:	{upper_torso,
+				right_hip,
+				left_hip}
+				
+RIGHT_HIP:		{lower_torso,
+				right_upper_leg}
+				
+RIGHT_UPPER_LEG:{right_hip,
+				right_knee}
+				
+RIGHT_KNEE:		{right_upper_leg,
+				right_lower_leg}
+				
+RIGHT_LOWER_LEG:{right_knee,
+				right_ankle}
+				
+RIGHT_ANKLE:	{right_ankle,
+				right_foot}
+
+RIGHT_FOOT:		{right_ankle
+				
+LEFT_HIP:		{lower_torso,
+				left_upper_leg}
+				
+LEFT_UPPER_LEG:	{left_hip,
+				left_knee}
+				
+LEFT_KNEE:		{left_upper_leg,
+				left_lower_leg}
+				
+LEFT_LOWER_LEG:	{left_knee,
+				left_ankle}
+				
+LEFT_ANKLE:		{left_ankle,
+				left_foot}
+
+LEFT_FOOT:		{left_ankle}
+							
+------------------------------------------------------
+CREATURES:
+NAME:		 	(personal name)
+GRAB_REACH	 	(based off of creatures' limbs, how far they can grab things/get items)
+WEPN_REACH		(based off of creatures' limbs and/or what they're holding)
+NEEDS:			(list of needs like hunger, thirst, etc. items should speicify what they satisfy)
+
+
+STATS:
+BRAWN	-	Carry weight, shove weight, melee.
+SMARTS	-	Intelligence, hommage to EG.
+REFLEX	-	Dodging, speed.
+
+
+
